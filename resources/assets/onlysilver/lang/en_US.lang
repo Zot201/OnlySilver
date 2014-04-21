@@ -1,0 +1,30 @@
+﻿
+tile.silverOre.name=Silver Ore
+tile.silverBlock.name=Silver Block
+
+item.silverIngot.name=Silver Ingot
+item.silverRod.name=Silver Rod
+
+item.silverPick.name=Silver Pickaxe
+item.silverAxe.name=Silver Axe
+item.silverShovel.name=Silver Shovel
+item.silverSword.name=Silver Sword
+item.silverHoe.name=Silver Hoe
+item.silverBow.name=Silver Bow
+
+item.silverHelm.name=Silver Helmet
+item.silverChest.name=Silver Chestplate
+item.silverLegs.name=Silver Leggings
+item.silverBoots.name=Silver Boots
+
+enchantment.onlysilver.everlasting=Everlasting
+enchantment.onlysilver.incantation=Incantation
+
+entity.onlysilver.silverGolem.name=Silver Golem
+
+achievement.silverBowAch=A New... Bow?
+achievement.silverBowAch.desc=Forge a new bow with magical properties
+
+itemGroup.tabOnlySilver=OnlySilver
+
+tips.knockbackTooltip=+Knockback
