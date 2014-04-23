@@ -1,11 +1,19 @@
 package zotmc.onlysilver.item;
 
+import static net.minecraft.enchantment.Enchantment.flame;
+import static net.minecraft.enchantment.Enchantment.infinity;
+import static net.minecraft.enchantment.Enchantment.power;
+import static net.minecraft.enchantment.Enchantment.punch;
+import static net.minecraft.enchantment.EnchantmentHelper.getEnchantmentLevel;
+import static net.minecraft.init.Items.arrow;
+import static net.minecraft.util.MathHelper.cos;
+import static net.minecraft.util.MathHelper.sin;
+
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
@@ -20,6 +28,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import org.lwjgl.opengl.GL11;
 
+import zotmc.onlysilver.Config;
 import zotmc.onlysilver.OnlySilver;
 import zotmc.onlysilver.Recipes;
 import cpw.mods.fml.relauncher.Side;
@@ -82,9 +91,9 @@ public class ItemOnlyBow extends ItemBow {
 			return;
 		
 		j = event.charge;
-		boolean flag = (player.capabilities.isCreativeMode) || (EnchantmentHelper.getEnchantmentLevel(
-						Enchantment.infinity.effectId, stack) > 0);
-		if (!flag && !player.inventory.hasItem(Items.arrow))
+		boolean inf = (player.capabilities.isCreativeMode)
+				|| (getEnchantmentLevel(infinity.effectId, stack) > 0);
+		if (!inf && !player.inventory.hasItem(arrow))
 			return;
 		
 		float f = j / 20.0F;
@@ -99,22 +108,21 @@ public class ItemOnlyBow extends ItemBow {
 		if (f == 1.0F)
 			entityarrow.setIsCritical(true);
 		
-		int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, stack);
-		if (k > 0)
-			entityarrow.setDamage(entityarrow.getDamage() + k * 0.5D + 0.5D);
+		int pow = getEnchantmentLevel(power.effectId, stack);
+		if (pow > 0)
+			entityarrow.setDamage(entityarrow.getDamage() + pow * 0.5D + 0.5D);
 		
-		int l = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, stack);
-		if (l > 0)
-			entityarrow.setKnockbackStrength(l + 2); // +2 for silver bow
+		entityarrow.setKnockbackStrength(
+				getEnchantmentLevel(punch.effectId, stack) + 2); // +2 for silver bow
 		
-		if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, stack) > 0)
+		if (getEnchantmentLevel(flame.effectId, stack) > 0)
 			entityarrow.setFire(100);
 		
 		stack.damageItem(1, player);
 		world.playSoundAtEntity(player, "random.bow", 1.0F,
 				1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
 		
-		if (flag)
+		if (inf)
 			entityarrow.canBePickedUp = 2;
 		else
 			player.inventory.consumeInventoryItem(Items.arrow);
@@ -122,6 +130,7 @@ public class ItemOnlyBow extends ItemBow {
 		if (world.isRemote)
 			return;
 		world.spawnEntityInWorld(entityarrow);
+		
 	}
 
 	@Override public int getItemEnchantability() {
@@ -133,6 +142,20 @@ public class ItemOnlyBow extends ItemBow {
 			if (OreDictionary.itemMatches(i, material, false))
 				return true;
 		return super.getIsRepairable(toolToRepair, material);
+	}
+	
+	@Override public boolean hitEntity(ItemStack stack, EntityLivingBase victim, EntityLivingBase user) {
+		if (Config.enableMeleeBow.get()) {
+			int pun = getEnchantmentLevel(punch.effectId, stack) + 2;
+			
+			double
+			x = -sin(user.rotationYaw * (float) Math.PI / 180.0F) * pun * 0.5,
+			z = cos(user.rotationYaw * (float) Math.PI / 180.0F) * pun * 0.5;
+	
+			victim.addVelocity(x, 0.1, z);
+		}
+		
+		return super.hitEntity(stack, victim, user);
 	}
 	
 }

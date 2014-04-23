@@ -1,7 +1,9 @@
 package zotmc.onlysilver;
 
+import static cpw.mods.fml.common.Loader.isModLoaded;
 import static net.minecraftforge.common.util.EnumHelper.addArmorMaterial;
 import static net.minecraftforge.common.util.EnumHelper.addToolMaterial;
+import static org.apache.logging.log4j.Level.ERROR;
 import static zotmc.onlysilver.OnlySilver.MODID;
 
 import java.lang.reflect.Method;
@@ -9,6 +11,8 @@ import java.lang.reflect.Method;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
@@ -18,6 +22,7 @@ import zotmc.onlysilver.block.BlockOnlySilver;
 import zotmc.onlysilver.block.BlockOnlyStorage;
 import zotmc.onlysilver.enchantment.EnchEverlasting;
 import zotmc.onlysilver.enchantment.EnchIncantation;
+import zotmc.onlysilver.entity.EntitySilverGolem;
 import zotmc.onlysilver.item.ItemOnlyArmor;
 import zotmc.onlysilver.item.ItemOnlyAxe;
 import zotmc.onlysilver.item.ItemOnlyBow;
@@ -26,24 +31,26 @@ import zotmc.onlysilver.item.ItemOnlyIngot;
 import zotmc.onlysilver.item.ItemOnlyPickaxe;
 import zotmc.onlysilver.item.ItemOnlySpade;
 import zotmc.onlysilver.item.ItemOnlySword;
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class Contents extends Config {
 	
+	static final String ERR_MSG = "[%s] An error occurred while trying to access the %s contents!";
+	
 	static void init() {
 		initBlocks();
 		initItems();
-		initEnchs();
+
+		if (isModLoaded("weaponmod"))
+			initBalkon();
 		
-		/*
-		if (enableBalkon.get() && Loader.isModLoaded("weaponmod"))
-			try {
-				ContentsBalkon.init();
-			} catch (Exception e) {
-				FMLLog.log(Level.ERROR, e,
-						"[%s] An error occurred while trying to access the weapon mod contents!", NAME);
-			}
-		*/
+		initEnchs();
+		initEntities();
+		
+		if (isModLoaded("Thaumcraft"))
+			initThaum();
 		
 		
 		try {
@@ -51,7 +58,7 @@ public class Contents extends Config {
 			m.setAccessible(true);
 			m.invoke(null);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Fatal Error", e);
 		}
 		
 	}
@@ -190,6 +197,41 @@ public class Contents extends Config {
 		
 	}
 	
+	
+	
+	
+	private static void initEntities() {
+		EntityRegistry.registerModEntity(EntitySilverGolem.class,
+				"silverGolem", 0, OnlySilver.instance, 64, 1, true);
+		
+		// re-map a mistaken previous name to the right one
+		Raws.<String, Class<? extends Entity>>castRaw(
+				EntityList.stringToClassMapping)
+					.put("onlysilver.onlysilver.silverGolem", EntitySilverGolem.class);
+		
+	}
+	
+	private static void initBalkon() {
+		try {
+			ContentsBalkon.init();
+			
+		} catch (Exception e) {
+			FMLLog.log(ERROR, e,
+					ERR_MSG, OnlySilver.NAME, "Weaponmod");
+		}
+		
+	}
+	
+	private static void initThaum() {
+		try {
+			ContentsThaum.init();
+			
+		} catch (Exception e) {
+			FMLLog.log(ERROR, e,
+					ERR_MSG, OnlySilver.NAME, "Thaumcraft");
+		}
+		
+	}
 	
 
 }

@@ -8,6 +8,7 @@ import static cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.DIME
 import static cpw.mods.fml.relauncher.Side.CLIENT;
 import static cpw.mods.fml.relauncher.Side.SERVER;
 import static net.minecraft.enchantment.EnchantmentHelper.getEnchantmentLevel;
+import static net.minecraft.enchantment.EnumEnchantmentType.breakable;
 import static zotmc.onlysilver.OnlySilver.channels;
 import static zotmc.onlysilver.OnlySilver.proxy;
 import static zotmc.onlysilver.Reflections.dropBlockAsItem;
@@ -19,7 +20,6 @@ import static zotmc.onlysilver.handler.JoinWorldHandler.HANDLED_KEY;
 import java.util.Map;
 
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,6 +29,7 @@ import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import zotmc.onlysilver.api.OnlySilverRegistry.InUseWeapon;
 import zotmc.onlysilver.handler.ChannelHandler.EverlastingMessage;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -39,7 +40,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class EnchEverlasting extends Enchantment {
 
 	public EnchEverlasting(int id) {
-		super(id, 5, EnumEnchantmentType.breakable);
+		super(id, 5, null);
 		
 		MinecraftForge.EVENT_BUS.register(this);
 		proxy.fmlEventBusClientRegister(this);
@@ -65,7 +66,7 @@ public class EnchEverlasting extends Enchantment {
 	}
 	
 	@Override public boolean canApplyAtEnchantingTable(ItemStack item) {
-		return canApply(item) && isSilverItem(item);
+		return breakable.canEnchantItem(item.getItem()) && isSilverItem(item);
 	}
 	
 	@Override public boolean isAllowedOnBooks() {
@@ -103,20 +104,17 @@ public class EnchEverlasting extends Enchantment {
 			return;
 		
 		InUseWeapon iuw = getWeapon(event.source);
+		Optional<ItemStack> weapon = iuw.getItem();
 		
-		if (iuw != null) {
-			ItemStack weapon = iuw.get();
+		if (weapon.isPresent() && weapon.get().stackSize > 0) {
+			int lvl = getEnchantmentLevel(effectId, weapon.get());
 			
-			if (weapon != null && weapon.stackSize > 0) {
-				int lvl = getEnchantmentLevel(effectId, weapon);
-				
-				if (lvl > 0)
-					for (EntityItem ei : event.drops) {
-						processEntityItem(false, ei);
-						dispatchMessage(false, ei);
-					}
-				
-			}
+			if (lvl > 0)
+				for (EntityItem ei : event.drops) {
+					processEntityItem(false, ei);
+					dispatchMessage(false, ei);
+				}
+			
 		}
 
 	}
@@ -171,10 +169,13 @@ public class EnchEverlasting extends Enchantment {
 	}
 	
 	private void dispatchMessage(boolean increaseLifespan, EntityItem ei) {
-		channels.get(SERVER).attr(FML_MESSAGETARGET).set(DIMENSION);
-		channels.get(SERVER).attr(FML_MESSAGETARGETARGS).set(ei.worldObj.provider.dimensionId);
+		channels.get(SERVER)
+			.attr(FML_MESSAGETARGET).set(DIMENSION);
+		channels.get(SERVER)
+			.attr(FML_MESSAGETARGETARGS).set(ei.worldObj.provider.dimensionId);
 		
-		channels.get(SERVER).writeOutbound(new EverlastingMessage(increaseLifespan, ei.getEntityId()));
+		channels.get(SERVER)
+			.writeOutbound(new EverlastingMessage(increaseLifespan, ei.getEntityId()));
 		
 	}
 	

@@ -31,7 +31,8 @@ public class Config {
 	silverBlockPrioritize	= ofBoolean(true, GENERAL_CAT, "Prioritize Silver Block Recipe",
 			"Set this true if you find that you cannot create a silver golem with the silver blocks you have."),
 	akkamaddiJoinWorld		= ofBoolean(true, GENERAL_CAT, "Enable 'Akkamaddi Style' Mob Equip Spawning"),
-	enableBalkon			= ofBoolean(true, GENERAL_CAT, "Enable Balkon's Weapon Mod Add-on Items");
+	//enableBalkon			= ofBoolean(true, GENERAL_CAT, "Enable Balkon's Weapon Mod Add-on Items"),
+	enableMeleeBow			= ofBoolean(true, GENERAL_CAT, "Enable silver bow with melee knockback");
 	
 	public static final Configurable<String[]>
 	oreGenerationProfile	= ofStringList(new String[] {
@@ -98,6 +99,7 @@ public class Config {
 					silverBlockPrioritize,
 					akkamaddiJoinWorld,
 					//enableBalkon,
+					enableMeleeBow,
 					
 					oreGenerationProfile,
 					blockDefinitions,

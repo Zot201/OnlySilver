@@ -1,6 +1,7 @@
 package zotmc.onlysilver.enchantment;
 
 import static net.minecraft.enchantment.EnchantmentHelper.getEnchantmentLevel;
+import static net.minecraft.enchantment.EnumEnchantmentType.digger;
 import static zotmc.onlysilver.Contents.everlasting;
 import static zotmc.onlysilver.api.OnlySilverRegistry.getWeapon;
 import static zotmc.onlysilver.api.OnlySilverRegistry.isSilverItem;
@@ -14,7 +15,6 @@ import java.util.Random;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
@@ -25,12 +25,15 @@ import net.minecraft.util.WeightedRandom;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import zotmc.onlysilver.api.OnlySilverRegistry.InUseWeapon;
+
+import com.google.common.base.Optional;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EnchIncantation extends Enchantment {
 
 	public EnchIncantation(int id) {
-		super(id, 1, EnumEnchantmentType.digger);
+		super(id, 1, null);
 		
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -50,7 +53,8 @@ public class EnchIncantation extends Enchantment {
 	}
 	
 	@Override public boolean canApply(ItemStack item) {
-		return (item.getItem() instanceof ItemSword || super.canApply(item)) && isSilverItem(item);
+		return (item.getItem() instanceof ItemSword || digger.canEnchantItem(item.getItem()))
+				&& isSilverItem(item);
 	}
 	
 	@Override public boolean isAllowedOnBooks() {
@@ -66,44 +70,40 @@ public class EnchIncantation extends Enchantment {
 			return;
 		
 		InUseWeapon iuw = getWeapon(event.source);
+		Optional<ItemStack> weapon = iuw.getItem();
 		
-		if (iuw != null) {
-			ItemStack weapon = iuw.get();
-			EntityLivingBase user = iuw.getUser();
+		if (weapon.isPresent() && weapon.get().stackSize > 0) {
+			Optional<EntityLivingBase> user = iuw.getUser();
+			int lvl = getEnchantmentLevel(effectId, weapon.get());
 			
-			if (weapon != null && weapon.stackSize > 0) {
-				int lvl = getEnchantmentLevel(effectId, weapon);
+			if (lvl > 0) {
+				int factor = lvl * 10 - 5;
 				
-				if (lvl > 0) {
-					int factor = lvl * 10 - 5;
+				boolean damaged = false;
+				for (EntityItem ei : event.drops) {
+					ItemStack item = ei.getEntityItem();
 					
-					boolean damaged = false;
-					for (EntityItem ei : event.drops) {
-						ItemStack item = ei.getEntityItem();
+					if (!item.isItemEnchanted() && item.isItemEnchantable()) {
+						addRandomEnchantment(rand, item, factor);
+						ei.setEntityItemStack(item);
 						
-						if (!item.isItemEnchanted() && item.isItemEnchantable()) {
-							addRandomEnchantment(rand, item, factor);
-							ei.setEntityItemStack(item);
-							
-							if (user != null)
-								weapon.damageItem(factor * 2, user);
-							else
-								weapon.attemptDamageItem(factor * 2, rand);
-							
-							damaged = true;
-							
-							if (weapon.stackSize <= 0)
-								break;
-						}
+						if (user.isPresent())
+							weapon.get().damageItem(factor * 2, user.get());
+						else
+							weapon.get().attemptDamageItem(factor * 2, rand);
+						
+						damaged = true;
+						
+						if (weapon.get().stackSize <= 0)
+							break;
 					}
-					
-					if (damaged)
-						iuw.update(weapon);
-					
 				}
+				
+				if (damaged)
+					iuw.update(weapon.get().stackSize > 0 ?
+							weapon.get() : null);
+				
 			}
-			
-			
 		}
 		
 	}
