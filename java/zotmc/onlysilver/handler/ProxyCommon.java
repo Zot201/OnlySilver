@@ -1,18 +1,20 @@
 package zotmc.onlysilver.handler;
 
-import static zotmc.onlysilver.Achievements.silverBowAch;
-import static zotmc.onlysilver.Config.akkamaddiJoinWorld;
-import static zotmc.onlysilver.Contents.silverBow;
+import static zotmc.onlysilver.Contents.silverBowAchievement;
+import static zotmc.onlysilver.item.Instrumentum.silverBow;
 import net.minecraftforge.common.MinecraftForge;
+import zotmc.onlysilver.config.Config;
+import zotmc.onlysilver.oregen.OnlySilverOreGen;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
+import cpw.mods.fml.common.registry.GameRegistry;
 
 public class ProxyCommon {
 	
 	@SubscribeEvent public void onItemCrafted(ItemCraftedEvent event) {
 		if (event.crafting.getItem() == silverBow.get())
-			event.player.addStat(silverBowAch.get(), 1);
+			event.player.addStat(silverBowAchievement.get(), 1);
 	}
 	
 	
@@ -21,8 +23,10 @@ public class ProxyCommon {
 	}
 
 	public void registerHandlers() {
+		GameRegistry.registerWorldGenerator(OnlySilverOreGen.INSTANCE, 0);
+		
 		FMLCommonHandler.instance().bus().register(this);
-		MinecraftForge.EVENT_BUS.register(new JoinWorldHandler(akkamaddiJoinWorld.get()));
+		MinecraftForge.EVENT_BUS.register(new JoinWorldHandler(Config.current().enableAkka.get()));
 		
 	}
 	

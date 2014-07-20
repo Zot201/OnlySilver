@@ -1,22 +1,24 @@
 package zotmc.onlysilver.handler;
 
-import static zotmc.onlysilver.Contents.silverAxe;
-import static zotmc.onlysilver.Contents.silverHoe;
-import static zotmc.onlysilver.Contents.silverPick;
-import static zotmc.onlysilver.Contents.silverShovel;
-import static zotmc.onlysilver.Contents.silverSword;
+import static net.minecraft.entity.SharedMonsterAttributes.attackDamage;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.BaseAttributeMap;
+import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import zotmc.onlysilver.OnlySilver;
 import zotmc.onlysilver.entity.EntitySilverGolem;
+import zotmc.onlysilver.item.Instrumentum;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 
@@ -25,25 +27,23 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 public class WerewolfHandler {
 	
 	private final Class<?> werewolf;
-	private final Invokable<EntityLivingBase, Boolean> isHumanForm;
-	
+	private final Method getIsHumanForm;
 	public WerewolfHandler() throws ClassNotFoundException, NoSuchMethodException, SecurityException {
 		werewolf = Class.forName("drzhark.mocreatures.entity.monster.MoCEntityWerewolf");
-		isHumanForm = TypeToken.of(EntityLivingBase.class)
-					.method(werewolf.getMethod("getIsHumanForm"))
-					.returning(Boolean.class);
+		getIsHumanForm = werewolf.getMethod("getIsHumanForm");
 	}
 	
-	private boolean isWerewolfInWolfForm(EntityLivingBase entityLiving) {
+	protected boolean isWerewolfInWolfForm(EntityLivingBase entityLiving) {
 		try {
-			return werewolf.isInstance(entityLiving) && !isHumanForm.invoke(entityLiving);
-		} catch (InvocationTargetException ignored) {
-		} catch (IllegalAccessException ignored) { }
+			return werewolf.isInstance(entityLiving) && !(Boolean) getIsHumanForm.invoke(entityLiving);
+		} catch (InvocationTargetException | IllegalAccessException e) {
+			OnlySilver.instance.log.catching(e);
+		}
 		
 		return false;
 	}
 	
-	private Random rand = new Random();
+	protected final Random rand = new Random();
 	@SubscribeEvent public void onLivingHurt(LivingHurtEvent event) {
 		if (!isWerewolfInWolfForm(event.entityLiving))
 			return;
@@ -58,22 +58,33 @@ public class WerewolfHandler {
 			return;
 		}
 		
-		ItemStack stack = ((EntityLivingBase) entity).getHeldItem();
-		if (stack == null)
+		ItemStack item = ((EntityLivingBase) entity).getHeldItem();
+		if (item == null)
 			return;
 		
-		Item item = stack.getItem();
-		if (item == silverHoe.get())
-			event.ammount = 6;
-		else if (item == silverShovel.get())
-			event.ammount = 7;
-		else if (item == silverPick.get())
-			event.ammount = 8;
-		else if (item == silverAxe.get())
-			event.ammount = 9;
-		else if (item == silverSword.get())
-			event.ammount = 10;
+		Float amount = damages.get(item.getItem());
+		if (amount != null)
+			event.ammount = amount;
 		
+	}
+	
+	protected final ImmutableMap<Item, Float> damages;
+	{
+		ImmutableMap.Builder<Item, Float> damages = ImmutableMap.builder();
+		for (Instrumentum inst : Instrumentum.values())
+			if (inst.exists() && inst.isTool()) {
+				BaseAttributeMap attrs = new ServersideAttributeMap();
+				attrs.registerAttribute(attackDamage);
+				attrs.applyAttributeModifiers(new ItemStack(inst.get()).getAttributeModifiers());
+				
+				float damage = (float) attrs.getAttributeInstance(attackDamage).getAttributeValue();
+				if (damage < 5)
+					damage = (damage + 16) / 3;
+				else
+					damage += 2;
+				damages.put(inst.get(), damage);
+			}
+		this.damages = damages.build();
 	}
 	
 }

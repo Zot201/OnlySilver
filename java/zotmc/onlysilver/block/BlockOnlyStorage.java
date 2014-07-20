@@ -4,20 +4,21 @@ import static net.minecraft.init.Blocks.air;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPumpkin;
 import net.minecraft.block.material.Material;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import zotmc.onlysilver.entity.EntitySilverGolem;
 
-public class BlockOnlyStorage extends BlockOnlySilver {
+public class BlockOnlyStorage extends Block {
 
-	public BlockOnlyStorage(Material material, String loc) {
-		super(material, loc);
+	public BlockOnlyStorage(Material material) {
+		super(material);
 	}
 	
-	public int newMetadata(World world, int x, int y, int z) {
+	private int newMetadata(World world, int x, int y, int z) {
 		return world.getBlock(x, y + 1, z) instanceof BlockPumpkin ? 1 : 0;
 	}
-	public void setMetadata(World world, int x, int y, int z, int newMeta) {
-		world.setBlockMetadataWithNotify(x, y, z, newMeta, 4); // 0b100
+	private void setMetadata(World world, int x, int y, int z, int newMeta) {
+		world.setBlockMetadataWithNotify(x, y, z, newMeta, 0b100);
 	}
 	
 	@Override public void onBlockAdded(World world, int x, int y, int z) {
@@ -90,6 +91,11 @@ public class BlockOnlyStorage extends BlockOnlySilver {
 			world.notifyBlockChange(x, y - 1, z - 1, air);
 			world.notifyBlockChange(x, y - 1, z + 1, air);
 		}
+	}
+	
+	@Override public boolean isBeaconBase(IBlockAccess worldObj,
+			int x, int y, int z, int beaconX, int beaconY, int beaconZ) {
+		return true;
 	}
 
 }

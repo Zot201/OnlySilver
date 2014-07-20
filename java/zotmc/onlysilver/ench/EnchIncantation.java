@@ -1,6 +1,7 @@
-package zotmc.onlysilver.enchantment;
+package zotmc.onlysilver.ench;
 
 import static net.minecraft.enchantment.EnchantmentHelper.getEnchantmentLevel;
+import static net.minecraft.enchantment.EnumEnchantmentType.all;
 import static net.minecraft.enchantment.EnumEnchantmentType.digger;
 import static zotmc.onlysilver.Contents.everlasting;
 import static zotmc.onlysilver.api.OnlySilverRegistry.getWeapon;
@@ -33,7 +34,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 public class EnchIncantation extends Enchantment {
 
 	public EnchIncantation(int id) {
-		super(id, 1, null);
+		super(id, 1, all);
 		
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -83,7 +84,7 @@ public class EnchIncantation extends Enchantment {
 				for (EntityItem ei : event.drops) {
 					ItemStack item = ei.getEntityItem();
 					
-					if (!item.isItemEnchanted() && item.isItemEnchantable()) {
+					if (item != null && !item.isItemEnchanted() && item.isItemEnchantable()) {
 						addRandomEnchantment(rand, item, factor);
 						ei.setEntityItemStack(item);
 						

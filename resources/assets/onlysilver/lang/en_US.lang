@@ -11,11 +11,23 @@ item.silverShovel.name=Silver Shovel
 item.silverSword.name=Silver Sword
 item.silverHoe.name=Silver Hoe
 item.silverBow.name=Silver Bow
-
 item.silverHelm.name=Silver Helmet
 item.silverChest.name=Silver Chestplate
 item.silverLegs.name=Silver Leggings
 item.silverBoots.name=Silver Boots
+
+item.silverHammer.name=Silver Hammer
+item.silverScythe.name=Silver Scythe
+
+item.silverSpear.name=Silver Spear
+item.silverHalberd.name=Silver Halberd
+item.silverBattleaxe.name=Silver Battleaxe
+item.silverKnife.name=Silver Knife
+item.silverWarhammer.name=Silver Warhammer
+item.silverFlail.name=Silver Flail
+item.silverKatana.name=Silver Katana
+item.silverBoomerang.name=Silver Boomerang
+item.silverBayonetMusket.name=Musket with Silver Bayonet
 
 enchantment.onlysilver.everlasting=Everlasting
 enchantment.onlysilver.incantation=Incantation

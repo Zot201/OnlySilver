@@ -51,9 +51,6 @@ public class EntitySilverGolem extends EntityIronGolem {
 	}
 	
 	@Override public void playSound(String sound, float volume, float pitch) {
-		if (sound.equals("none"))
-			return; // No more "Unable to play unknown soundEvent: minecraft:none" logs
-		
 		if (!sound.equals("mob.irongolem.throw"))
 			volume *= 1.6271853423385485683250586869705F;
 		

@@ -1,12 +1,12 @@
 package zotmc.onlysilver.api;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static zotmc.onlysilver.api.OnlySilverAPI.silverIngot;
 
 import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
@@ -18,10 +18,6 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 
 public class OnlySilverRegistry {
-
-	public static void registerWeaponFunction(String damageType, Function<DamageSource, InUseWeapon> function) {
-		weaponFunctions.put(damageType, function);
-	}
 	
 	public interface InUseWeapon {
 		
@@ -33,6 +29,28 @@ public class OnlySilverRegistry {
 		
 	}
 	
+	private static final ListMultimap<String, Function<DamageSource, InUseWeapon>>
+	weaponFunctions = ArrayListMultimap.create();
+	
+	private static final List<Predicate<ItemStack>>
+	silverItemPredicates = Lists.newArrayList();
+	
+	
+	
+	public static void registerWeaponFunction(
+			String damageType, Function<DamageSource, InUseWeapon> function) {
+		weaponFunctions.put(damageType, function);
+	}
+	
+	@Deprecated public static void registerSilverItemPredicate(Predicate<ItemStack> isSilverItem) {
+		registerSilverItems(isSilverItem);
+	}
+	public static void registerSilverItems(Predicate<ItemStack> isSilverItem) {
+		silverItemPredicates.add(checkNotNull(isSilverItem));
+	}
+	
+	
+	
 	public static InUseWeapon getWeapon(DamageSource damage) {
 		InUseWeapon ret;
 		for (Function<DamageSource, InUseWeapon> f : weaponFunctions.get(damage.damageType))
@@ -42,9 +60,19 @@ public class OnlySilverRegistry {
 		return ABSENT_WEAPON;
 	}
 	
+	public static boolean isSilverItem(ItemStack item) {
+		if (item == null)
+			return false;
+		
+		for (Predicate<ItemStack> p : silverItemPredicates)
+			if (p.apply(item))
+				return true;
+		return false;
+	}
 	
-	private static final ListMultimap<String, Function<DamageSource, InUseWeapon>>
-	weaponFunctions = ArrayListMultimap.create();
+	
+	
+	
 	
 	private static final InUseWeapon ABSENT_WEAPON = new InUseWeapon() {
 		@Override public Optional<EntityLivingBase> getUser() {
@@ -54,6 +82,10 @@ public class OnlySilverRegistry {
 			return Optional.absent();
 		}
 		@Override public void update(ItemStack item) { }
+		
+		@Override public String toString() {
+			return "[No Weapons Defined]";
+		}
 	};
 	
 	static {
@@ -73,10 +105,16 @@ public class OnlySilverRegistry {
 						}
 						@Override public void update(ItemStack item) {
 							// TODO: find a way to disarm a mob without causing a ConcurrentModificationException.
-							/*
-							if (item == null && !(elb instanceof EntityPlayer))
-								elb.setCurrentItemOrArmor(0, null);
-								*/
+							if (elb instanceof EntityPlayer)
+								elb.setCurrentItemOrArmor(0, item);
+							else if (item == null)
+								elb.getHeldItem().stackSize = 0;
+							else
+								elb.setCurrentItemOrArmor(0, item);
+						}
+						@Override public String toString() {
+							return String.format("[%s held by %s]",
+									getItem().orNull(), getUser().orNull());
 						}
 					};
 				}
@@ -91,35 +129,4 @@ public class OnlySilverRegistry {
 	}
 	
 	
-	
-	
-	
-	public static void registerSilverItemPredicate(Predicate<ItemStack> predicate) {
-		silverItemPredicates.add(checkNotNull(predicate));
-	}
-	
-	public static boolean isSilverItem(ItemStack item) {
-		if (item == null)
-			return false;
-		
-		for (Predicate<ItemStack> p : silverItemPredicates)
-			if (p.apply(item))
-				return true;
-		return false;
-	}
-	
-	
-	private static final List<Predicate<ItemStack>>
-	silverItemPredicates = Lists.newArrayList();
-	
-	static {
-		registerSilverItemPredicate(new Predicate<ItemStack>() {
-			@Override public boolean apply(ItemStack input) {
-				return input.getItem().getIsRepairable(input, new ItemStack(silverIngot.get()));
-			}
-		});
-		
-	}
-	
-
 }

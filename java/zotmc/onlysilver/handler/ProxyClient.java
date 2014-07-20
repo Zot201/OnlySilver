@@ -1,6 +1,6 @@
 package zotmc.onlysilver.handler;
 
-import static zotmc.onlysilver.Contents.silverBow;
+import static zotmc.onlysilver.item.Instrumentum.silverBow;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.common.MinecraftForge;

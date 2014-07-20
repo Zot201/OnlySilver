@@ -5,11 +5,11 @@ import static net.minecraftforge.common.ChestGenHooks.PYRAMID_DESERT_CHEST;
 import static net.minecraftforge.common.ChestGenHooks.PYRAMID_JUNGLE_CHEST;
 import static net.minecraftforge.common.ChestGenHooks.VILLAGE_BLACKSMITH;
 import static net.minecraftforge.common.ChestGenHooks.getInfo;
-import static zotmc.onlysilver.Contents.silverBoots;
-import static zotmc.onlysilver.Contents.silverChest;
-import static zotmc.onlysilver.Contents.silverHelm;
 import static zotmc.onlysilver.Contents.silverIngot;
-import static zotmc.onlysilver.Contents.silverLegs;
+import static zotmc.onlysilver.item.Instrumentum.silverBoots;
+import static zotmc.onlysilver.item.Instrumentum.silverChest;
+import static zotmc.onlysilver.item.Instrumentum.silverHelm;
+import static zotmc.onlysilver.item.Instrumentum.silverLegs;
 import net.minecraft.item.Item;
 import net.minecraft.util.WeightedRandomChestContent;
 

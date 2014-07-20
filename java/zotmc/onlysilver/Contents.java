@@ -1,10 +1,8 @@
 package zotmc.onlysilver;
 
 import static cpw.mods.fml.common.Loader.isModLoaded;
-import static net.minecraftforge.common.util.EnumHelper.addArmorMaterial;
-import static net.minecraftforge.common.util.EnumHelper.addToolMaterial;
-import static org.apache.logging.log4j.Level.ERROR;
 import static zotmc.onlysilver.OnlySilver.MODID;
+import static zotmc.onlysilver.item.Instrumentum.silverBow;
 
 import java.lang.reflect.Method;
 
@@ -12,226 +10,252 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
-import zotmc.onlysilver.Content.ItemContent;
-import zotmc.onlysilver.api.OnlySilverAPI;
-import zotmc.onlysilver.block.BlockOnlySilver;
+import net.minecraft.item.ItemStack;
+import net.minecraft.stats.Achievement;
+import net.minecraft.stats.AchievementList;
+import net.minecraft.util.DamageSource;
+import zotmc.onlysilver.api.OnlySilverRegistry;
+import zotmc.onlysilver.api.OnlySilverRegistry.InUseWeapon;
 import zotmc.onlysilver.block.BlockOnlyStorage;
-import zotmc.onlysilver.enchantment.EnchEverlasting;
-import zotmc.onlysilver.enchantment.EnchIncantation;
+import zotmc.onlysilver.config.Config;
+import zotmc.onlysilver.ench.EnchEverlasting;
+import zotmc.onlysilver.ench.EnchIncantation;
 import zotmc.onlysilver.entity.EntitySilverGolem;
-import zotmc.onlysilver.item.ItemOnlyArmor;
-import zotmc.onlysilver.item.ItemOnlyAxe;
-import zotmc.onlysilver.item.ItemOnlyBow;
-import zotmc.onlysilver.item.ItemOnlyHoe;
+import zotmc.onlysilver.item.Instrumentum;
 import zotmc.onlysilver.item.ItemOnlyIngot;
-import zotmc.onlysilver.item.ItemOnlyPickaxe;
-import zotmc.onlysilver.item.ItemOnlySpade;
-import zotmc.onlysilver.item.ItemOnlySword;
-import cpw.mods.fml.common.FMLLog;
+import zotmc.onlysilver.util.Dynamic;
+import zotmc.onlysilver.util.Dynamic.Refer;
+import zotmc.onlysilver.util.Reserve;
+import zotmc.onlysilver.util.Utils;
+
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
+
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-public class Contents extends Config {
+public class Contents {
 	
-	static final String ERR_MSG = "[%s] An error occurred while trying to access the %s contents!";
+	public static final Reserve<Block>
+	silverOre = Reserve.absent(),
+	silverBlock = Reserve.absent();
+	
+	public static final Reserve<Item>
+	silverIngot = Reserve.absent(),
+	silverRod = Reserve.absent();
+	
+	public static final Reserve<ToolMaterial>
+	toolSilver = Reserve.absent();
+	public static final Reserve<ArmorMaterial>
+	armorSilver = Reserve.absent();
+	public static final Reserve<Integer>
+	rendererPrefix = Reserve.absent();
+	
+	public static final Reserve<EnchEverlasting>
+	everlasting = Reserve.absent();
+	public static final Reserve<Enchantment>
+	incantation = Reserve.absent();
+	
+	public static final Reserve<Achievement>
+	silverBowAchievement = Reserve.absent();
+	
 	
 	static void init() {
-		initBlocks();
-		initItems();
+		silverOre.set(register(
+				new Block(Material.rock) { }
+					.setBlockName("silverOre")
+					.setBlockTextureName(OnlySilver.MODID + ":silverOre")
+					.setCreativeTab(OnlySilver.instance.tabOnlySilver)
+		));
+		Config.current().silverOre.get().setStatTo(silverOre, "pickaxe");
+		
+		silverBlock.set(register(
+				new BlockOnlyStorage(Material.iron)
+					.setBlockName("silverBlock")
+					.setBlockTextureName(OnlySilver.MODID + ":silverBlock")
+					.setCreativeTab(OnlySilver.instance.tabOnlySilver)
+		));
+		Config.current().silverBlock.get().setStatTo(silverBlock, null);
+		
+		silverIngot.set(register(
+				new ItemOnlyIngot("silverIngot")
+		));
+		silverRod.set(register(
+				new ItemOnlyIngot("silverRod")
+		));
+		
+		
+		toolSilver.set(Config.current().toolSilver.get().addToolMaterial("SILVER"));
+		armorSilver.set(Config.current().armorSilver.get().addArmorMaterial("SILVER"));
+		rendererPrefix.set(OnlySilver.proxy.addArmor("silver"));
+		
+		armorSilver.get().customCraftingMaterial = silverIngot.get();
+        toolSilver.get().customCraftingMaterial = silverIngot.get();
+        
+        
+        init(Instrumentum.class);
+        
+        
+		
+        Config.current().everlasting.get()
+        	.addEnchantment(everlasting, EnchEverlasting.class, MODID + ".everlasting");
+        Config.current().incantation.get()
+    		.addEnchantment(incantation, EnchIncantation.class, MODID + ".incantation");
+		
 
+		EntityRegistry.registerModEntity(EntitySilverGolem.class,
+				"silverGolem", 0, OnlySilver.instance, 64, 1, true);
+		Utils.EntityLists.stringToClassMapping()
+			.put("onlysilver.onlysilver.silverGolem", EntitySilverGolem.class); // re-map a mistaken previous name
+		
+		
+		silverBowAchievement.set(
+				new Achievement("silverBowAch", "silverBowAch", 6, 5,
+						silverBow.get(), AchievementList.acquireIron
+				).registerStat()
+		);
+        
+        
 		if (isModLoaded("weaponmod"))
 			initBalkon();
-		
-		initEnchs();
-		initEntities();
 		
 		if (isModLoaded("Thaumcraft"))
 			initThaum();
 		
 		
-		try {
-			Method m = OnlySilverAPI.class.getDeclaredMethod("init");
-			m.setAccessible(true);
-			m.invoke(null);
-		} catch (Exception e) {
-			throw new RuntimeException("Fatal Error", e);
-		}
 		
-	}
-	
-	
-	
-	
-	public static final Content<Block>
-	silverOre = Content.absent(),
-	silverBlock = Content.absent();
-	
-	
-	private static void initBlocks() {
-		silverOre.set(register(
-				new BlockOnlySilver(Material.rock, "silverOre")
-					.setHardness(silverOreHardness.get())
-					.setResistance(silverOreResistance.get())
-					.setBlockName("silverOre")));
-		silverOre.get().setHarvestLevel("pickaxe", silverOreHarvestLevel.get());
+		init(InitApi.class);
 		
-		silverBlock.set(register(
-				new BlockOnlyStorage(Material.iron, "silverBlock")
-					.setHardness(silverBlockHardness.get())
-					.setResistance(silverBlockResistance.get())
-					.setBlockName("silverBlock")));
 	}
 	
 	private static Block register(Block block) {
 		return GameRegistry.registerBlock(block, block.getUnlocalizedName().substring(5)); // without "tile."
 	}
-	
-	
-	
-	
-	public static Content<ToolMaterial>
-	toolSilver = Content.absent();
-	
-	public static Content<ArmorMaterial>
-	armorSilver = Content.absent();
-	
-	public static final ItemContent<Item>
-	silverIngot = Content.absentItem(),
-	silverRod = Content.absentItem(),
-	silverPick = Content.absentItem(),
-	silverAxe = Content.absentItem(),
-	silverShovel = Content.absentItem(),
-	silverSword = Content.absentItem(),
-	silverHoe = Content.absentItem(),
-	silverBow = Content.absentItem(),
-	silverHelm = Content.absentItem(),
-	silverChest = Content.absentItem(),
-	silverLegs = Content.absentItem(),
-	silverBoots = Content.absentItem(),
-	
-	silverSpear = Content.absentItem(),
-	silverHalberd = Content.absentItem(),
-	silverBattleaxe = Content.absentItem(),
-	silverKnife = Content.absentItem(),
-	silverWarhammer = Content.absentItem(),
-	silverFlail = Content.absentItem(),
-	silverKatana = Content.absentItem(),
-	silverBoomerang = Content.absentItem(),
-	silverBayonetMusket = Content.absentItem();
-	
-	
-	
-	private static void initItems() {
-		toolSilver.set(addToolMaterial("SILVER",
-				silverHarvestLevel.get(),
-				silverMaxUses.get(),
-				silverEfficiency.get(),
-				silverDamage.get(),
-				silverEnchant.get()));
-		armorSilver.set(addArmorMaterial("SILVER",
-				silverArmorDurability.get(),
-				silverArmorReduction.get(),
-				silverArmorEnchant.get()));
-		
-		
-		silverIngot.set(register(
-				new ItemOnlyIngot("silverIngot").setUnlocalizedName("silverIngot")));
-		silverRod.set(register(
-				new ItemOnlyIngot("silverRod").setUnlocalizedName("silverRod")));
-		
-		silverPick.set(register(
-				new ItemOnlyPickaxe(toolSilver.get(), "silverPick").setUnlocalizedName("silverPick")));
-		silverAxe.set(register(
-				new ItemOnlyAxe(toolSilver.get(), "silverAxe").setUnlocalizedName("silverAxe")));
-		silverShovel.set(register(
-				new ItemOnlySpade(toolSilver.get(), "silverShovel").setUnlocalizedName("silverShovel")));
-		silverSword.set(register(
-				new ItemOnlySword(toolSilver.get(), "silverSword").setUnlocalizedName("silverSword")));
-		silverHoe.set(register(
-				new ItemOnlyHoe(toolSilver.get(), "silverHoe").setUnlocalizedName("silverHoe")));
-		silverBow.set(register(
-				new ItemOnlyBow(500).setFull3D().setUnlocalizedName("silverBow")));
-		
-		
-		int render = OnlySilver.proxy.addArmor("silver");
-		silverHelm.set(register(
-				new ItemOnlyArmor(armorSilver.get(), render, 0, "silverHelm").setUnlocalizedName("silverHelm")));
-		silverChest.set(register(
-				new ItemOnlyArmor(armorSilver.get(), render, 1, "silverChest").setUnlocalizedName("silverChest")));
-		silverLegs.set(register(
-				new ItemOnlyArmor(armorSilver.get(), render, 2, "silverLegs").setUnlocalizedName("silverLegs")));
-		silverBoots.set(register(
-				new ItemOnlyArmor(armorSilver.get(), render, 3, "silverBoots").setUnlocalizedName("silverBoots")));
-		
-		
-		armorSilver.get().customCraftingMaterial = silverIngot.get();
-        toolSilver.get().customCraftingMaterial = silverIngot.get();
-        
-	}
-	
 	private static Item register(Item item) {
 		GameRegistry.registerItem(item, item.getUnlocalizedName().substring(5)); // without "item."
 		return item;
 	}
-	
-	
-	
-	
-	public static final Content<EnchEverlasting>
-	everlasting = Content.absent();
-	
-	public static final Content<Enchantment>
-	incantation = Content.absent();
-	
-	
-	private static void initEnchs() {
-		if (enableEverlasting.get())
-			everlasting.set(new EnchEverlasting(everlastingID.get()).setName(MODID + ".everlasting"));
-		
-		if (enableIncantation.get())
-			incantation.set(new EnchIncantation(incantationID.get()).setName(MODID + ".incantation"));
-		
+	private static void init(Class<?> clz) {
+		Dynamic.<Void>invoke(clz, "init").get();
 	}
 	
 	
 	
 	
-	private static void initEntities() {
-		EntityRegistry.registerModEntity(EntitySilverGolem.class,
-				"silverGolem", 0, OnlySilver.instance, 64, 1, true);
-		
-		// re-map a mistaken previous name to the right one
-		Raws.<String, Class<? extends Entity>>castRaw(
-				EntityList.stringToClassMapping)
-					.put("onlysilver.onlysilver.silverGolem", EntitySilverGolem.class);
-		
-	}
+	private static final String ERR_MSG = "An error occurred while trying to access the %s contents!";
 	
 	private static void initBalkon() {
 		try {
-			ContentsBalkon.init();
+			final Class<?> empClz = Class.forName(
+					"ckathode.weaponmod.entity.projectile.EntityMaterialProjectile"
+			);
 			
-		} catch (Exception e) {
-			FMLLog.log(ERROR, e,
-					ERR_MSG, OnlySilver.NAME, "Weaponmod");
+			final Method
+			getThrower = empClz.getMethod("getThrower"),
+			getPickupItem = empClz.getMethod("getPickupItem"),
+			setThrownItemStack = empClz.getMethod("setThrownItemStack", ItemStack.class);
+			
+			OnlySilverRegistry.registerWeaponFunction(
+					"weapon", new Function<DamageSource, InUseWeapon>() {
+				
+				@Override public InUseWeapon apply(DamageSource input) {
+					final Entity projectile = input.getSourceOfDamage();
+					
+					if (empClz.isInstance(projectile))
+						return new InUseWeapon() {
+							@Override public Optional<EntityLivingBase> getUser() {
+								try {
+									Entity thrower = (Entity) getThrower.invoke(projectile);
+									
+									return Optional.fromNullable(
+											thrower instanceof EntityLivingBase ?
+													(EntityLivingBase) thrower : null);
+									
+								} catch (Throwable e) {
+									throw Throwables.propagate(e);
+								}
+							}
+							
+							ItemStack getPickipItem() throws Throwable {
+								return (ItemStack) getPickupItem.invoke(projectile);
+							}
+							@Override public Optional<ItemStack> getItem() {
+								try {
+									return Optional.fromNullable(getPickipItem());
+								} catch (Throwable e) {
+									throw Throwables.propagate(e);
+								}
+							}
+							@Override public void update(ItemStack item) {
+								try {
+									if (item == null)
+										projectile.setDead();
+									
+									if (item != getPickipItem())
+										setThrownItemStack.invoke(projectile, item);
+									
+								} catch (Throwable e) {
+									throw Throwables.propagate(e);
+								}
+							}
+							
+							@Override public String toString() {
+								return String.format("[Projectile %s thrown by %s]",
+										getItem().orNull(), getUser().orNull());
+							}
+						};
+					
+					return null;
+				}
+			});
+			
+		} catch (Throwable e) {
+			OnlySilver.instance.log.error(String.format(ERR_MSG, "weaponmod"), e);
 		}
 		
 	}
+	
+	
+	private static final String
+	THAUMCRAFT_API = "thaumcraft.api.ThaumcraftApi",
+	ASPECT_LIST = "thaumcraft.api.aspects.AspectList",
+	ASPECT = "thaumcraft.api.aspects.Aspect",
+	ADD = "add";
+	
+	private static final Refer<?>
+	METAL = Dynamic.refer(ASPECT, "METAL"),
+	GREED = Dynamic.refer(ASPECT, "GREED"),
+	EARTH = Dynamic.refer(ASPECT, "EARTH");
 	
 	private static void initThaum() {
 		try {
-			ContentsThaum.init();
+			Dynamic.<Void>invoke(THAUMCRAFT_API, "registerEntityTag")
+				.via(Utils.getEntityString(EntitySilverGolem.class))
+				.via(ASPECT_LIST, Dynamic.construct(ASPECT_LIST)
+						.invoke(ADD).via(ASPECT, METAL).viaInt(4)
+						.invoke(ADD).via(ASPECT, GREED).viaInt(3)
+						.invoke(ADD).via(ASPECT, EARTH).viaInt(3))
+				.via(Utils.newArray(THAUMCRAFT_API + "$EntityTagsNBT", 0))
+				.get();
 			
-		} catch (Exception e) {
-			FMLLog.log(ERROR, e,
-					ERR_MSG, OnlySilver.NAME, "Thaumcraft");
+			Dynamic.<Void>invoke(THAUMCRAFT_API, "registerObjectTag")
+				.via(Dynamic.construct(ItemStack.class)
+						.via(Block.class, silverBlock))
+				.via(ASPECT_LIST, Dynamic.construct(ASPECT_LIST)
+						.invoke(ADD).via(ASPECT, METAL).viaInt(8)
+						.invoke(ADD).via(ASPECT, GREED).viaInt(8))
+				.get();
+			
+		} catch (Throwable e) {
+			OnlySilver.instance.log.error(String.format(ERR_MSG, "Thaumcraft"), e);
 		}
 		
 	}
 	
-
+	
 }

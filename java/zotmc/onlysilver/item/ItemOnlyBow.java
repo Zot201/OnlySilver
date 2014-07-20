@@ -24,41 +24,37 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
-import net.minecraftforge.oredict.OreDictionary;
 
 import org.lwjgl.opengl.GL11;
 
-import zotmc.onlysilver.Config;
-import zotmc.onlysilver.OnlySilver;
-import zotmc.onlysilver.Recipes;
+import zotmc.onlysilver.config.Config;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemOnlyBow extends ItemBow {
-	public static IIcon silverBow;
-	public static IIcon silverBow1;
-	public static IIcon silverBow2;
-	public static IIcon silverBow3;
-
-	public ItemOnlyBow(int dam) {
+	
+	private final ToolMaterial material;
+	private IIcon silverBow1, silverBow2, silverBow3;
+	
+	public ItemOnlyBow(ToolMaterial material) {
+		this.material = material;
 		maxStackSize = 1;
 		canRepair = true;
-		setCreativeTab(OnlySilver.TAB_ONLY_SILVER);
 		bFull3D = true;
-		setMaxDamage(dam);
+		setMaxDamage(material.getMaxUses() * 2 + 1);
 	}
-
+	
 	@Override @SideOnly(Side.CLIENT) public void registerIcons(IIconRegister iconRegister) {
 		itemIcon = iconRegister.registerIcon("onlysilver:" + "silverBow");
-
-		silverBow = iconRegister.registerIcon("onlysilver:" + "silverBow");
+		
 		silverBow1 = iconRegister.registerIcon("onlysilver:" + "silverBow1");
 		silverBow2 = iconRegister.registerIcon("onlysilver:" + "silverBow2");
 		silverBow3 = iconRegister.registerIcon("onlysilver:" + "silverBow3");
 	}
-
+	
 	@Override public IIcon getIcon(
 			ItemStack itemStack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
+		
 		if (Minecraft.getMinecraft().gameSettings.thirdPersonView != 0) {
 			GL11.glTranslatef(0.0F, -0.6F, -0.025F);
 			GL11.glRotatef(-17.0F, 0.0F, 0.0F, 1.0F);
@@ -77,12 +73,12 @@ public class ItemOnlyBow extends ItemBow {
 			return silverBow1;
 		return this.itemIcon;
 	}
-
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
 		list.add(StatCollector.translateToLocal("tips.knockbackTooltip"));
 	}
-
+	
 	@Override public void onPlayerStoppedUsing(ItemStack stack, World world, EntityPlayer player, int par4) {
 		int j = getMaxItemUseDuration(stack) - par4;
 		ArrowLooseEvent event = new ArrowLooseEvent(player, stack, j);
@@ -132,30 +128,27 @@ public class ItemOnlyBow extends ItemBow {
 		world.spawnEntityInWorld(entityarrow);
 		
 	}
-
-	@Override public int getItemEnchantability() {
-		return 10;
-	}
 	
-	@Override public boolean getIsRepairable(ItemStack toolToRepair, ItemStack material) {
-		for (ItemStack i : OreDictionary.getOres(Recipes.SILVER_INGOT))
-			if (OreDictionary.itemMatches(i, material, false))
-				return true;
-		return super.getIsRepairable(toolToRepair, material);
+	@Override public int getItemEnchantability() {
+		return material.getEnchantability() / 3;
 	}
 	
 	@Override public boolean hitEntity(ItemStack stack, EntityLivingBase victim, EntityLivingBase user) {
-		if (Config.enableMeleeBow.get()) {
+		if (Config.current().enableMeleeBow.get()) {
 			int pun = getEnchantmentLevel(punch.effectId, stack) + 2;
 			
 			double
 			x = -sin(user.rotationYaw * (float) Math.PI / 180.0F) * pun * 0.5,
 			z = cos(user.rotationYaw * (float) Math.PI / 180.0F) * pun * 0.5;
-	
+			
 			victim.addVelocity(x, 0.1, z);
 		}
 		
 		return super.hitEntity(stack, victim, user);
+	}
+	
+	@Override public boolean getIsRepairable(ItemStack toRepair, ItemStack toRepairWith) {
+		return ItemUtils.isSilverIngot(toRepairWith);
 	}
 	
 }

@@ -1,17 +1,18 @@
 package zotmc.onlysilver.handler;
 
+import static cpw.mods.fml.common.eventhandler.EventPriority.LOWEST;
 import static net.minecraft.enchantment.EnchantmentHelper.addRandomEnchantment;
 import static net.minecraft.entity.EntityLiving.getArmorPosition;
 import static net.minecraft.init.Items.shears;
-import static zotmc.onlysilver.Contents.silverAxe;
-import static zotmc.onlysilver.Contents.silverBoots;
-import static zotmc.onlysilver.Contents.silverChest;
-import static zotmc.onlysilver.Contents.silverHelm;
-import static zotmc.onlysilver.Contents.silverHoe;
-import static zotmc.onlysilver.Contents.silverLegs;
-import static zotmc.onlysilver.Contents.silverPick;
-import static zotmc.onlysilver.Contents.silverShovel;
-import static zotmc.onlysilver.Contents.silverSword;
+import static zotmc.onlysilver.item.Instrumentum.silverAxe;
+import static zotmc.onlysilver.item.Instrumentum.silverBoots;
+import static zotmc.onlysilver.item.Instrumentum.silverChest;
+import static zotmc.onlysilver.item.Instrumentum.silverHelm;
+import static zotmc.onlysilver.item.Instrumentum.silverHoe;
+import static zotmc.onlysilver.item.Instrumentum.silverLegs;
+import static zotmc.onlysilver.item.Instrumentum.silverPick;
+import static zotmc.onlysilver.item.Instrumentum.silverShovel;
+import static zotmc.onlysilver.item.Instrumentum.silverSword;
 
 import java.util.List;
 import java.util.Random;
@@ -23,8 +24,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import zotmc.onlysilver.Content;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent.SpecialSpawn;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -50,7 +53,21 @@ public class JoinWorldHandler {
 		this.akkaEnabled = akkaEnabled;
 	}
 	
+
 	
+	@SubscribeEvent(priority = LOWEST)
+	public void onSpecialSpawn(SpecialSpawn event) {
+		if (!event.world.isRemote && event.isCanceled()) {
+			Entity entity = event.entityLiving;
+			
+			if (!(entity.getClass() == EntitySkeleton.class && ((EntitySkeleton) entity).getSkeletonType() == 0
+					|| entity.getClass() == EntityZombie.class))
+				return;
+			
+			entity.getEntityData().setBoolean(HANDLED_KEY, true);
+		}
+		
+	}
 	
 	@SubscribeEvent public void onEntityJoinWorld(EntityJoinWorldEvent event) {
 		if (event.world.isRemote)
@@ -83,10 +100,10 @@ public class JoinWorldHandler {
 		
 	}
 	
-	public static ItemStack enchanting(Item item, float factor, Random rand) {
+	public static ItemStack enchanting(Item item, float difficulty, Random rand) {
 		ItemStack stack = new ItemStack(item);
-		if (rand.nextFloat() < factor * (item instanceof ItemArmor ? 0.5F : 0.25F))
-			addRandomEnchantment(rand, stack, 5 + (int) (factor * rand.nextInt(18)));
+		if (rand.nextFloat() < difficulty * (item instanceof ItemArmor ? 0.5F : 0.25F))
+			addRandomEnchantment(rand, stack, 5 + (int) (difficulty * rand.nextInt(18)));
 		return stack;
 	}
 	
@@ -99,21 +116,21 @@ public class JoinWorldHandler {
 		DIGGER (silverLegs, silverBoots, silverShovel),
 		WOODSMAN (silverHelm, silverChest, silverAxe),
 		FARMER (silverHelm, silverBoots, silverHoe),
-		GARDENER (silverHelm, silverChest, Content.<Item>of(shears));
+		GARDENER (silverHelm, silverChest, Suppliers.<Item>ofInstance(shears));
 		
 		
-		private final List<Content<Item>> equips;
+		private final List<Supplier<Item>> equips;
 		
-		Akka(Content<Item>... contents) {
+		Akka(Supplier<Item>... contents) {
 			equips = ImmutableList.copyOf(contents);
 		}
 		
 		public List<Item> equips() {
-			return Lists.transform(equips, Content.<Item>unwrap());
+			return Lists.transform(equips, Suppliers.<Item>supplierFunction());
 		}
 		
 		public void apply(Entity entity, float factor, Random rand) {
-			for (Content<Item> equip : equips) {
+			for (Supplier<Item> equip : equips) {
 				ItemStack stack = enchanting(equip.get(), factor, rand);
 				entity.setCurrentItemOrArmor(getArmorPosition(stack), stack);
 			}

@@ -1,4 +1,4 @@
-package zotmc.onlysilver.enchantment;
+package zotmc.onlysilver.ench;
 
 import static cpw.mods.fml.common.eventhandler.EventPriority.LOWEST;
 import static cpw.mods.fml.common.gameevent.TickEvent.Phase.START;
@@ -8,28 +8,31 @@ import static cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.DIME
 import static cpw.mods.fml.relauncher.Side.CLIENT;
 import static cpw.mods.fml.relauncher.Side.SERVER;
 import static net.minecraft.enchantment.EnchantmentHelper.getEnchantmentLevel;
+import static net.minecraft.enchantment.EnumEnchantmentType.all;
 import static net.minecraft.enchantment.EnumEnchantmentType.breakable;
-import static zotmc.onlysilver.OnlySilver.channels;
-import static zotmc.onlysilver.OnlySilver.proxy;
-import static zotmc.onlysilver.Reflections.dropBlockAsItem;
-import static zotmc.onlysilver.Reflections.Fields.INVULNERABLE;
 import static zotmc.onlysilver.api.OnlySilverRegistry.getWeapon;
 import static zotmc.onlysilver.api.OnlySilverRegistry.isSilverItem;
 import static zotmc.onlysilver.handler.JoinWorldHandler.HANDLED_KEY;
 
 import java.util.Map;
 
+import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import zotmc.onlysilver.Obfuscations;
+import zotmc.onlysilver.OnlySilver;
 import zotmc.onlysilver.api.OnlySilverRegistry.InUseWeapon;
 import zotmc.onlysilver.handler.ChannelHandler.EverlastingMessage;
+import zotmc.onlysilver.util.Utils;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -40,10 +43,10 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class EnchEverlasting extends Enchantment {
 
 	public EnchEverlasting(int id) {
-		super(id, 5, null);
+		super(id, 5, all);
 		
 		MinecraftForge.EVENT_BUS.register(this);
-		proxy.fmlEventBusClientRegister(this);
+		OnlySilver.proxy.fmlEventBusClientRegister(this);
 	}
 	
 	@Override public EnchEverlasting setName(String par1Str) {
@@ -98,8 +101,16 @@ public class EnchEverlasting extends Enchantment {
 		
 	}
 	
+	private static void dropBlockAsItem(Block block, World world, int x, int y, int z, ItemStack drop) {
+		try {
+			Obfuscations.DROP_BLOCK_AS_ITEM.invoke(block, world, x, y, z, drop);
+		} catch (Throwable e) {
+			throw Throwables.propagate(e);
+		}
+	}
+	
 
-	@SubscribeEvent public void onLivingDrop(LivingDropsEvent event) {
+	@SubscribeEvent(priority = LOWEST) public void onLivingDrop(LivingDropsEvent event) {
 		if (event.entity.worldObj.isRemote)
 			return;
 		
@@ -162,19 +173,21 @@ public class EnchEverlasting extends Enchantment {
 	
 	
 	public void processEntityItem(boolean increaseLifespan, EntityItem ei) {
-		INVULNERABLE.set(ei, true);
+		Utils.<Boolean>set(Obfuscations.INVULNERABLE, ei, true);
+		
 		if (increaseLifespan)
 			ei.lifespan *= 3;
 		
 	}
 	
+	
 	private void dispatchMessage(boolean increaseLifespan, EntityItem ei) {
-		channels.get(SERVER)
+		OnlySilver.channels().get(SERVER)
 			.attr(FML_MESSAGETARGET).set(DIMENSION);
-		channels.get(SERVER)
+		OnlySilver.channels().get(SERVER)
 			.attr(FML_MESSAGETARGETARGS).set(ei.worldObj.provider.dimensionId);
 		
-		channels.get(SERVER)
+		OnlySilver.channels().get(SERVER)
 			.writeOutbound(new EverlastingMessage(increaseLifespan, ei.getEntityId()));
 		
 	}
