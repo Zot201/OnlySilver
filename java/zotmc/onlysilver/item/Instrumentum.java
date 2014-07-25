@@ -12,7 +12,7 @@ import static zotmc.onlysilver.item.Instrumentum.Syntax.VANILLA;
 import static zotmc.onlysilver.item.ItemUtils.GET_IS_REPAIRABLE;
 import static zotmc.onlysilver.item.ItemUtils.GET_ITEM_ENCHANTABILITY;
 import static zotmc.onlysilver.item.ItemUtils.REGISTER_ICONS;
-import static zotmc.onlysilver.item.RecipeUtils.addRecipe;
+import static zotmc.onlysilver.item.RecipeUtils.addRecipes;
 import static zotmc.onlysilver.util.BooleanSupplier.alwaysTrue;
 import static zotmc.onlysilver.util.BooleanSupplier.isModLoaded;
 
@@ -20,7 +20,6 @@ import java.util.Set;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemPickaxe;
@@ -36,7 +35,7 @@ import zotmc.onlysilver.util.Feature;
 import zotmc.onlysilver.util.Utils;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Sets;
 
@@ -56,7 +55,7 @@ public enum Instrumentum implements Feature<Item> {
 	silverBoots		("···|σ σ|σ σ", ARMOR, 3),
 	
 	//mods
-	silverHammer	(" σ | ισ|ι  ", MOD, "crowley.skyblock", "exnihilo.items.hammers.ItemHammerBase"),
+	silverHammer	(" σ | ισ|ι  ", MOD, "exnihilo", "exnihilo.items.hammers.ItemHammerBase"),
 	silverScythe	("　σσ|σ ι|  ι", MOD, "BiomesOPlenty",
 			Dynamic.<Item>construct("biomesoplenty.common.items.ItemBOPScythe")
 				.via(ToolMaterial.IRON)
@@ -127,7 +126,7 @@ public enum Instrumentum implements Feature<Item> {
 	private Supplier<Boolean> enabled;
 	private Supplier<? extends Item> factory;
 	private Item item;
-	private Syntax syntax;
+	private final Syntax syntax;
 
 	private Instrumentum(Runnable recipes, boolean register,
 			Supplier<Boolean> enabled, Supplier<? extends Item> factory) {
@@ -135,12 +134,13 @@ public enum Instrumentum implements Feature<Item> {
 		this.register = register;
 		this.enabled = enabled;
 		this.factory = factory;
+		this.syntax = null;
 	}
 	
 	private Instrumentum(String recipes, Syntax syntax, Class<? extends Item> clz) {
 		switch (this.syntax = syntax) {
 		case VANILLA:
-			this.recipes = addRecipe(this, recipes);
+			this.recipes = addRecipes(this, recipes);
 			register = true;
 			enabled = alwaysTrue();
 			factory = Dynamic.construct(clz)
@@ -155,7 +155,7 @@ public enum Instrumentum implements Feature<Item> {
 	private Instrumentum(String recipes, Syntax syntax, int armorPosition) {
 		switch (this.syntax = syntax) {
 		case ARMOR:
-			this.recipes = addRecipe(this, recipes);
+			this.recipes = addRecipes(this, recipes);
 			register = true;
 			enabled = alwaysTrue();
 			factory = Dynamic.construct(ItemOnlyArmor.class)
@@ -172,13 +172,13 @@ public enum Instrumentum implements Feature<Item> {
 	private Instrumentum(String recipes, Syntax syntax, String species, Supplier<?> factory) {
 		switch (this.syntax = syntax) {
 		case MOD:
-			this.recipes = addRecipe(this, recipes);
+			this.recipes = addRecipes(this, recipes);
 			register = true;
 			enabled = isModLoaded(species);
 			this.factory = (Supplier<? extends Item>) factory;
 			return;
 		case BALKON:
-			this.recipes = addRecipe(this, recipes);
+			this.recipes = addRecipes(this, recipes);
 			register = false;
 			enabled = Balkon.isModLoaded.and(Balkon.isEnabled.via(species));
 			this.factory = Balkon.newItemMelee
@@ -194,7 +194,7 @@ public enum Instrumentum implements Feature<Item> {
 	private Instrumentum(String recipes, Syntax syntax, String species, String clz) {
 		switch (this.syntax = syntax) {
 		case MOD:
-			this.recipes = addRecipe(this, recipes);
+			this.recipes = addRecipes(this, recipes);
 			register = true;
 			enabled = isModLoaded(species);
 			factory = Dynamic.<Item>construct(clz)
@@ -202,7 +202,7 @@ public enum Instrumentum implements Feature<Item> {
 					.assemble(GET_IS_REPAIRABLE);
 			return;
 		case FLAIL:
-			this.recipes = addRecipe(this, recipes);
+			this.recipes = addRecipes(this, recipes);
 			register = false;
 			enabled = Balkon.isModLoaded.and(Balkon.isEnabled.via(species));
 			factory = Dynamic.<Item>construct(clz)
@@ -211,7 +211,7 @@ public enum Instrumentum implements Feature<Item> {
 					.assemble(GET_IS_REPAIRABLE);
 			return;
 		case BALKON:
-			this.recipes = addRecipe(this, recipes);
+			this.recipes = addRecipes(this, recipes);
 			register = false;
 			enabled = Balkon.isModLoaded.and(Balkon.isEnabled.via(species));
 			factory = Balkon.newItemMelee
@@ -266,12 +266,9 @@ public enum Instrumentum implements Feature<Item> {
 				inst.factory = null;
 			}
 		
-
-		OnlySilverRegistry.registerSilverItems(new Predicate<ItemStack>() {
-			@Override public boolean apply(ItemStack input) {
-				return input != null && instruments.contains(input.getItem());
-			}
-		});
+		
+		for (Item item : instruments)
+			OnlySilverRegistry.registerSilverPredicate(item, Predicates.<ItemStack>alwaysTrue());
 		
 	}
 	

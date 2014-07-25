@@ -3,9 +3,6 @@ package zotmc.onlysilver;
 import static cpw.mods.fml.common.Loader.isModLoaded;
 import static zotmc.onlysilver.OnlySilver.MODID;
 import static zotmc.onlysilver.item.Instrumentum.silverBow;
-
-import java.lang.reflect.Method;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.Enchantment;
@@ -31,10 +28,12 @@ import zotmc.onlysilver.util.Dynamic;
 import zotmc.onlysilver.util.Dynamic.Refer;
 import zotmc.onlysilver.util.Reserve;
 import zotmc.onlysilver.util.Utils;
+import zotmc.onlysilver.util.Utils.Uncheck;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
+import com.google.common.reflect.Invokable;
 
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -151,68 +150,65 @@ public class Contents {
 	
 	private static void initBalkon() {
 		try {
-			final Class<?> empClz = Class.forName(
-					"ckathode.weaponmod.entity.projectile.EntityMaterialProjectile"
+			final Class<? extends Entity>
+			emp = Utils.getClassChecked("ckathode.weaponmod.entity.projectile.EntityMaterialProjectile");
+
+			final Uncheck<Entity, Entity> getThrower = Utils.uncheck(
+					Utils.upcast(emp)
+						.method(emp.getMethod("getThrower"))
+						.returning(Entity.class)
 			);
 			
-			final Method
-			getThrower = empClz.getMethod("getThrower"),
-			getPickupItem = empClz.getMethod("getPickupItem"),
-			setThrownItemStack = empClz.getMethod("setThrownItemStack", ItemStack.class);
+			final Uncheck<Entity, ItemStack> getPickupItem = Utils.uncheck(
+					Utils.upcast(emp)
+						.method(emp.getMethod("getPickupItem"))
+						.returning(ItemStack.class)
+			);
 			
-			OnlySilverRegistry.registerWeaponFunction(
-					"weapon", new Function<DamageSource, InUseWeapon>() {
+			final Uncheck<Entity, Void> setThrownItemStack = Utils.uncheck(
+					Utils.upcast(emp)
+						.method(emp.getMethod("setThrownItemStack", ItemStack.class))
+						.returning(void.class)
+			);
+			
+			
+			OnlySilverRegistry.registerWeaponFunction("weapon",
+					new Function<DamageSource, InUseWeapon>() {
 				
 				@Override public InUseWeapon apply(DamageSource input) {
 					final Entity projectile = input.getSourceOfDamage();
+					if (!emp.isInstance(projectile))
+						return null;
 					
-					if (empClz.isInstance(projectile))
-						return new InUseWeapon() {
-							@Override public Optional<EntityLivingBase> getUser() {
-								try {
-									Entity thrower = (Entity) getThrower.invoke(projectile);
-									
-									return Optional.fromNullable(
-											thrower instanceof EntityLivingBase ?
-													(EntityLivingBase) thrower : null);
-									
-								} catch (Throwable e) {
-									throw Throwables.propagate(e);
-								}
-							}
-							
-							ItemStack getPickipItem() throws Throwable {
-								return (ItemStack) getPickupItem.invoke(projectile);
-							}
-							@Override public Optional<ItemStack> getItem() {
-								try {
-									return Optional.fromNullable(getPickipItem());
-								} catch (Throwable e) {
-									throw Throwables.propagate(e);
-								}
-							}
-							@Override public void update(ItemStack item) {
-								try {
-									if (item == null)
-										projectile.setDead();
-									
-									if (item != getPickipItem())
-										setThrownItemStack.invoke(projectile, item);
-									
-								} catch (Throwable e) {
-									throw Throwables.propagate(e);
-								}
-							}
-							
-							@Override public String toString() {
-								return String.format("[Projectile %s thrown by %s]",
-										getItem().orNull(), getUser().orNull());
-							}
-						};
+					return new InUseWeapon() {
+						@Override public Optional<EntityLivingBase> getUser() {
+							Entity thrower = getThrower.invoke(projectile);
+							return Optional.fromNullable(
+									thrower instanceof EntityLivingBase ?
+											(EntityLivingBase) thrower : null
+							);
+						}
+						@Override public Optional<ItemStack> getItem() {
+							return Optional.fromNullable(getPickupItem.invoke(projectile));
+						}
+						@Override public void update(ItemStack item) {
+							if (item == null)
+								projectile.setDead();
+							if (item != getPickupItem.invoke(projectile))
+								setThrownItemStack.invoke(projectile, item);
+						}
+						
+						@Override public String toString() {
+							return String.format(
+									"[Projectile %s thrown by %s]",
+									getItem().orNull(), getUser().orNull()
+							);
+						}
+					};
 					
-					return null;
 				}
 			});
+			
 			
 		} catch (Throwable e) {
 			OnlySilver.instance.log.error(String.format(ERR_MSG, "weaponmod"), e);

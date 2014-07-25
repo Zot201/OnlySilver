@@ -4,8 +4,6 @@ import static net.minecraft.enchantment.EnchantmentHelper.getEnchantmentLevel;
 import static net.minecraft.enchantment.EnumEnchantmentType.all;
 import static net.minecraft.enchantment.EnumEnchantmentType.digger;
 import static zotmc.onlysilver.Contents.everlasting;
-import static zotmc.onlysilver.api.OnlySilverRegistry.getWeapon;
-import static zotmc.onlysilver.api.OnlySilverRegistry.isSilverItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +23,7 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.util.WeightedRandom;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import zotmc.onlysilver.api.OnlySilverRegistry;
 import zotmc.onlysilver.api.OnlySilverRegistry.InUseWeapon;
 
 import com.google.common.base.Optional;
@@ -55,7 +54,7 @@ public class EnchIncantation extends Enchantment {
 	
 	@Override public boolean canApply(ItemStack item) {
 		return (item.getItem() instanceof ItemSword || digger.canEnchantItem(item.getItem()))
-				&& isSilverItem(item);
+				&& OnlySilverRegistry.isSilverItem(item);
 	}
 	
 	@Override public boolean isAllowedOnBooks() {
@@ -70,7 +69,7 @@ public class EnchIncantation extends Enchantment {
 		if (event.entity.worldObj.isRemote)
 			return;
 		
-		InUseWeapon iuw = getWeapon(event.source);
+		InUseWeapon iuw = OnlySilverRegistry.getWeapon(event.source);
 		Optional<ItemStack> weapon = iuw.getItem();
 		
 		if (weapon.isPresent() && weapon.get().stackSize > 0) {

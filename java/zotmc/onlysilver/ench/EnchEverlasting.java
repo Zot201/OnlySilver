@@ -10,8 +10,6 @@ import static cpw.mods.fml.relauncher.Side.SERVER;
 import static net.minecraft.enchantment.EnchantmentHelper.getEnchantmentLevel;
 import static net.minecraft.enchantment.EnumEnchantmentType.all;
 import static net.minecraft.enchantment.EnumEnchantmentType.breakable;
-import static zotmc.onlysilver.api.OnlySilverRegistry.getWeapon;
-import static zotmc.onlysilver.api.OnlySilverRegistry.isSilverItem;
 import static zotmc.onlysilver.handler.JoinWorldHandler.HANDLED_KEY;
 
 import java.util.Map;
@@ -27,6 +25,7 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import zotmc.onlysilver.Obfuscations;
 import zotmc.onlysilver.OnlySilver;
+import zotmc.onlysilver.api.OnlySilverRegistry;
 import zotmc.onlysilver.api.OnlySilverRegistry.InUseWeapon;
 import zotmc.onlysilver.handler.ChannelHandler.EverlastingMessage;
 import zotmc.onlysilver.util.Utils;
@@ -69,7 +68,7 @@ public class EnchEverlasting extends Enchantment {
 	}
 	
 	@Override public boolean canApplyAtEnchantingTable(ItemStack item) {
-		return breakable.canEnchantItem(item.getItem()) && isSilverItem(item);
+		return breakable.canEnchantItem(item.getItem()) && OnlySilverRegistry.isSilverItem(item);
 	}
 	
 	@Override public boolean isAllowedOnBooks() {
@@ -114,7 +113,7 @@ public class EnchEverlasting extends Enchantment {
 		if (event.entity.worldObj.isRemote)
 			return;
 		
-		InUseWeapon iuw = getWeapon(event.source);
+		InUseWeapon iuw = OnlySilverRegistry.getWeapon(event.source);
 		Optional<ItemStack> weapon = iuw.getItem();
 		
 		if (weapon.isPresent() && weapon.get().stackSize > 0) {

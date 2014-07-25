@@ -38,7 +38,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 	
-@Mod(modid = MODID, name = NAME, version = "1.9.1-1.7.2",
+@Mod(modid = MODID, name = NAME, version = "1.9.3-1.7.2",
 		dependencies = "required-after:Forge@[10.12.2.1121,);after:weaponmod;")
 public class OnlySilver {
 	

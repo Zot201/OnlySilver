@@ -39,14 +39,14 @@ class RecipeUtils {
 	
 	
 	
-	public static Runnable addRecipe(final Supplier<Item> item, final String shapes) {
-		return new AddRecipe(item, shapes);
+	public static Runnable addRecipes(final Supplier<Item> item, final String shapes) {
+		return new AddRecipes(item, shapes);
 	}
 	
-	private static class AddRecipe implements Runnable {
+	private static class AddRecipes implements Runnable {
 		private final Supplier<Item> item;
 		private final String shapes;
-		private AddRecipe(Supplier<Item> item, String shapes) {
+		private AddRecipes(Supplier<Item> item, String shapes) {
 			this.item = item;
 			this.shapes = shapes;
 		}

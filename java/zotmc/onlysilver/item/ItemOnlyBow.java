@@ -8,17 +8,20 @@ import static net.minecraft.enchantment.EnchantmentHelper.getEnchantmentLevel;
 import static net.minecraft.init.Items.arrow;
 import static net.minecraft.util.MathHelper.cos;
 import static net.minecraft.util.MathHelper.sin;
+import static zotmc.onlysilver.util.Utils.PI;
 
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
@@ -27,11 +30,14 @@ import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 
 import org.lwjgl.opengl.GL11;
 
+import zotmc.onlysilver.OnlySilver;
 import zotmc.onlysilver.config.Config;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemOnlyBow extends ItemBow {
+	
+	private static final String ONLY_ARROW = OnlySilver.MODID + ".onlyArrow";
 	
 	private final ToolMaterial material;
 	private IIcon silverBow1, silverBow2, silverBow3;
@@ -101,6 +107,7 @@ public class ItemOnlyBow extends ItemBow {
 			f = 1.0F;
 		
 		EntityArrow entityarrow = new EntityArrow(world, player, f * 2.0F);
+		entityarrow.getEntityData().setBoolean(ONLY_ARROW, true);
 		if (f == 1.0F)
 			entityarrow.setIsCritical(true);
 		
@@ -138,8 +145,8 @@ public class ItemOnlyBow extends ItemBow {
 			int pun = getEnchantmentLevel(punch.effectId, stack) + 2;
 			
 			double
-			x = -sin(user.rotationYaw * (float) Math.PI / 180.0F) * pun * 0.5,
-			z = cos(user.rotationYaw * (float) Math.PI / 180.0F) * pun * 0.5;
+			x = -sin(user.rotationYaw * PI / 180.0F) * pun * 0.5,
+			z = cos(user.rotationYaw * PI / 180.0F) * pun * 0.5;
 			
 			victim.addVelocity(x, 0.1, z);
 		}
@@ -149,6 +156,15 @@ public class ItemOnlyBow extends ItemBow {
 	
 	@Override public boolean getIsRepairable(ItemStack toRepair, ItemStack toRepairWith) {
 		return ItemUtils.isSilverIngot(toRepairWith);
+	}
+	
+	
+	public static boolean isShotBySilverBow(DamageSource source) {
+		if ("arrow".equals(source.damageType)) {
+			Entity sod = source.getSourceOfDamage();
+			return sod != null && sod.getEntityData().getBoolean(ONLY_ARROW);
+		}
+		return false;
 	}
 	
 }

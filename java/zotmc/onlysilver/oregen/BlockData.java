@@ -7,7 +7,7 @@ import com.google.common.base.Objects;
 
 import cpw.mods.fml.common.registry.GameData;
 
-final class BlockData {
+public final class BlockData {
 	
 	public final Block block;
 	public final int meta;

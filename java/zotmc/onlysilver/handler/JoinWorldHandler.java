@@ -17,6 +17,7 @@ import static zotmc.onlysilver.item.Instrumentum.silverSword;
 import java.util.List;
 import java.util.Random;
 
+import zotmc.onlysilver.OnlySilver;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
@@ -41,7 +42,7 @@ public class JoinWorldHandler {
 	MINOR_CHANCE = 1 / 20F;
 	
 	public static final String
-	HANDLED_KEY = "onlysilver.spawn.handled";
+	HANDLED_KEY = OnlySilver.MODID + ".spawn.handled";
 	
 
 	public List<Item> defaultEquips = ImmutableList.copyOf(Akka.SOLDIER.equips());

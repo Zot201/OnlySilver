@@ -32,7 +32,7 @@ public final class ArmorStat {
 	public ArmorStat(int durability, String reductionAmounts, int enchantability) {
 		this(durability,
 				FluentIterable.from(Splitter.on(',').trimResults().split(reductionAmounts))
-					.transform(Utils.parseInt())
+					.transform(Utils.parseInteger())
 					.toList(),
 				enchantability
 		);

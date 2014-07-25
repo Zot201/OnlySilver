@@ -17,10 +17,13 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.MathHelper;
 
 import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.base.Throwables;
+import com.google.common.reflect.Invokable;
+import com.google.common.reflect.TypeToken;
 
 import cpw.mods.fml.common.registry.GameData;
 
@@ -47,11 +50,11 @@ public class Utils {
 	}
 	
 	public static Optional<Item> getItem(String modid, String name) {
-		return Optional.fromNullable(GameData.getItemRegistry().getObject(modid + ":" + name));
+		return Optional.fromNullable(GameData.getItemRegistry().getRaw(modid + ":" + name));
 	}
 	
 	public static Optional<Block> getBlock(String modid, String name) {
-		return Optional.fromNullable(GameData.getBlockRegistry().getObject(modid + ":" + name));
+		return Optional.fromNullable(GameData.getBlockRegistry().getRaw(modid + ":" + name));
 	}
 	
 	
@@ -70,6 +73,32 @@ public class Utils {
 	
 	
 	//reflections and asm
+	
+	@SuppressWarnings("unchecked")
+	public static <T> Class<T> getClassChecked(String className) throws ClassNotFoundException {
+		return (Class<T>) Class.forName(className);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> TypeToken<T> upcast(Class<? extends T> type) {
+		return (TypeToken<T>) TypeToken.of(type);
+	}
+	
+	public static <T, R> Uncheck<T, R> uncheck(final Invokable<T, R> invokable) {
+		return new Uncheck<T, R>() {
+			@Override public R invoke(T receiver, Object... args) {
+				try {
+					return invokable.invoke(receiver, args);
+				} catch (Throwable e) {
+					throw Throwables.propagate(e);
+				}
+			}
+		};
+	}
+	public static abstract class Uncheck<T, R> {
+		private Uncheck() { }
+		public abstract R invoke(T receiver, Object... args);
+	}
 	
 	public static Supplier<?> newArray(final String componentType, final int length) {
 		return new Supplier<Object>() {
@@ -138,7 +167,7 @@ public class Utils {
 	
 	//functional idioms
 	
-	public static Function<String, Integer> parseInt() {
+	public static Function<String, Integer> parseInteger() {
 		return ParseInt.INSTANCE;
 	}
 	private enum ParseInt implements Function<String, Integer> {
@@ -177,6 +206,11 @@ public class Utils {
 	private enum NullConsumer implements Consumer<Object> {
 		INSTANCE;
 		@Override public void accept(Object t) { }
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <F, T> Function<F, T> constant(T value) {
+		return (Function<F, T>) Functions.constant(value);
 	}
 	
 	
