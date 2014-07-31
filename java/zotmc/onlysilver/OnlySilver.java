@@ -4,8 +4,7 @@ import static net.minecraft.init.Items.enchanted_book;
 import static zotmc.onlysilver.Contents.everlasting;
 import static zotmc.onlysilver.Contents.incantation;
 import static zotmc.onlysilver.Contents.silverIngot;
-import static zotmc.onlysilver.OnlySilver.MODID;
-import static zotmc.onlysilver.OnlySilver.NAME;
+import static zotmc.onlysilver.data.ModData.OnlySilvers.*;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -20,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import zotmc.onlysilver.config.Config;
 import zotmc.onlysilver.config.Config.ConfigState;
+import zotmc.onlysilver.data.ModData;
 import zotmc.onlysilver.handler.ChannelHandler;
 import zotmc.onlysilver.handler.LootManager;
 import zotmc.onlysilver.handler.ProxyCommon;
@@ -38,21 +38,13 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 	
-@Mod(modid = MODID, name = NAME, version = "1.9.3-1.7.2",
-		dependencies = "required-after:Forge@[10.12.2.1121,);after:weaponmod;")
+@Mod(modid = MODID, name = NAME, version = VERSION, dependencies = DEPENDENCIES)
 public class OnlySilver {
 	
-	public static final String
-	MODID = "onlysilver",
-	NAME = "OnlySilver",
-	PACKAGE_NAME = "zotmc.onlysilver";
+	@SidedProxy(clientSide = CLIENT_PROXY, serverSide = COMMON_PROXY)
+	public static ProxyCommon proxy;
 	
 	@Instance(MODID) public static OnlySilver instance;
-	
-	@SidedProxy(
-			clientSide = PACKAGE_NAME + ".handler.ProxyClient",
-			serverSide = PACKAGE_NAME + ".handler.ProxyCommon")
-	public static ProxyCommon proxy;
 	
 	public final Logger log = LogManager.getFormatterLogger(MODID);
 	
@@ -80,6 +72,8 @@ public class OnlySilver {
 	
 	
 	@EventHandler public void preInit(FMLPreInitializationEvent event) {
+		ModData.init(event.getModMetadata());
+		
 		Config.init(
 				new Configuration(event.getSuggestedConfigurationFile()),
 				Holder.<ConfigState>absent()
@@ -95,7 +89,7 @@ public class OnlySilver {
 		
 		channels = NetworkRegistry.INSTANCE.newChannel(MODID, new ChannelHandler());
 		
-		LootManager.addLoot();
+		LootManager.init();
 		
 		
 		if (Config.current().enableWerewolf.get())
@@ -111,6 +105,7 @@ public class OnlySilver {
 	@EventHandler public void postInit(FMLPostInitializationEvent event) {
 		OnlySilverOreGen.validateProfile();
 		//System.out.println(Config.current().oreGenProfile.get());
+		
 	}
 	
 }

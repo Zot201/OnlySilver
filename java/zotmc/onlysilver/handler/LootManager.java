@@ -15,7 +15,7 @@ import net.minecraft.util.WeightedRandomChestContent;
 
 public class LootManager {
 	
-	public static void addLoot() {
+	public static void init() {
 		getInfo(VILLAGE_BLACKSMITH).addItem(of(silverHelm.get(), 1, 1, 2));
 		getInfo(VILLAGE_BLACKSMITH).addItem(of(silverChest.get(), 1, 1, 2));
 		getInfo(VILLAGE_BLACKSMITH).addItem(of(silverLegs.get(), 1, 1, 2));

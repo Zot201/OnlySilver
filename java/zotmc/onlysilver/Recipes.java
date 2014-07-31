@@ -10,6 +10,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import zotmc.onlysilver.data.ModData.OnlySilvers;
 import zotmc.onlysilver.item.Instrumentum;
 import zotmc.onlysilver.util.Dynamic;
 import zotmc.onlysilver.util.Utils;
@@ -34,7 +35,7 @@ public class Recipes {
 				'σ', INGOT_SILVER
 		) { };
 		RecipeSorter.register(
-				OnlySilver.MODID + ":silverblock",
+				OnlySilvers.MODID + ":silverblock",
 				r.getClass(), SHAPED, "before:minecraft:shaped"
 		);
 		Utils.CraftingManagers.getRecipeList().add(0, r);

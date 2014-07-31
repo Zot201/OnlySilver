@@ -3,18 +3,17 @@ package zotmc.onlysilver.item;
 import static zotmc.onlysilver.Contents.armorSilver;
 import static zotmc.onlysilver.Contents.rendererPrefix;
 import static zotmc.onlysilver.Contents.toolSilver;
-import static zotmc.onlysilver.Obfuscations.SET_MAX_DAMAGE;
+import static zotmc.onlysilver.data.AsmData.GET_IS_REPAIRABLE;
+import static zotmc.onlysilver.data.AsmData.GET_ITEM_ENCHANTABILITY;
+import static zotmc.onlysilver.data.ObfData.SET_MAX_DAMAGE;
 import static zotmc.onlysilver.item.Instrumentum.Syntax.ARMOR;
 import static zotmc.onlysilver.item.Instrumentum.Syntax.BALKON;
 import static zotmc.onlysilver.item.Instrumentum.Syntax.FLAIL;
 import static zotmc.onlysilver.item.Instrumentum.Syntax.MOD;
 import static zotmc.onlysilver.item.Instrumentum.Syntax.VANILLA;
-import static zotmc.onlysilver.item.ItemUtils.GET_IS_REPAIRABLE;
-import static zotmc.onlysilver.item.ItemUtils.GET_ITEM_ENCHANTABILITY;
-import static zotmc.onlysilver.item.ItemUtils.REGISTER_ICONS;
 import static zotmc.onlysilver.item.RecipeUtils.addRecipes;
-import static zotmc.onlysilver.util.BooleanSupplier.alwaysTrue;
-import static zotmc.onlysilver.util.BooleanSupplier.isModLoaded;
+import static zotmc.onlysilver.util.FluentBoolean.alwaysTrue;
+import static zotmc.onlysilver.util.FluentBoolean.isModLoaded;
 
 import java.util.Set;
 
@@ -29,7 +28,9 @@ import net.minecraft.item.ItemSword;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import zotmc.onlysilver.OnlySilver;
 import zotmc.onlysilver.api.OnlySilverRegistry;
-import zotmc.onlysilver.item.ItemUtils.Balkon;
+import zotmc.onlysilver.data.AsmData.Clients;
+import zotmc.onlysilver.data.ModData.OnlySilvers;
+import zotmc.onlysilver.data.ModData.WeaponMod;
 import zotmc.onlysilver.util.Dynamic;
 import zotmc.onlysilver.util.Feature;
 import zotmc.onlysilver.util.Utils;
@@ -55,14 +56,16 @@ public enum Instrumentum implements Feature<Item> {
 	silverBoots		("···|σ σ|σ σ", ARMOR, 3),
 	
 	//mods
-	silverHammer	(" σ | ισ|ι  ", MOD, "exnihilo", "exnihilo.items.hammers.ItemHammerBase"),
+	silverHammer	(" σ | ισ|ι  ", MOD, "exnihilo", "exnihilo.items.hammers.ItemHammerBase",
+			Dynamic.<Boolean>refer("exnihilo.data.ModData", "ALLOW_HAMMERS")
+	),
 	silverScythe	("　σσ|σ ι|  ι", MOD, "BiomesOPlenty",
 			Dynamic.<Item>construct("biomesoplenty.common.items.ItemBOPScythe")
 				.via(ToolMaterial.IRON)
 				.viaInt(-1)
 				.assemble(GET_IS_REPAIRABLE)
 				.assemble(GET_ITEM_ENCHANTABILITY)
-				.assemble(REGISTER_ICONS)
+				.assemble(Clients.REGISTER_ICONS)
 				.call(SET_MAX_DAMAGE, toolSilver.get().getMaxUses())
 	),
 	
@@ -80,15 +83,15 @@ public enum Instrumentum implements Feature<Item> {
 				.<Integer>assign("ignoreArmourAmount", 1)
 	),
 	silverKatana	("  σ| σ |ι  ", BALKON, "katana",
-			Dynamic.construct(Balkon.MELEE_COMPONENT)
-				.via(Dynamic.refer(Balkon.MELEE_COMPONENT + "$MeleeSpecs", "KATANA"))
+			Dynamic.construct(WeaponMod.MELEE_COMPONENT)
+				.via(Dynamic.refer(WeaponMod.MELEE_COMPONENT + "$MeleeSpecs", "KATANA"))
 				.via(toolSilver)
 				.assemble(GET_IS_REPAIRABLE)
 	),
 	silverBayonetMusket (
 			new Runnable() {
 				public void run() {
-					Optional<Item> musket = Utils.getItem(Balkon.MODID, "musket");
+					Optional<Item> musket = Utils.getItem(WeaponMod.MODID, "musket");
 					if (silverKnife.exists() && musket.isPresent())
 						GameRegistry.addRecipe(new ShapelessOreRecipe(
 								silverBayonetMusket.get(),
@@ -97,12 +100,12 @@ public enum Instrumentum implements Feature<Item> {
 				}
 			},
 			false,
-			Balkon.isModLoaded
-				.and(Balkon.isEnabled.via("musketbayonet"))
-				.and(Balkon.isEnabled.via("knife")),
+			WeaponMod.isModLoaded
+				.and(WeaponMod.isEnabled.via("musketbayonet"))
+				.and(WeaponMod.isEnabled.via("knife")),
 			Dynamic.<Item>construct("ckathode.weaponmod.item.ItemMusket")
 				.via("silverBayonetMusket")
-				.via(Balkon.MELEE_COMPONENT,
+				.via(WeaponMod.MELEE_COMPONENT,
 						Dynamic.construct("ckathode.weaponmod.item.MeleeCompKnife")
 							.via(toolSilver)
 				)
@@ -127,7 +130,7 @@ public enum Instrumentum implements Feature<Item> {
 	private Supplier<? extends Item> factory;
 	private Item item;
 	private final Syntax syntax;
-
+	
 	private Instrumentum(Runnable recipes, boolean register,
 			Supplier<Boolean> enabled, Supplier<? extends Item> factory) {
 		this.recipes = recipes;
@@ -180,10 +183,10 @@ public enum Instrumentum implements Feature<Item> {
 		case BALKON:
 			this.recipes = addRecipes(this, recipes);
 			register = false;
-			enabled = Balkon.isModLoaded.and(Balkon.isEnabled.via(species));
-			this.factory = Balkon.newItemMelee
+			enabled = WeaponMod.isModLoaded.and(WeaponMod.isEnabled.via(species));
+			this.factory = WeaponMod.newItemMelee
 					.via(toString())
-					.via(Balkon.MELEE_COMPONENT, factory)
+					.via(WeaponMod.MELEE_COMPONENT, factory)
 					.assemble(GET_IS_REPAIRABLE);
 			return;
 		default:
@@ -193,18 +196,10 @@ public enum Instrumentum implements Feature<Item> {
 	
 	private Instrumentum(String recipes, Syntax syntax, String species, String clz) {
 		switch (this.syntax = syntax) {
-		case MOD:
-			this.recipes = addRecipes(this, recipes);
-			register = true;
-			enabled = isModLoaded(species);
-			factory = Dynamic.<Item>construct(clz)
-					.via(toolSilver)
-					.assemble(GET_IS_REPAIRABLE);
-			return;
 		case FLAIL:
 			this.recipes = addRecipes(this, recipes);
 			register = false;
-			enabled = Balkon.isModLoaded.and(Balkon.isEnabled.via(species));
+			enabled = WeaponMod.isModLoaded.and(WeaponMod.isEnabled.via(species));
 			factory = Dynamic.<Item>construct(clz)
 					.via(toString())
 					.via(toolSilver)
@@ -213,16 +208,33 @@ public enum Instrumentum implements Feature<Item> {
 		case BALKON:
 			this.recipes = addRecipes(this, recipes);
 			register = false;
-			enabled = Balkon.isModLoaded.and(Balkon.isEnabled.via(species));
-			factory = Balkon.newItemMelee
+			enabled = WeaponMod.isModLoaded.and(WeaponMod.isEnabled.via(species));
+			factory = WeaponMod.newItemMelee
 					.via(toString())
-					.via(Balkon.MELEE_COMPONENT,
+					.via(WeaponMod.MELEE_COMPONENT,
 							Dynamic.construct(clz).via(toolSilver))
 					.assemble(GET_IS_REPAIRABLE);
 			return;
 		default:
 			throw new IllegalArgumentException();
 		}
+	}
+	
+	private Instrumentum(String recipes, Syntax syntax, String modid, String clz,
+			Supplier<Boolean> recipeCondition) {
+		switch (this.syntax = syntax) {
+		case MOD:
+			this.recipes = Utils.conditional(recipeCondition, addRecipes(this, recipes));
+			register = true;
+			enabled = isModLoaded(modid);
+			factory = Dynamic.<Item>construct(clz)
+					.via(toolSilver)
+					.assemble(GET_IS_REPAIRABLE);
+			return;
+		default:
+			throw new IllegalArgumentException();
+		}
+		
 	}
 	
 	
@@ -248,7 +260,7 @@ public enum Instrumentum implements Feature<Item> {
 			try {
 				if (inst.enabled.get()) {
 					inst.item = inst.factory.get()
-						.setTextureName(OnlySilver.MODID + ":" + inst.toString())
+						.setTextureName(OnlySilvers.MODID + ":" + inst.toString())
 						.setUnlocalizedName(inst.toString())
 						.setCreativeTab(OnlySilver.instance.tabOnlySilver);
 					

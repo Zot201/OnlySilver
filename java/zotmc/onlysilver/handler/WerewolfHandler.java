@@ -68,7 +68,7 @@ public class WerewolfHandler {
 			return;
 		}
 		
-		if (isShotBySilverBow(event.source) && event.ammount < 6) {
+		if (event.ammount < 6 && isShotBySilverBow(event.source)) {
 			event.ammount = 6;
 			return;
 		}

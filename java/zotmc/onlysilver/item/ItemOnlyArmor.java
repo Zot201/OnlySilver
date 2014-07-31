@@ -17,7 +17,7 @@ public class ItemOnlyArmor extends ItemArmor {
 	}
 	
 	@Override public boolean getIsRepairable(ItemStack toRepair, ItemStack toRepairWith) {
-		return ItemUtils.isSilverIngot(toRepairWith);
+		return ItemOnlyIngot.isSilverIngot(toRepairWith);
 	}
 	
 }

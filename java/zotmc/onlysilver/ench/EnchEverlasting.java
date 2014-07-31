@@ -23,10 +23,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
-import zotmc.onlysilver.Obfuscations;
 import zotmc.onlysilver.OnlySilver;
 import zotmc.onlysilver.api.OnlySilverRegistry;
 import zotmc.onlysilver.api.OnlySilverRegistry.InUseWeapon;
+import zotmc.onlysilver.data.ObfData;
 import zotmc.onlysilver.handler.ChannelHandler.EverlastingMessage;
 import zotmc.onlysilver.util.Utils;
 
@@ -102,7 +102,7 @@ public class EnchEverlasting extends Enchantment {
 	
 	private static void dropBlockAsItem(Block block, World world, int x, int y, int z, ItemStack drop) {
 		try {
-			Obfuscations.DROP_BLOCK_AS_ITEM.invoke(block, world, x, y, z, drop);
+			ObfData.DROP_BLOCK_AS_ITEM.invoke(block, world, x, y, z, drop);
 		} catch (Throwable e) {
 			throw Throwables.propagate(e);
 		}
@@ -172,7 +172,7 @@ public class EnchEverlasting extends Enchantment {
 	
 	
 	public void processEntityItem(boolean increaseLifespan, EntityItem ei) {
-		Utils.<Boolean>set(Obfuscations.INVULNERABLE, ei, true);
+		Utils.<Boolean>set(ObfData.INVULNERABLE, ei, true);
 		
 		if (increaseLifespan)
 			ei.lifespan *= 3;

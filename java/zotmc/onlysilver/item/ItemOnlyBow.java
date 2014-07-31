@@ -30,14 +30,14 @@ import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 
 import org.lwjgl.opengl.GL11;
 
-import zotmc.onlysilver.OnlySilver;
 import zotmc.onlysilver.config.Config;
+import zotmc.onlysilver.data.ModData.OnlySilvers;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemOnlyBow extends ItemBow {
 	
-	private static final String ONLY_ARROW = OnlySilver.MODID + ".onlyArrow";
+	private static final String ONLY_ARROW = OnlySilvers.MODID + ".onlyArrow";
 	
 	private final ToolMaterial material;
 	private IIcon silverBow1, silverBow2, silverBow3;
@@ -155,7 +155,7 @@ public class ItemOnlyBow extends ItemBow {
 	}
 	
 	@Override public boolean getIsRepairable(ItemStack toRepair, ItemStack toRepairWith) {
-		return ItemUtils.isSilverIngot(toRepairWith);
+		return ItemOnlyIngot.isSilverIngot(toRepairWith);
 	}
 	
 	

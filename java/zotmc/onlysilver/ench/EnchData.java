@@ -19,8 +19,15 @@ public final class EnchData {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends Enchantment> void addEnchantment(Reserve<? super T> ench, Class<T> clz, String name) {
-		if (isEnabled)
+		if (isEnabled) {
+			if (Enchantment.enchantmentsList[enchId] != null)
+				throw new IllegalArgumentException(String.format(
+						"Duplicated id (%d) between %s and enchantment.%s",
+						enchId, Enchantment.enchantmentsList[enchId].getName(), name
+				));
+			
 			ench.set((T) Dynamic.construct(clz).viaInt(enchId).get().setName(name));
+		}
 	}
 	
 }

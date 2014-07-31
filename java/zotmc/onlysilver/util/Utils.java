@@ -167,6 +167,24 @@ public class Utils {
 	
 	//functional idioms
 	
+	public static Runnable conditional(final Supplier<Boolean> condition, final Runnable runnable) {
+		return new Runnable() {
+			@Override public void run() {
+				if (condition.get())
+					runnable.run();
+			}
+		};
+	}
+	
+	public static <T> Consumer<T> conditional(final Supplier<Boolean> condition, final Consumer<T> consumer) {
+		return new Consumer<T>() {
+			@Override public void accept(T t) {
+				if (condition.get())
+					consumer.accept(t);
+			}
+		};
+	}
+	
 	public static Function<String, Integer> parseInteger() {
 		return ParseInt.INSTANCE;
 	}

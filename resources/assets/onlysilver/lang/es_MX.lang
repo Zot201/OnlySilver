@@ -1,0 +1,27 @@
+﻿
+tile.silverOre.name=Mineral de Plata
+tile.silverBlock.name=Bloque de Plata
+
+item.silverIngot.name=Lingote de Plata
+item.silverRod.name=Vara de Plata
+
+item.silverPick.name=Pico de Plata
+item.silverAxe.name=Hacha de Plata
+item.silverShovel.name=Pala de Plata
+item.silverSword.name=Espada de Plata
+item.silverHoe.name=Azada de Plata
+item.silverBow.name=Arco de Plata
+item.silverHelm.name=Casco de Plata
+item.silverChest.name=Pechera de Plata
+item.silverLegs.name=Pantalones de Plata
+item.silverBoots.name=Botas de Plata
+
+
+entity.onlysilver.silverGolem.name=Golem de Plata
+
+achievement.silverBowAch=Un Nuevo Tipo de Arco?!
+achievement.silverBowAch.desc=Has Creado un Nuevo Tipo de Arco con Propiedades Magicas
+
+itemGroup.tabOnlySilver=OnlySilver
+
+tips.knockbackTooltip=+Empuje

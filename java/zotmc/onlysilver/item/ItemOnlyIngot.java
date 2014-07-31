@@ -3,24 +3,24 @@ package zotmc.onlysilver.item;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
-
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.GeneratorAdapter;
-import org.objectweb.asm.commons.Method;
-
-import zotmc.onlysilver.Obfuscations;
 import zotmc.onlysilver.OnlySilver;
 import zotmc.onlysilver.Recipes;
-import zotmc.onlysilver.util.Consumer;
+import zotmc.onlysilver.data.ModData.OnlySilvers;
 
 public class ItemOnlyIngot extends Item {
 
 	public ItemOnlyIngot(String name) {
-		setTextureName(OnlySilver.MODID + ":" + name);
+		setTextureName(OnlySilvers.MODID + ":" + name);
 		setUnlocalizedName(name);
 		setCreativeTab(OnlySilver.instance.tabOnlySilver);
+	}
+	
+	
+	public static boolean isSilverIngot(ItemStack item) {
+		for (ItemStack i : OreDictionary.getOres(Recipes.INGOT_SILVER))
+			if (OreDictionary.itemMatches(i, item, false))
+			return true;
+		return false;
 	}
 	
 }

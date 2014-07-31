@@ -1,7 +1,6 @@
 package zotmc.onlysilver.entity;
 
 import static zotmc.onlysilver.Contents.silverIngot;
-import static zotmc.onlysilver.OnlySilver.MODID;
 import net.minecraft.block.Block;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityItem;
@@ -10,6 +9,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
+import zotmc.onlysilver.data.ModData.OnlySilvers;
 
 public class EntitySilverGolem extends EntityIronGolem {
 
@@ -38,11 +38,11 @@ public class EntitySilverGolem extends EntityIronGolem {
 	
 	
 	@Override protected String getHurtSound() {
-		return MODID + ":silvergolem.hit";
+		return OnlySilvers.MODID + ":silvergolem.hit";
 	}
 	
 	@Override protected String getDeathSound() {
-		return MODID + ":silvergolem.death";
+		return OnlySilvers.MODID + ":silvergolem.death";
 	}
 
 	//playStepSound

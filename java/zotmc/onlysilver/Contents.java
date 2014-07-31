@@ -1,7 +1,6 @@
 package zotmc.onlysilver;
 
 import static cpw.mods.fml.common.Loader.isModLoaded;
-import static zotmc.onlysilver.OnlySilver.MODID;
 import static zotmc.onlysilver.item.Instrumentum.silverBow;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -19,6 +18,9 @@ import zotmc.onlysilver.api.OnlySilverRegistry;
 import zotmc.onlysilver.api.OnlySilverRegistry.InUseWeapon;
 import zotmc.onlysilver.block.BlockOnlyStorage;
 import zotmc.onlysilver.config.Config;
+import zotmc.onlysilver.data.ModData.OnlySilvers;
+import zotmc.onlysilver.data.ModData.Thaumcraft;
+import zotmc.onlysilver.data.ModData.WeaponMod;
 import zotmc.onlysilver.ench.EnchEverlasting;
 import zotmc.onlysilver.ench.EnchIncantation;
 import zotmc.onlysilver.entity.EntitySilverGolem;
@@ -32,8 +34,6 @@ import zotmc.onlysilver.util.Utils.Uncheck;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
-import com.google.common.reflect.Invokable;
 
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -68,7 +68,7 @@ public class Contents {
 		silverOre.set(register(
 				new Block(Material.rock) { }
 					.setBlockName("silverOre")
-					.setBlockTextureName(OnlySilver.MODID + ":silverOre")
+					.setBlockTextureName(OnlySilvers.MODID + ":silverOre")
 					.setCreativeTab(OnlySilver.instance.tabOnlySilver)
 		));
 		Config.current().silverOre.get().setStatTo(silverOre, "pickaxe");
@@ -76,7 +76,7 @@ public class Contents {
 		silverBlock.set(register(
 				new BlockOnlyStorage(Material.iron)
 					.setBlockName("silverBlock")
-					.setBlockTextureName(OnlySilver.MODID + ":silverBlock")
+					.setBlockTextureName(OnlySilvers.MODID + ":silverBlock")
 					.setCreativeTab(OnlySilver.instance.tabOnlySilver)
 		));
 		Config.current().silverBlock.get().setStatTo(silverBlock, null);
@@ -102,9 +102,9 @@ public class Contents {
         
 		
         Config.current().everlasting.get()
-        	.addEnchantment(everlasting, EnchEverlasting.class, MODID + ".everlasting");
+        	.addEnchantment(everlasting, EnchEverlasting.class, OnlySilvers.MODID + ".everlasting");
         Config.current().incantation.get()
-    		.addEnchantment(incantation, EnchIncantation.class, MODID + ".incantation");
+    		.addEnchantment(incantation, EnchIncantation.class, OnlySilvers.MODID + ".incantation");
 		
 
 		EntityRegistry.registerModEntity(EntitySilverGolem.class,
@@ -120,10 +120,10 @@ public class Contents {
 		);
         
         
-		if (isModLoaded("weaponmod"))
+		if (isModLoaded(WeaponMod.MODID))
 			initBalkon();
 		
-		if (isModLoaded("Thaumcraft"))
+		if (isModLoaded(Thaumcraft.MODID))
 			initThaum();
 		
 		

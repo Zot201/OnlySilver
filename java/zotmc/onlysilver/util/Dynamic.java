@@ -9,7 +9,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
 
-import zotmc.onlysilver.OnlySilver;
+import zotmc.onlysilver.data.ModData.OnlySilvers;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -313,7 +313,7 @@ public class Dynamic {
 		protected Klas<?> getUniqueName() {
 			return Klas.ofName(String.format(
 					"%s_ASM_%d_%s",
-					OnlySilver.MODID,
+					OnlySilvers.MODID,
 					id++,
 					parent.clz.toClass().getSimpleName()
 			));
