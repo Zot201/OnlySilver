@@ -1,0 +1,79 @@
+﻿# OnlySilver language file en_US
+﻿
+# Vanilla Items
+tile.silverOre.name=Silver Ore
+tile.silverBlock.name=Silver Block
+item.silverIngot.name=Silver Ingot
+item.silverRod.name=Silver Rod
+item.silverPick.name=Silver Pickaxe
+item.silverAxe.name=Silver Axe
+item.silverShovel.name=Silver Shovel
+item.silverSword.name=Silver Sword
+item.silverHoe.name=Silver Hoe
+item.silverBow.name=Silver Bow
+item.silverHelm.name=Silver Helmet
+item.silverChest.name=Silver Chestplate
+item.silverLegs.name=Silver Leggings
+item.silverBoots.name=Silver Boots
+
+# Mod Items
+item.silverHammer.name=Silver Hammer
+item.silverScythe.name=Silver Scythe
+
+# Balkon's WeaponMod Items
+item.silverSpear.name=Silver Spear
+item.silverHalberd.name=Silver Halberd
+item.silverBattleaxe.name=Silver Battleaxe
+item.silverKnife.name=Silver Knife
+item.silverWarhammer.name=Silver Warhammer
+item.silverFlail.name=Silver Flail
+item.silverKatana.name=Silver Katana
+item.silverBoomerang.name=Silver Boomerang
+item.silverBayonetMusket.name=Musket with Silver Bayonet
+
+# Enchantments
+enchantment.onlysilver.silverAura=Silver Aura
+enchantment.onlysilver.incantation=Incantation
+
+# Tooltips
+onlysilver.tooltip.knockback=+Knockback
+
+# Entities
+entity.onlysilver.silverGolem.name=Silver Golem
+
+# Creative Tabs
+itemGroup.tabOnlySilver=OnlySilver
+
+# Achievements
+achievement.silverBowAch=A New... Bow?
+achievement.silverBowAch.desc=Forge a new bow with magical properties
+
+# Customized World Type Settings
+onlysilver.customize.silverOre=%s (%s)
+
+# OnlySilver Options
+onlysilver.options.title=%s %s
+onlysilver.options.default=%s - %s
+onlysilver.options.oreGeneration=Ore Generation
+onlysilver.options.silverGenDefaults=Silver Gen. Defaults
+onlysilver.options.dimensions=Dimensions
+onlysilver.options.enchantments=Enchantments
+onlysilver.options.stats=Stats
+onlysilver.options.harvestLevel=Harvest Level
+onlysilver.options.hardness=Hardness
+onlysilver.options.resistance=Resistance
+onlysilver.options.silverTools=Silver Tools
+onlysilver.options.maxUses=Max Uses
+onlysilver.options.efficiency=Efficiency
+onlysilver.options.damage=Damage
+onlysilver.options.enchantability=Enchantability
+onlysilver.options.silverArmor=Silver Armor
+onlysilver.options.durability=Durability
+onlysilver.options.helmetDefensePoint=Helmet Defense Point
+onlysilver.options.chestplateDefensePoint=Chestplate Defense Point
+onlysilver.options.leggingsDefensePoint=Leggings Defense Point
+onlysilver.options.bootsDefensePoint=Boots Defense Point
+onlysilver.options.optionalFeatures=Optional Features
+onlysilver.options.meleeBowKnockback=Melee Bow Knockback
+onlysilver.options.werewolfEffectiveness=Werewolf Effectiveness
+onlysilver.options.silverGolemAssembly=Silver Golem Assembly

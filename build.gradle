@@ -1,0 +1,67 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    maven {
+      name = "forge"
+      url = "http://files.minecraftforge.net/maven"
+    }
+    maven {
+      name = "sonatype"
+      url = "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+  }
+  dependencies {
+    classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+  }
+}
+
+apply plugin: 'forge'
+
+version = "2.0.0.6-1.8"
+group = "zotmc.onlysilver"
+archivesBaseName = "OnlySilver"
+
+minecraft {
+  version = "1.8-11.14.1.1336"
+  runDir = "eclipse"
+  
+  mappings = "stable_16"
+}
+
+processResources {
+  inputs.property "version", project.version
+  inputs.property "mcversion", project.minecraft.version
+  
+  from(sourceSets.main.resources.srcDirs) {
+    include 'mcmod.info'
+    expand 'version':project.version, 'mcversion':project.minecraft.version
+  }
+  
+  from(sourceSets.main.resources.srcDirs) {
+    exclude 'mcmod.info'
+  }
+}
+
+
+def coreModManifest = {
+  attributes 'FMLCorePlugin': 'zotmc.onlysilver.loading.OnlyLoading'
+  attributes 'FMLCorePluginContainsFMLMod': 'true'
+}
+
+task devJar(type: Jar) {
+  from sourceSets.main.output
+  classifier = 'dev'
+  manifest coreModManifest
+}
+
+jar {
+  manifest coreModManifest
+}
+
+[compileJava, compileTestJava].each {
+  it.options.encoding = 'UTF-8'
+  it.options.compilerArgs += ['-source', '1.7', '-target', '1.7']
+}
+reobf {
+  //deobfFile = new net.minecraftforge.gradle.delayed.DelayedFile(project, "build/tmp/deobfuscateJar/deobfed.jar")
+}

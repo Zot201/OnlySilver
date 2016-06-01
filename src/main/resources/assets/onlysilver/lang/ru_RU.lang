@@ -1,0 +1,43 @@
+﻿#OnlySilver language file ru_RU
+﻿
+tile.silverOre.name=Серебряная руда
+tile.silverBlock.name=Серебряный блок
+
+item.silverIngot.name=Серебряный слиток
+item.silverRod.name=Серебряный стержень
+
+item.silverPick.name=Серебряная кирка
+item.silverAxe.name=Серебряный топор
+item.silverShovel.name=Серебряная лопата
+item.silverSword.name=Серебряный меч
+item.silverHoe.name=Серебряная мотыга
+item.silverBow.name=Серебряный лук
+item.silverHelm.name=Серебряный шлем
+item.silverChest.name=Серебряный нагрудник
+item.silverLegs.name=Серебряный поножи
+item.silverBoots.name=Серебряный ботинки
+
+#item.silverHammer.name=Silver Hammer
+#item.silverScythe.name=Silver Scythe
+
+#item.silverSpear.name=Silver Spear
+#item.silverHalberd.name=Silver Halberd
+#item.silverBattleaxe.name=Silver Battleaxe
+#item.silverKnife.name=Silver Knife
+#item.silverWarhammer.name=Silver Warhammer
+#item.silverFlail.name=Silver Flail
+#item.silverKatana.name=Silver Katana
+#item.silverBoomerang.name=Silver Boomerang
+#item.silverBayonetMusket.name=Musket with Silver Bayonet
+
+#enchantment.onlysilver.silverAura=Silver Aura
+#enchantment.onlysilver.incantation=Incantation
+
+#entity.onlysilver.silverGolem.name=Silver Golem
+
+achievement.silverBowAch=Это новый... Новый лук?
+achievement.silverBowAch.desc=Выковать новый лук с магическими способностями
+
+itemGroup.tabOnlySilver=OnlySilver
+
+tips.knockbackTooltip=+Отдача
