@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.ench;
 
 import java.util.Random;
@@ -7,6 +22,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
@@ -26,8 +42,9 @@ public class EnchSilverAura extends Enchantment {
   private static final UUID weaponModifierUUID = Fields.get(null, ReflData.ITEM_MODIFIER_UUID);
   private final ThreadLocal<Boolean> lock = Utils.newThreadLocal(false);
 
-  public EnchSilverAura(int id, ResourceLocation uid) {
-    super(id, uid, 5, Contents.BREAKABLE);
+  public EnchSilverAura(ResourceLocation uid) {
+    super(Rarity.UNCOMMON, Contents.BREAKABLE, new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND});
+    setRegistryName(uid);
   }
 
   @Override public int getMinLevel() {

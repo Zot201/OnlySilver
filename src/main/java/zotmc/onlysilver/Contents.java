@@ -21,6 +21,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
@@ -142,9 +143,9 @@ public class Contents {
     
 
     // silver aura
-    int id = Config.current().silverAuraId.get();
-    if (id != -1) {
-      EnchSilverAura ench = new EnchSilverAura(id, new ResourceLocation(OnlySilvers.MODID, "silver_aura"));
+    // TODO: Allow disabling
+    {
+      EnchSilverAura ench = new EnchSilverAura(new ResourceLocation(OnlySilvers.MODID, "silver_aura"));
       ench.setName(OnlySilvers.MODID + ".silverAura");
       //Enchantment.addToBookList(ench); // TODO: Check effect of previous addToBookList call
       silverAura.set(ench);
@@ -152,19 +153,19 @@ public class Contents {
     }
     
     // incantation
-    id = Config.current().incantationId.get();
-    if (id != -1) {
-      Enchantment ench = new EnchIncantation(id, new ResourceLocation(OnlySilvers.MODID, "incantation"))
-        .subscribeEvent()
-        .setName(OnlySilvers.MODID + ".incantation");
+    // TODO: Allow disabling
+    {
+      Enchantment ench = new EnchIncantation(new ResourceLocation(OnlySilvers.MODID, "incantation"))
+          .subscribeEvent()
+          .setName(OnlySilvers.MODID + ".incantation");
       //Enchantment.addToBookList(ench); // TODO: Same as above
       incantation.set(ench);
     }
     
     // silver golem
     EntityRegistry.registerModEntity(EntitySilverGolem.class, "silverGolem", 0, OnlySilver.INSTANCE, 80, 3, true);
-    Utils.EntityLists.stringToClassMapping()
-      .put("onlysilver.onlysilver.silverGolem", EntitySilverGolem.class); // re-map a mistaken previous name
+    EntityList.NAME_TO_CLASS.put(
+        "onlysilver.onlysilver.silverGolem", EntitySilverGolem.class); // re-map a mistaken previous name
     OnlySilver.INSTANCE.proxy.registerEntityRenderer(EntitySilverGolem.class);
     
     // achievement

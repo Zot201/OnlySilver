@@ -1,11 +1,25 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.ench;
-
-import java.util.Random;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -15,10 +29,13 @@ import zotmc.onlysilver.Contents;
 import zotmc.onlysilver.api.AttackItem;
 import zotmc.onlysilver.api.OnlySilverUtils;
 
+import java.util.Random;
+
 public class EnchIncantation extends Enchantment {
 
-  public EnchIncantation(int id, ResourceLocation uid) {
-    super(id, uid, 2, Contents.TOOL);
+  public EnchIncantation(ResourceLocation uid) {
+    super(Rarity.RARE, Contents.TOOL, new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND});
+    setRegistryName(uid);
   }
 
   public EnchIncantation subscribeEvent() {
