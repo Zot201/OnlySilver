@@ -1,6 +1,19 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.api;
-
-import java.util.Random;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -8,6 +21,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
+
+import java.util.Random;
 
 public class AttackItem {
 
@@ -25,6 +40,7 @@ public class AttackItem {
     return cachedItem != null ? cachedItem : (cachedItem = handler.getItem(damage));
   }
 
+  @SuppressWarnings("WeakerAccess")
   public void updateItem(ItemStack item) {
     handler.updateItem(damage, item);
     cachedItem = null;
@@ -37,7 +53,7 @@ public class AttackItem {
 
   public int getEnchantmentLevel(Enchantment ench) {
     ItemStack item = getItem();
-    return item == null ? 0 : EnchantmentHelper.getEnchantmentLevel(ench.effectId, item);
+    return item == null ? 0 : EnchantmentHelper.getEnchantmentLevel(ench, item);
   }
 
   public void damageItem(int amount, Random rand) {

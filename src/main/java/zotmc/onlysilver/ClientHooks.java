@@ -24,7 +24,7 @@ public class ClientHooks {
   // silver aura rendering
 
   private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
-  public static final ThreadLocal<Integer> renderArmorContext = new ThreadLocal<Integer>();
+  public static final ThreadLocal<Integer> renderArmorContext = new ThreadLocal<>();
 
   public static boolean renderSilverAura(RenderItem renderItem,
       @SuppressWarnings("deprecation") net.minecraft.client.resources.model.IBakedModel model, ItemStack item) {
