@@ -7,14 +7,14 @@ import java.util.List;
  */
 public interface Screen {
 
-	public void create();
+  public void create();
 
-	public void destroy();
-	
-	public Iterable<Element> getElements(int w, int h, Holder<List<String>> hoveringText, Runnable quit);
-	
-	public int getRowHeight();
+  public void destroy();
 
-	public Iterable<Row> getRows(int w, Holder<List<String>> hoveringText);
+  public Iterable<Element> getElements(int w, int h, Holder<List<String>> hoveringText, Runnable quit);
+
+  public int getRowHeight();
+
+  public Iterable<Row> getRows(int w, Holder<List<String>> hoveringText);
 
 }

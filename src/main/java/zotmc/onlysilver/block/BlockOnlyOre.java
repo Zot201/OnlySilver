@@ -7,14 +7,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockOnlyOre extends Block {
-	
-	public BlockOnlyOre() {
-		super(Material.rock);
-	}
-	
-	@SideOnly(Side.CLIENT)
-	@Override public EnumWorldBlockLayer getBlockLayer() {
-		return EnumWorldBlockLayer.CUTOUT_MIPPED;
-	}
+
+  public BlockOnlyOre() {
+    super(Material.rock);
+  }
+
+  @SideOnly(Side.CLIENT)
+  @Override public EnumWorldBlockLayer getBlockLayer() {
+    return EnumWorldBlockLayer.CUTOUT_MIPPED;
+  }
 
 }

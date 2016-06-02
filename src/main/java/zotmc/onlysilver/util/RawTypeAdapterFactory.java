@@ -13,41 +13,41 @@ import com.google.gson.stream.JsonWriter;
 
 public abstract class RawTypeAdapterFactory<V> implements TypeAdapterFactory {
 
-	protected abstract Class<? super V> targetType();
+  protected abstract Class<? super V> targetType();
 
-	protected abstract V postProcessing(V in);
+  protected abstract V postProcessing(V in);
 
-	@SuppressWarnings("unchecked")
-	@Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-		if (type.getRawType() == targetType()) {
-			final TypeAdapter<V> delegate = gson.getDelegateAdapter(this, (TypeToken<V>) type);
+  @SuppressWarnings("unchecked")
+  @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+    if (type.getRawType() == targetType()) {
+      final TypeAdapter<V> delegate = gson.getDelegateAdapter(this, (TypeToken<V>) type);
 
-			return (TypeAdapter<T>) new TypeAdapter<V>() {
-				@Override public void write(JsonWriter out, V value) throws IOException {
-					delegate.write(out, value);
-				}
+      return (TypeAdapter<T>) new TypeAdapter<V>() {
+        @Override public void write(JsonWriter out, V value) throws IOException {
+          delegate.write(out, value);
+        }
 
-				@Override public V read(JsonReader in) throws IOException {
-					return postProcessing(delegate.read(in));
-				}
-			};
-		}
+        @Override public V read(JsonReader in) throws IOException {
+          return postProcessing(delegate.read(in));
+        }
+      };
+    }
 
-		return null;
-	}
+    return null;
+  }
 
 
-	public static RawTypeAdapterFactory<Set<?>> immutableSet() {
-		return new ImmutableSetAdapterFactory();
-	}
+  public static RawTypeAdapterFactory<Set<?>> immutableSet() {
+    return new ImmutableSetAdapterFactory();
+  }
 
-	private static class ImmutableSetAdapterFactory extends RawTypeAdapterFactory<Set<?>> {
-		@Override protected Class<? super Set<?>> targetType() {
-			return Set.class;
-		}
-		@Override protected Set<?> postProcessing(Set<?> in) {
-			return ImmutableSet.copyOf(in);
-		}
-	}
+  private static class ImmutableSetAdapterFactory extends RawTypeAdapterFactory<Set<?>> {
+    @Override protected Class<? super Set<?>> targetType() {
+      return Set.class;
+    }
+    @Override protected Set<?> postProcessing(Set<?> in) {
+      return ImmutableSet.copyOf(in);
+    }
+  }
 
 }

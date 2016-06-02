@@ -5,12 +5,12 @@ package zotmc.onlysilver.config.gui;
  */
 public interface Element {
 
-	public void draw(int mouseX, int mouseY);
+  public void draw(int mouseX, int mouseY);
 
-	public boolean click(int mouseX, int mouseY);
+  public boolean click(int mouseX, int mouseY);
 
-	public void release(int mouseX, int mouseY);
+  public void release(int mouseX, int mouseY);
 
-	public void keyTyped(char typedChar, int keyCode);
+  public void keyTyped(char typedChar, int keyCode);
 
 }

@@ -35,42 +35,42 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.Invokable;
 
 public class Instrumenti {
-	
-	private static final MethodInfo
-	GET_IS_REPAIRABLE = Utils.findMethod(Item.class, "getIsRepairable", "func_82789_a")
-		.asMethodInfo(ItemStack.class, ItemStack.class),
-	GET_ITEM_ENCHANTABILITY = Utils.findMethod(Item.class, "getItemEnchantability", "func_77619_b")
-		.asMethodInfo();
-	
-	public static final Invokable<Item, Item>
-	SET_MAX_DAMAGE = Utils.findMethod(Item.class, "setMaxDamage", "func_77656_e")
-		.asInvokable(int.class)
-		.returning(Item.class);
-	
-	
-	public static final java.util.function.Consumer<KlastWriter<?>>
-	GET_IS_REPAIRABLE_SILVER = cw -> {
+
+  private static final MethodInfo
+  GET_IS_REPAIRABLE = Utils.findMethod(Item.class, "getIsRepairable", "func_82789_a")
+    .asMethodInfo(ItemStack.class, ItemStack.class),
+  GET_ITEM_ENCHANTABILITY = Utils.findMethod(Item.class, "getItemEnchantability", "func_77619_b")
+    .asMethodInfo();
+
+  public static final Invokable<Item, Item>
+  SET_MAX_DAMAGE = Utils.findMethod(Item.class, "setMaxDamage", "func_77656_e")
+    .asInvokable(int.class)
+    .returning(Item.class);
+
+
+  public static final java.util.function.Consumer<KlastWriter<?>>
+  GET_IS_REPAIRABLE_SILVER = cw -> {
     GeneratorAdapter mg = new GeneratorAdapter(ACC_PUBLIC, GET_IS_REPAIRABLE, null, null, cw);
     mg.loadArg(1);
     mg.invokeStatic(Type.getType(CommonHooks.class), MethodInfo.of("isSilverIngot", "(Lnet/minecraft/item/ItemStack;)Z"));
     mg.returnValue();
     mg.endMethod();
   },
-	GET_ITEM_ENCHANTABILITY_SILVER = cw -> {
+  GET_ITEM_ENCHANTABILITY_SILVER = cw -> {
     GeneratorAdapter mg = new GeneratorAdapter(ACC_PUBLIC, GET_ITEM_ENCHANTABILITY, null, null, cw);
     mg.invokeStatic(Type.getType(CommonHooks.class), MethodInfo.of("getSilverToolEnchantability", "()I"));
     mg.returnValue();
     mg.endMethod();
   };
-	
-	public static final Map<Character, Object> RECIPE_SYMBOLS = ImmutableMap.<Character, Object>builder()
-			.put('ι', "stickWood")
-			.put('σ', "ingotSilver")
-			.put('ϧ', Items.STRING)
-			.put('ɾ', "rodSilver")
-			.put('ɪ', "ingotIron")
-			.put('϶', "plankWood")
-			.put('ᴦ', "blockSilver")
-			.build();
-	
+
+  public static final Map<Character, Object> RECIPE_SYMBOLS = ImmutableMap.<Character, Object>builder()
+      .put('ι', "stickWood")
+      .put('σ', "ingotSilver")
+      .put('ϧ', Items.STRING)
+      .put('ɾ', "rodSilver")
+      .put('ɪ', "ingotIron")
+      .put('϶', "plankWood")
+      .put('ᴦ', "blockSilver")
+      .build();
+
 }

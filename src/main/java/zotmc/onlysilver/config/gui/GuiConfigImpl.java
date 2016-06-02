@@ -8,18 +8,18 @@ import com.google.common.collect.Maps;
 
 public class GuiConfigImpl extends GuiScreenWrapper {
 
-	private static final Map<Class<? extends GuiConfigImpl>, Screen> screens = Maps.newIdentityHashMap();
+  private static final Map<Class<? extends GuiConfigImpl>, Screen> screens = Maps.newIdentityHashMap();
 
-	@Deprecated protected GuiConfigImpl(GuiScreen parent) {
-		super(parent);
-	}
+  @Deprecated protected GuiConfigImpl(GuiScreen parent) {
+    super(parent);
+  }
 
-	@Override Screen createScreen() {
-		return screens.get(getClass());
-	}
+  @Override Screen createScreen() {
+    return screens.get(getClass());
+  }
 
-	public static void setScreen(Class<? extends GuiConfigImpl> clz, Screen screen) {
-		screens.put(clz, screen);
-	}
+  public static void setScreen(Class<? extends GuiConfigImpl> clz, Screen screen) {
+    screens.put(clz, screen);
+  }
 
 }

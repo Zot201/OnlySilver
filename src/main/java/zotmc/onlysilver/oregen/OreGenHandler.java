@@ -61,250 +61,250 @@ import com.google.gson.JsonSyntaxException;
 
 //TODO: Forge PR to eliminate needs for low level hooks
 public class OreGenHandler extends CacheLoader<WorldInfo, ExtSettings> {
-	
-	public static final OreGenHandler INSTANCE = new OreGenHandler();
-	private final Map<Factory, JsonHelper> factories = new MapMaker().weakKeys().makeMap();
-	private final LoadingCache<WorldInfo, ExtSettings> settings = CacheBuilder.newBuilder().weakKeys().build(this);
-	
-	public ExtSettings loadExtSettings(World world) {
-		return settings.getUnchecked(world.getWorldInfo());
-	}
-	
-	@Deprecated @Override public ExtSettings load(WorldInfo worldInfo) {
-		if (worldInfo instanceof DerivedWorldInfo)
-			return settings.getUnchecked(Fields.<WorldInfo>get(worldInfo, ReflData.THE_WORLD_INFO));
-		
-		try {
-			String silverGen = ((NBTTagString) getSilverGen(worldInfo)).getString();
-			JsonObject j = new Gson().fromJson(silverGen, JsonObject.class);
-			return new ExtSettings(new JsonHelper(j));
-			
-		} catch (Throwable t) {
-			OnlySilver.INSTANCE.log.catching(t);
-		}
 
-		OnlySilver.INSTANCE.log.warn("Silver generation property is missing or corrupted");
-		JsonHelper ext = null;
-		String generatorOptions = worldInfo.getGeneratorOptions();
-		
-		if (generatorOptions != null && !generatorOptions.isEmpty()) {
-			Factory factory = Factory.func_177865_a(generatorOptions);
-			ext = INSTANCE.factories.get(factory);
-		}
-		if (ext == null) ext = Config.current().silverGenDefaults.base().get().get();
-		
-		return new ExtSettings(ext);
-	}
-	
-	private static NBTBase getSilverGen(WorldInfo worldInfo) {
-		if (Utils.isClientSide()) {
-			String silverGen = Holder.silverGenStrings.get(worldInfo);
-			if (silverGen != null) return new NBTTagString(silverGen);
-		}
-		return worldInfo.getAdditionalProperty(OnlySilvers.MODID + "-silverGen");
-	}
-	
+  public static final OreGenHandler INSTANCE = new OreGenHandler();
+  private final Map<Factory, JsonHelper> factories = new MapMaker().weakKeys().makeMap();
+  private final LoadingCache<WorldInfo, ExtSettings> settings = CacheBuilder.newBuilder().weakKeys().build(this);
 
-	// ======================================== Common hooks ========================================
-	
-	public static void loadWorldProperty(Map<String, NBTBase> properties, WorldInfo worldInfo, NBTTagCompound tagCompound) {
-		String silverGen;
-		NBTTagCompound onlysilver = tagCompound.getCompoundTag(OnlySilvers.MODID);
-		
-		if (onlysilver.hasKey("silverGen", 8)) silverGen = onlysilver.getString("silverGen");
-		else {
-			JsonHelper ext = null;
-			String generatorOptions = worldInfo.getGeneratorOptions();
-			
-			if (generatorOptions != null && !generatorOptions.isEmpty()) {
-				Factory factory = Factory.func_177865_a(generatorOptions);
-				ext = INSTANCE.factories.get(factory);
-			}
-			if (ext == null) ext = Config.current().silverGenDefaults.get().get();
-			
-			silverGen = new Gson().toJson(ext.asJsonObject());
-		}
-		
-		properties.put(OnlySilvers.MODID + "-silverGen", new NBTTagString(silverGen));
-	}
-	
-	@Hook @Static(FMLCommonHandler.class)
-	public static void handleWorldDataSave(SaveHandler handler, WorldInfo worldInfo, NBTTagCompound tagCompound) {
-		NBTBase silverGen = getSilverGen(worldInfo);
-		if (silverGen instanceof NBTTagString) {
-			NBTTagCompound onlysilver = new NBTTagCompound();
-			onlysilver.setTag("silverGen", silverGen);
-			tagCompound.setTag(OnlySilvers.MODID, onlysilver);
-		}
-	}
-	
-	@Hook @Name("func_177863_a")
-	public static void onReset(Factory factory) {
-		INSTANCE.factories.remove(factory);
-	}
-	
-	@Hook(Strategy.AGENT)
-	public static int hashCode(int hash, Factory factory) {
-		JsonHelper ext = INSTANCE.factories.get(factory);
-		return 31 * hash + (ext == null ? 0 : ext.hashCode());
-	}
-	
-	@Hook @ReturnBoolean(condition = false, value = false)
-	public static boolean equals(Factory factory, Object object) {
-		if (object != factory && object instanceof Factory) {
-			Map<Factory, JsonHelper> exts = INSTANCE.factories;
-			return Objects.equal(exts.get(factory), exts.get(object));
-		}
-		return true;
-	}
+  public ExtSettings loadExtSettings(World world) {
+    return settings.getUnchecked(world.getWorldInfo());
+  }
 
-	@Hook(Strategy.AGENT)
-	public static <T> void deserialize(T result, Serializer caller, JsonElement json, Type typeOfT, JsonDeserializationContext ctx) {
-		try {
-			JsonHelper j = new JsonHelper((JsonObject)  json).getAsHelper(OnlySilvers.MODID + "-silver");
-			if (!j.isEmpty()) INSTANCE.factories.put((Factory) result, j);
-		} catch (JsonSyntaxException ignored) { }
-	}
+  @Deprecated @Override public ExtSettings load(WorldInfo worldInfo) {
+    if (worldInfo instanceof DerivedWorldInfo)
+      return settings.getUnchecked(Fields.<WorldInfo>get(worldInfo, ReflData.THE_WORLD_INFO));
 
-	@Hook(Strategy.AGENT)
-	public static <T> void serialize(JsonElement result, Serializer caller, T src, Type typeOfSrc, JsonSerializationContext ctx) {
-		JsonHelper ext = INSTANCE.factories.get(src);
-		if (ext != null) new JsonHelper((JsonObject) result).set(OnlySilvers.MODID + "-silver", ext);
-	}
+    try {
+      String silverGen = ((NBTTagString) getSilverGen(worldInfo)).getString();
+      JsonObject j = new Gson().fromJson(silverGen, JsonObject.class);
+      return new ExtSettings(new JsonHelper(j));
 
-	
-	// ======================================== Client explicit hooks ========================================
+    } catch (Throwable t) {
+      OnlySilver.INSTANCE.log.catching(t);
+    }
 
-	@SideOnly(Side.CLIENT)
-	private static class Holder {
-		static final Map<GuiCustomizeWorldScreen, JsonHelper> genDefaults = new MapMaker().weakKeys().makeMap();
-		static final Map<Object, String> silverGenStrings = new MapMaker().weakKeys().makeMap();
-		static List<WeakReference<GuiListEntry>> extraEntries;
-	}
-	
-	@SideOnly(Side.CLIENT) @Hook @Static(FMLCommonHandler.class)
-	public static void handleWorldDataLoad(SaveHandler handler, WorldInfo worldInfo, NBTTagCompound tagCompound) {
-		if (FMLCommonHandler.instance().getEffectiveSide() != Side.SERVER) {
-			NBTTagCompound onlysilver = tagCompound.getCompoundTag(OnlySilvers.MODID);
-			if (onlysilver.hasKey("silverGen", 8)) Holder.silverGenStrings.put(worldInfo, onlysilver.getString("silverGen"));
-		}
-	}
+    OnlySilver.INSTANCE.log.warn("Silver generation property is missing or corrupted");
+    JsonHelper ext = null;
+    String generatorOptions = worldInfo.getGeneratorOptions();
 
-	@SideOnly(Side.CLIENT) @Hook @Name("func_146318_a")
-	public static void readWorldInfo(GuiCreateWorld gui, WorldInfo worldInfo) {
-		Map<Object, String> map = Holder.silverGenStrings;
-		String silverGen = map.get(worldInfo);
-		if (silverGen != null) map.put(gui, silverGen);
-	}
-	
-	@SideOnly(Side.CLIENT)
-	public static void onWorldSettingsCreated(WorldSettings worldSettings, GuiCreateWorld gui) {
-		Map<Object, String> map = Holder.silverGenStrings;
-		String silverGen = map.get(gui);
-		if (silverGen != null) map.put(worldSettings, silverGen);
-	}
+    if (generatorOptions != null && !generatorOptions.isEmpty()) {
+      Factory factory = Factory.func_177865_a(generatorOptions);
+      ext = INSTANCE.factories.get(factory);
+    }
+    if (ext == null) ext = Config.current().silverGenDefaults.base().get().get();
 
-	@SideOnly(Side.CLIENT) @Hook(Strategy.RETURN) @Name("<init>")
-	public static void onWorldInfoBuilt(WorldInfo worldInfo, WorldSettings worldSettings, String name) {
-		Map<Object, String> map = Holder.silverGenStrings;
-		String silverGen = map.get(worldSettings);
-		if (silverGen != null) map.put(worldInfo, silverGen);
-	}
-	
-	@SideOnly(Side.CLIENT)
-	public static GuiListEntry[][] onGuiInit(GuiListEntry[][] entries, GuiCustomizeWorldScreen gui, Factory factory) {
-		UniqueIntegers freeIds = UniqueIntegers.startFrom(0x16A65CDC);
-		for (GuiListEntry[] a : entries)
-			for (GuiListEntry entry : a)
-				if (entry != null)
-					freeIds.remove(entry.func_178935_b());
-		
-		GenDefaults genDefaults = Config.current().silverGenDefaults.get();
-		Holder.genDefaults.put(gui, genDefaults.get());
-		JsonHelper ext = INSTANCE.factories.get(factory);
-		if (ext == null) ext = genDefaults.get();
-		
-		List<GuiListEntry> toAdd = Lists.newArrayList();
-		toAdd.add(new GuiLabelEntry(freeIds.next(), LangData.SILVER_ORE_ONLY_SILVER.get(), false));
-		toAdd.add(null);
-		toAdd.add(new GuiSlideEntry(freeIds.next(), LangData.SIZE.get(), false, gui, 1, 50, ext.getAsInt("size")));
-		toAdd.add(new GuiSlideEntry(freeIds.next(), LangData.COUNT.get(), false, gui, 0, 40, ext.getAsInt("count")));
-		toAdd.add(new GuiSlideEntry(freeIds.next(), LangData.MIN_HEIGHT.get(), false, gui, 0, 255, ext.getAsInt("minHeight")));
-		toAdd.add(new GuiSlideEntry(freeIds.next(), LangData.MAX_HEIGHT.get(), false, gui, 0, 255, ext.getAsInt("maxHeight")));
-		
-		Holder.extraEntries = Lists.newArrayList();
-		for (int i = 2; i < 6; i++)
-			Holder.extraEntries.add(new WeakReference<>(toAdd.get(i)));
-		
-		Class<GuiListEntry> clz = GuiListEntry.class;
-		entries[1] = ObjectArrays.concat(entries[1], Iterables.toArray(toAdd, clz), clz);
-		return entries;
-	}
-	
-	@SideOnly(Side.CLIENT)
-	public static void onGuiSetFloatValue(GuiCustomizeWorldScreen gui, Factory factory, int elementId, float value) {
-		List<WeakReference<GuiListEntry>> extraEntries = Holder.extraEntries;
-		
-		if (extraEntries != null)
-			for (int i = 0; i < 4; i++) {
-				GuiListEntry entry = extraEntries.get(i).get();
-				
-				if (entry != null && entry.func_178935_b() == elementId) {
-					String s;
-					switch (i) {
-						case 0: s = "size"; break;
-						case 1: s = "count"; break;
-						case 2: s = "minHeight"; break;
-						case 3: s = "maxHeight"; break;
-						default: throw new IllegalArgumentException();
-					}
-					
-					Map<Factory, JsonHelper> exts = INSTANCE.factories;
-					JsonHelper ext = exts.get(factory);
-					if (ext != null) {
-						ext.set(s, (int) value);
-						if (ext.equals(Holder.genDefaults.get(gui))) exts.remove(factory);
-					}
-					else {
-						ext = Config.current().silverGenDefaults.get().get().set(s, (int) value);
-						if (!ext.equals(Holder.genDefaults.get(gui))) exts.put(factory, ext);
-					}
-				}
-			}
-	}
+    return new ExtSettings(ext);
+  }
 
-	@SideOnly(Side.CLIENT)
-	private static class UniqueIntegers extends AbstractIterator<Integer> {
-		private static final RangeSet<Integer> ALL = ImmutableRangeSet.of(Range.<Integer>all().canonical(DiscreteDomain.integers()));
-		private final RangeSet<Integer> free = TreeRangeSet.create(ALL);
-		private Integer next;
-		private UniqueIntegers() { }
+  private static NBTBase getSilverGen(WorldInfo worldInfo) {
+    if (Utils.isClientSide()) {
+      String silverGen = Holder.silverGenStrings.get(worldInfo);
+      if (silverGen != null) return new NBTTagString(silverGen);
+    }
+    return worldInfo.getAdditionalProperty(OnlySilvers.MODID + "-silverGen");
+  }
 
-		public static UniqueIntegers startFrom(int i) {
-			UniqueIntegers ret = new UniqueIntegers();
-			ret.next = i;
-			return ret;
-		}
-		public void remove(Integer i) {
-			free.remove(Range.singleton(i).canonical(DiscreteDomain.integers()));
-		}
 
-		@Override protected Integer computeNext() {
-			if (!free.isEmpty()) {
-				Range<Integer> r = free.complement().rangeContaining(next);
-				if (r != null) {
-					if (r.hasUpperBound()) next = r.upperEndpoint();
-					else {
-						r = free.complement().rangeContaining(Integer.MIN_VALUE);
-						next = r != null ? r.upperEndpoint() : Integer.MIN_VALUE;
-					}
-				}
-				Integer ret = next++;
-				remove(ret);
-				return ret;
-			}
-			return endOfData();
-		}
-	}
-	
+  // ======================================== Common hooks ========================================
+
+  public static void loadWorldProperty(Map<String, NBTBase> properties, WorldInfo worldInfo, NBTTagCompound tagCompound) {
+    String silverGen;
+    NBTTagCompound onlysilver = tagCompound.getCompoundTag(OnlySilvers.MODID);
+
+    if (onlysilver.hasKey("silverGen", 8)) silverGen = onlysilver.getString("silverGen");
+    else {
+      JsonHelper ext = null;
+      String generatorOptions = worldInfo.getGeneratorOptions();
+
+      if (generatorOptions != null && !generatorOptions.isEmpty()) {
+        Factory factory = Factory.func_177865_a(generatorOptions);
+        ext = INSTANCE.factories.get(factory);
+      }
+      if (ext == null) ext = Config.current().silverGenDefaults.get().get();
+
+      silverGen = new Gson().toJson(ext.asJsonObject());
+    }
+
+    properties.put(OnlySilvers.MODID + "-silverGen", new NBTTagString(silverGen));
+  }
+
+  @Hook @Static(FMLCommonHandler.class)
+  public static void handleWorldDataSave(SaveHandler handler, WorldInfo worldInfo, NBTTagCompound tagCompound) {
+    NBTBase silverGen = getSilverGen(worldInfo);
+    if (silverGen instanceof NBTTagString) {
+      NBTTagCompound onlysilver = new NBTTagCompound();
+      onlysilver.setTag("silverGen", silverGen);
+      tagCompound.setTag(OnlySilvers.MODID, onlysilver);
+    }
+  }
+
+  @Hook @Name("func_177863_a")
+  public static void onReset(Factory factory) {
+    INSTANCE.factories.remove(factory);
+  }
+
+  @Hook(Strategy.AGENT)
+  public static int hashCode(int hash, Factory factory) {
+    JsonHelper ext = INSTANCE.factories.get(factory);
+    return 31 * hash + (ext == null ? 0 : ext.hashCode());
+  }
+
+  @Hook @ReturnBoolean(condition = false, value = false)
+  public static boolean equals(Factory factory, Object object) {
+    if (object != factory && object instanceof Factory) {
+      Map<Factory, JsonHelper> exts = INSTANCE.factories;
+      return Objects.equal(exts.get(factory), exts.get(object));
+    }
+    return true;
+  }
+
+  @Hook(Strategy.AGENT)
+  public static <T> void deserialize(T result, Serializer caller, JsonElement json, Type typeOfT, JsonDeserializationContext ctx) {
+    try {
+      JsonHelper j = new JsonHelper((JsonObject)  json).getAsHelper(OnlySilvers.MODID + "-silver");
+      if (!j.isEmpty()) INSTANCE.factories.put((Factory) result, j);
+    } catch (JsonSyntaxException ignored) { }
+  }
+
+  @Hook(Strategy.AGENT)
+  public static <T> void serialize(JsonElement result, Serializer caller, T src, Type typeOfSrc, JsonSerializationContext ctx) {
+    JsonHelper ext = INSTANCE.factories.get(src);
+    if (ext != null) new JsonHelper((JsonObject) result).set(OnlySilvers.MODID + "-silver", ext);
+  }
+
+
+  // ======================================== Client explicit hooks ========================================
+
+  @SideOnly(Side.CLIENT)
+  private static class Holder {
+    static final Map<GuiCustomizeWorldScreen, JsonHelper> genDefaults = new MapMaker().weakKeys().makeMap();
+    static final Map<Object, String> silverGenStrings = new MapMaker().weakKeys().makeMap();
+    static List<WeakReference<GuiListEntry>> extraEntries;
+  }
+
+  @SideOnly(Side.CLIENT) @Hook @Static(FMLCommonHandler.class)
+  public static void handleWorldDataLoad(SaveHandler handler, WorldInfo worldInfo, NBTTagCompound tagCompound) {
+    if (FMLCommonHandler.instance().getEffectiveSide() != Side.SERVER) {
+      NBTTagCompound onlysilver = tagCompound.getCompoundTag(OnlySilvers.MODID);
+      if (onlysilver.hasKey("silverGen", 8)) Holder.silverGenStrings.put(worldInfo, onlysilver.getString("silverGen"));
+    }
+  }
+
+  @SideOnly(Side.CLIENT) @Hook @Name("func_146318_a")
+  public static void readWorldInfo(GuiCreateWorld gui, WorldInfo worldInfo) {
+    Map<Object, String> map = Holder.silverGenStrings;
+    String silverGen = map.get(worldInfo);
+    if (silverGen != null) map.put(gui, silverGen);
+  }
+
+  @SideOnly(Side.CLIENT)
+  public static void onWorldSettingsCreated(WorldSettings worldSettings, GuiCreateWorld gui) {
+    Map<Object, String> map = Holder.silverGenStrings;
+    String silverGen = map.get(gui);
+    if (silverGen != null) map.put(worldSettings, silverGen);
+  }
+
+  @SideOnly(Side.CLIENT) @Hook(Strategy.RETURN) @Name("<init>")
+  public static void onWorldInfoBuilt(WorldInfo worldInfo, WorldSettings worldSettings, String name) {
+    Map<Object, String> map = Holder.silverGenStrings;
+    String silverGen = map.get(worldSettings);
+    if (silverGen != null) map.put(worldInfo, silverGen);
+  }
+
+  @SideOnly(Side.CLIENT)
+  public static GuiListEntry[][] onGuiInit(GuiListEntry[][] entries, GuiCustomizeWorldScreen gui, Factory factory) {
+    UniqueIntegers freeIds = UniqueIntegers.startFrom(0x16A65CDC);
+    for (GuiListEntry[] a : entries)
+      for (GuiListEntry entry : a)
+        if (entry != null)
+          freeIds.remove(entry.func_178935_b());
+
+    GenDefaults genDefaults = Config.current().silverGenDefaults.get();
+    Holder.genDefaults.put(gui, genDefaults.get());
+    JsonHelper ext = INSTANCE.factories.get(factory);
+    if (ext == null) ext = genDefaults.get();
+
+    List<GuiListEntry> toAdd = Lists.newArrayList();
+    toAdd.add(new GuiLabelEntry(freeIds.next(), LangData.SILVER_ORE_ONLY_SILVER.get(), false));
+    toAdd.add(null);
+    toAdd.add(new GuiSlideEntry(freeIds.next(), LangData.SIZE.get(), false, gui, 1, 50, ext.getAsInt("size")));
+    toAdd.add(new GuiSlideEntry(freeIds.next(), LangData.COUNT.get(), false, gui, 0, 40, ext.getAsInt("count")));
+    toAdd.add(new GuiSlideEntry(freeIds.next(), LangData.MIN_HEIGHT.get(), false, gui, 0, 255, ext.getAsInt("minHeight")));
+    toAdd.add(new GuiSlideEntry(freeIds.next(), LangData.MAX_HEIGHT.get(), false, gui, 0, 255, ext.getAsInt("maxHeight")));
+
+    Holder.extraEntries = Lists.newArrayList();
+    for (int i = 2; i < 6; i++)
+      Holder.extraEntries.add(new WeakReference<>(toAdd.get(i)));
+
+    Class<GuiListEntry> clz = GuiListEntry.class;
+    entries[1] = ObjectArrays.concat(entries[1], Iterables.toArray(toAdd, clz), clz);
+    return entries;
+  }
+
+  @SideOnly(Side.CLIENT)
+  public static void onGuiSetFloatValue(GuiCustomizeWorldScreen gui, Factory factory, int elementId, float value) {
+    List<WeakReference<GuiListEntry>> extraEntries = Holder.extraEntries;
+
+    if (extraEntries != null)
+      for (int i = 0; i < 4; i++) {
+        GuiListEntry entry = extraEntries.get(i).get();
+
+        if (entry != null && entry.func_178935_b() == elementId) {
+          String s;
+          switch (i) {
+            case 0: s = "size"; break;
+            case 1: s = "count"; break;
+            case 2: s = "minHeight"; break;
+            case 3: s = "maxHeight"; break;
+            default: throw new IllegalArgumentException();
+          }
+
+          Map<Factory, JsonHelper> exts = INSTANCE.factories;
+          JsonHelper ext = exts.get(factory);
+          if (ext != null) {
+            ext.set(s, (int) value);
+            if (ext.equals(Holder.genDefaults.get(gui))) exts.remove(factory);
+          }
+          else {
+            ext = Config.current().silverGenDefaults.get().get().set(s, (int) value);
+            if (!ext.equals(Holder.genDefaults.get(gui))) exts.put(factory, ext);
+          }
+        }
+      }
+  }
+
+  @SideOnly(Side.CLIENT)
+  private static class UniqueIntegers extends AbstractIterator<Integer> {
+    private static final RangeSet<Integer> ALL = ImmutableRangeSet.of(Range.<Integer>all().canonical(DiscreteDomain.integers()));
+    private final RangeSet<Integer> free = TreeRangeSet.create(ALL);
+    private Integer next;
+    private UniqueIntegers() { }
+
+    public static UniqueIntegers startFrom(int i) {
+      UniqueIntegers ret = new UniqueIntegers();
+      ret.next = i;
+      return ret;
+    }
+    public void remove(Integer i) {
+      free.remove(Range.singleton(i).canonical(DiscreteDomain.integers()));
+    }
+
+    @Override protected Integer computeNext() {
+      if (!free.isEmpty()) {
+        Range<Integer> r = free.complement().rangeContaining(next);
+        if (r != null) {
+          if (r.hasUpperBound()) next = r.upperEndpoint();
+          else {
+            r = free.complement().rangeContaining(Integer.MIN_VALUE);
+            next = r != null ? r.upperEndpoint() : Integer.MIN_VALUE;
+          }
+        }
+        Integer ret = next++;
+        remove(ret);
+        return ret;
+      }
+      return endOfData();
+    }
+  }
+
 }

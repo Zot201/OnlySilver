@@ -41,85 +41,85 @@ import com.google.common.collect.Queues;
 
 @SideOnly(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
-	
-	private final Set<Class<? extends Entity>> entityRenderers = Utils.newIdentityHashSet();
-	private final ListMultimap<Item, String> itemModels = Utils.newArrayListMultimap(Maps.newIdentityHashMap());
-	
-	private final Semaphore canSpawn = new Semaphore(0, true);
-	private final Queue<Entity> spawnQueue = Queues.newConcurrentLinkedQueue();
-	
-	private ClientProxy() { }
-	
-	@Override public void registerEntityRenderer(Class<? extends Entity> entity) {
-		checkArgument(entity.getAnnotation(EntityRenderer.class) != null);
-		entityRenderers.add(entity);
-	}
-	
-	@Override public void registerItemModels(Item i, String... models) {
-		List<String> list = itemModels.get(i);
-		for (String s : models)
-			list.add(s.indexOf(':') != -1 ? s : OnlySilvers.MODID + ":" + s);
-	}
-	
-	@Override public void spawnEntityInWorld(Entity entity) {
-		spawnQueue.add(entity);
-	}
-	
-	
-	@SubscribeEvent public void init(OnlySilver.Init event) {
-		RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
-		for (Class<? extends Entity> entity : entityRenderers) {
-			Render render = Dynamic.construct(entity.getAnnotation(EntityRenderer.class).value())
-					.via(RenderManager.class, renderManager)
-					.get();
-			RenderingRegistry.registerEntityRenderingHandler(entity, render);
-		}
-		
-		ItemModelMesher itemModelMesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
-		for (Map.Entry<Item, List<String>> entry : Multimaps.asMap(itemModels).entrySet()) {
-			for (int i = 0; i < entry.getValue().size(); i++)
-				itemModelMesher.register(entry.getKey(), i, new ModelResourceLocation(entry.getValue().get(i), "inventory"));
-			ModelBakery.addVariantName(entry.getKey(), Iterables.toArray(entry.getValue(), String.class));
-		}
-	}
-	
-	@SubscribeEvent public void onFOVUpdate(FOVUpdateEvent event) {
-		EntityPlayer player = event.entity;
-		if (player.isUsingItem() && player.getItemInUse().getItem() == ItemFeature.silverBow.get())
-			event.newfov = getFOVMultiplier(player);
-	}
-	
-	private float getFOVMultiplier(EntityPlayer player) {
-		float f = player.getItemInUseDuration() / 20.0F;
-		if (f > 1) f = 1;
-		else f *= f;
-		return 1 - f * 0.15F;
-	}
-	
-	@SubscribeEvent public void onServerTick(ServerTickEvent event) {
-		if (event.phase == Phase.END && !spawnQueue.isEmpty()) {
-			canSpawn.acquireUninterruptibly();
-			
-			do {
-				Entity entity = spawnQueue.remove();
-				entity.worldObj.spawnEntityInWorld(entity);
-			} while (!spawnQueue.isEmpty());
-			
-			canSpawn.release();
-		}
-	}
-	
-	@SubscribeEvent public void onRenderTick(RenderTickEvent event) {
-		Semaphore s = canSpawn;
-		s.release();
-		s.acquireUninterruptibly();
-	}
-	
-	
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target(ElementType.TYPE)
-	public @interface EntityRenderer {
-		public Class<? extends Render> value();
-	}
-	
+
+  private final Set<Class<? extends Entity>> entityRenderers = Utils.newIdentityHashSet();
+  private final ListMultimap<Item, String> itemModels = Utils.newArrayListMultimap(Maps.newIdentityHashMap());
+
+  private final Semaphore canSpawn = new Semaphore(0, true);
+  private final Queue<Entity> spawnQueue = Queues.newConcurrentLinkedQueue();
+
+  private ClientProxy() { }
+
+  @Override public void registerEntityRenderer(Class<? extends Entity> entity) {
+    checkArgument(entity.getAnnotation(EntityRenderer.class) != null);
+    entityRenderers.add(entity);
+  }
+
+  @Override public void registerItemModels(Item i, String... models) {
+    List<String> list = itemModels.get(i);
+    for (String s : models)
+      list.add(s.indexOf(':') != -1 ? s : OnlySilvers.MODID + ":" + s);
+  }
+
+  @Override public void spawnEntityInWorld(Entity entity) {
+    spawnQueue.add(entity);
+  }
+
+
+  @SubscribeEvent public void init(OnlySilver.Init event) {
+    RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
+    for (Class<? extends Entity> entity : entityRenderers) {
+      Render render = Dynamic.construct(entity.getAnnotation(EntityRenderer.class).value())
+          .via(RenderManager.class, renderManager)
+          .get();
+      RenderingRegistry.registerEntityRenderingHandler(entity, render);
+    }
+
+    ItemModelMesher itemModelMesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
+    for (Map.Entry<Item, List<String>> entry : Multimaps.asMap(itemModels).entrySet()) {
+      for (int i = 0; i < entry.getValue().size(); i++)
+        itemModelMesher.register(entry.getKey(), i, new ModelResourceLocation(entry.getValue().get(i), "inventory"));
+      ModelBakery.addVariantName(entry.getKey(), Iterables.toArray(entry.getValue(), String.class));
+    }
+  }
+
+  @SubscribeEvent public void onFOVUpdate(FOVUpdateEvent event) {
+    EntityPlayer player = event.entity;
+    if (player.isUsingItem() && player.getItemInUse().getItem() == ItemFeature.silverBow.get())
+      event.newfov = getFOVMultiplier(player);
+  }
+
+  private float getFOVMultiplier(EntityPlayer player) {
+    float f = player.getItemInUseDuration() / 20.0F;
+    if (f > 1) f = 1;
+    else f *= f;
+    return 1 - f * 0.15F;
+  }
+
+  @SubscribeEvent public void onServerTick(ServerTickEvent event) {
+    if (event.phase == Phase.END && !spawnQueue.isEmpty()) {
+      canSpawn.acquireUninterruptibly();
+
+      do {
+        Entity entity = spawnQueue.remove();
+        entity.worldObj.spawnEntityInWorld(entity);
+      } while (!spawnQueue.isEmpty());
+
+      canSpawn.release();
+    }
+  }
+
+  @SubscribeEvent public void onRenderTick(RenderTickEvent event) {
+    Semaphore s = canSpawn;
+    s.release();
+    s.acquireUninterruptibly();
+  }
+
+
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(ElementType.TYPE)
+  public @interface EntityRenderer {
+    public Class<? extends Render> value();
+  }
+
 }
