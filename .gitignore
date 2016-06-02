@@ -1,8 +1,12 @@
 # Common
 /.gradle
 /build
+/run
 
 # Eclipse
 /.settings
 /.classpath
 /.project
+
+# Intellij
+/.idea
