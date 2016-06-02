@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -56,6 +71,7 @@ import com.google.common.collect.Sets;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 
+@SuppressWarnings("WeakerAccess")
 public class Utils {
 
   public static final SimpleVersion MC_VERSION =
@@ -115,9 +131,7 @@ public class Utils {
     }
 
     public Supplier<String> append(final Object obj) {
-      return new Supplier<String>() { public String get() {
-        return Localization.this.get().concat(String.valueOf(obj));
-      }};
+      return () -> Localization.this.get().concat(String.valueOf(obj));
     }
   }
 
@@ -219,17 +233,18 @@ public class Utils {
   // collections
 
   public static <K, V> Map<K, V> newIdentityHashMap() {
-    return new NullSafeMap<>(Maps.<K, V>newIdentityHashMap());
+    return new NullSafeMap<>(Maps.newIdentityHashMap());
   }
 
   public static <K, V> Map<K, V> newHashMap() {
-    return new NullSafeMap<>(Maps.<K, V>newHashMap());
+    return new NullSafeMap<>(Maps.newHashMap());
   }
 
   public static <E> Set<E> newIdentityHashSet() {
-    return Sets.newSetFromMap(Utils.<E, Boolean>newIdentityHashMap());
+    return Sets.newSetFromMap(Utils.newIdentityHashMap());
   }
 
+  @SuppressWarnings("NullableProblems")
   private static class NullSafeMap<K, V> extends ForwardingMap<K, V> {
     private final Map<K, V> delegate;
     private Set<Entry<K, V>> entrySet;
@@ -288,9 +303,9 @@ public class Utils {
     }
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   public static <K, V> ListMultimap<K, V> newArrayListMultimap(Map<Object, Object> map) {
     checkArgument(map.isEmpty());
+    //noinspection unchecked
     return Multimaps.newListMultimap((Map) map, (Supplier) ArrayListSupplier.INSTANCE);
   }
 
@@ -316,7 +331,7 @@ public class Utils {
   }
 
   public static <T> MethodFinder<T> findMethod(Class<T> clz, String... names) {
-    return new MethodFinder<T>(clz, names);
+    return new MethodFinder<>(clz, names);
   }
   public static class MethodFinder<T> {
     private final Class<T> clz;
@@ -395,7 +410,7 @@ public class Utils {
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.TYPE)
   public @interface Requirements {
-    public String[] value();
+    String[] value();
   }
 
   public static void checkRequirements(Class<?> clz) {
@@ -497,8 +512,9 @@ public class Utils {
   public static RuntimeException propagate(Throwable t) {
     return propagateWhatever(checkNotNull(t)); // sneaky throw
   }
-  @SuppressWarnings("unchecked")
+
   private static <T extends Throwable> T propagateWhatever(Throwable t) throws T {
+    //noinspection unchecked
     throw (T) t;
   }
 

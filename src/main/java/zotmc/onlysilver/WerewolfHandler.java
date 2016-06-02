@@ -41,9 +41,9 @@ public class WerewolfHandler<MoCEntityWerewolf extends EntityLivingBase> {
   private final Random rand = new Random();
   private boolean enabled;
   
-  @SuppressWarnings("unchecked")
   public WerewolfHandler(EventBus bus) throws Throwable {
     this.bus = bus;
+    //noinspection unchecked
     werewolfType = (Class<MoCEntityWerewolf>) Class.forName(MoCreatures.MOC_ENTITY_WEREWOLF);
     getIsHumanForm = TypeToken.of(werewolfType)
         .method(werewolfType.getDeclaredMethod(MoCreatures.GET_IS_HUMAN_FORM))

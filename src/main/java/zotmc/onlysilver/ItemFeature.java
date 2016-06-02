@@ -15,38 +15,18 @@
  */
 package zotmc.onlysilver;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Field;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.BaseAttributeMap;
-import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
-import net.minecraft.item.Item;
+import com.google.common.base.*;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import net.minecraft.item.*;
 import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.item.ItemAxe;
-import net.minecraft.item.ItemHoe;
-import net.minecraft.item.ItemPickaxe;
-import net.minecraft.item.ItemSpade;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
-import zotmc.onlysilver.api.OnlySilverRegistry;
 import zotmc.onlysilver.config.Config;
 import zotmc.onlysilver.data.Instrumenti;
 import zotmc.onlysilver.data.ModData.OnlySilvers;
@@ -60,15 +40,19 @@ import zotmc.onlysilver.util.Feature;
 import zotmc.onlysilver.util.Utils;
 import zotmc.onlysilver.util.Utils.Localization;
 
-import com.google.common.base.CaseFormat;
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Enums;
-import com.google.common.base.Functions;
-import com.google.common.base.Splitter;
-import com.google.common.base.Supplier;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Field;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
+@SuppressWarnings("Guava")
 public enum ItemFeature implements Feature<Item> {
   // vanilla
   @Recipes(value = "ᴦ", output = 9) @Ores("ingotSilver") @Important @PlainItem(ItemOnlyIngot.class) silverIngot,
@@ -93,7 +77,7 @@ public enum ItemFeature implements Feature<Item> {
   @Recipes(" σ | ισ|ι  ")
   @Depends("exnihilo") @Tool(string = "exnihilo.items.hammers.ItemHammerBase")
   silverHammer {{
-    recipesEnabledFactory = Dynamic.<Boolean>refer("exnihilo.data.ModData", "ALLOW_HAMMERS");
+    recipesEnabledFactory = Dynamic.refer("exnihilo.data.ModData", "ALLOW_HAMMERS");
   }},
   
   @Recipes("　σσ|σ ι|  ι")
@@ -142,8 +126,8 @@ public enum ItemFeature implements Feature<Item> {
   @WM(isEnabled = "battleaxe")
   silverBattleaxe {{
     Supplier<?> meleeComp = Dynamic.construct("ckathode.weaponmod.item.MeleeCompBattleaxe")
-      .via(ToolMaterial.class, Contents.silverToolMaterial)
-      .assign("ignoreArmourAmount", 1);
+        .via(ToolMaterial.class, Contents.silverToolMaterial)
+        .assign("ignoreArmourAmount", 1);
     
     itemFactory = new WeaponMod.ItemMeleeSupplier(getItemId(), meleeComp);
   }},
@@ -161,7 +145,7 @@ public enum ItemFeature implements Feature<Item> {
   @WM(isEnabled = {"musketbayonet", "knife"})
   silverBayonetMusket {{
     recipeFactory = new Iterable<IRecipe>() { public Iterator<IRecipe> iterator() {
-      Item musket = GameRegistry.findItem(WeaponMod.MODID, "musket");
+      Item musket = Item.REGISTRY.getObject(new ResourceLocation(WeaponMod.MODID, "musket"));
       if (silverKnife.exists() && musket != null) {
         IRecipe r = new ShapelessRecipes(
             new ItemStack(silverBayonetMusket.get()),
@@ -353,27 +337,33 @@ public enum ItemFeature implements Feature<Item> {
       }
       
       checkArgument(valid);
-      
+
       if (value != null) {
         value.setUnlocalizedName(name()).setCreativeTab(Contents.tabOnlySilver);
-        
+
         String id = getItemId();
-        if (GameData.getItemRegistry().getNameForObject(value) == null)
-          GameRegistry.registerItem(value, id);
+        // TODO: Check if already registered
+        //if (GameData.getItemRegistry().getNameForObject(value) == null)
+        value.setRegistryName(id);
+        GameRegistry.register(value);
         
         if (f.getAnnotation(ItemId.class) != null) Contents.renameMap.put(name(), id);
         
         OnlySilver.INSTANCE.proxy.registerItemModels(value, getModels());
-        
-        if (isTool()) {
+
+        // TODO: Re-implementation
+        //noinspection SpellCheckingInspection
+        {
+        /*if (isTool()) {
           BaseAttributeMap attrs = new ServersideAttributeMap();
           attrs.registerAttribute(SharedMonsterAttributes.attackDamage);
           attrs.applyAttributeModifiers(new ItemStack(value).getAttributeModifiers());
-          
+
           float damage = (float)
               attrs.getAttributeInstance(SharedMonsterAttributes.attackDamage).getAttributeValue();
           damage = 6 + Math.max(0, damage - 2 - Contents.silverToolMaterial.get().getDamageVsEntity());
           OnlySilverRegistry.registerWerewolfDamage(value, Functions.constant(damage));
+        }*/
         }
       }
       
