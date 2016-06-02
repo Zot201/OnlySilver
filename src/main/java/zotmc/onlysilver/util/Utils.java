@@ -15,27 +15,13 @@
  */
 package zotmc.onlysilver.util;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.base.Supplier;
+import com.google.common.collect.*;
+import com.google.common.reflect.Invokable;
+import com.google.common.reflect.TypeToken;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -55,41 +41,28 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import zotmc.onlysilver.util.init.MethodInfo;
 import zotmc.onlysilver.util.init.SimpleVersion;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.base.Supplier;
-import com.google.common.collect.ForwardingIterator;
-import com.google.common.collect.ForwardingMap;
-import com.google.common.collect.ForwardingSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.ObjectArrays;
-import com.google.common.collect.Sets;
-import com.google.common.reflect.Invokable;
-import com.google.common.reflect.TypeToken;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.function.Consumer;
 
-@SuppressWarnings("WeakerAccess")
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@SuppressWarnings({"WeakerAccess", "Guava"})
 public class Utils {
 
   public static final SimpleVersion MC_VERSION =
-      new SimpleVersion(Fields.<String>get(null, findField(Loader.class, "MC_VERSION"))); // prevent inlining
+      new SimpleVersion(Fields.get(null, findField(Loader.class, "MC_VERSION"))); // prevent inlining
 
 
   // Minecraft
 
-  public static class EntityLists {
-    @SuppressWarnings("unchecked")
-    public static Map<String, Class<? extends Entity>> stringToClassMapping() {
-      return EntityList.stringToClassMapping;
-    }
-  }
-
   public static String getEntityString(Class<? extends Entity> clz) {
-    return (String) EntityList.classToStringMapping.get(clz);
+    return EntityList.CLASS_TO_NAME.get(clz);
   }
 
   public static boolean isClientSide() {
@@ -137,7 +110,7 @@ public class Utils {
   }
 
   public static int getEnchLevel(ItemStack item, Enchantment ench) {
-    return EnchantmentHelper.getEnchantmentLevel(ench.effectId, item);
+    return EnchantmentHelper.getEnchantmentLevel(ench, item);
   }
 
   public static boolean hasEnch(EntityItem item, Feature<? extends Enchantment> ench) {
@@ -148,10 +121,11 @@ public class Utils {
   }
   public static boolean hasEnch(ItemStack item, Enchantment ench) {
     if (item != null) {
-      int id = ench.effectId;
-      NBTTagList nbt = item.getItem() == Items.enchanted_book ?
-          Items.enchanted_book.getEnchantments(item) : item.getEnchantmentTagList();
+      int id = Enchantment.getEnchantmentID(ench);
+      NBTTagList nbt = item.getItem() == Items.ENCHANTED_BOOK ?
+          Items.ENCHANTED_BOOK.getEnchantments(item) : item.getEnchantmentTagList();
 
+      //noinspection ConstantConditions
       if (nbt != null)
         for (int i = 0; i < nbt.tagCount(); i++)
           if (nbt.getCompoundTagAt(i).getShort("id") == id)
