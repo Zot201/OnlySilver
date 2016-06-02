@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
@@ -213,8 +214,8 @@ public class Utils {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> java.util.function.Consumer<T> doNothing() {
-    return (java.util.function.Consumer<T>) EmptyConsumer.INSTANCE;
+  public static <T> Consumer<T> doNothing() {
+    return (Consumer<T>) EmptyConsumer.INSTANCE;
   }
   private enum EmptyConsumer implements java.util.function.Consumer<Object> {
     INSTANCE;

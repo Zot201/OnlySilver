@@ -1,59 +1,51 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config;
-
-import java.util.List;
-import java.util.Set;
-
-import net.minecraft.block.Block;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.commons.lang3.mutable.MutableInt;
-
-import zotmc.onlysilver.Contents;
-import zotmc.onlysilver.ItemFeature;
-import zotmc.onlysilver.config.AbstractConfig.Property;
-import zotmc.onlysilver.config.gui.AbstractBooleanRow;
-import zotmc.onlysilver.config.gui.AbstractConfigFactory;
-import zotmc.onlysilver.config.gui.BasicOreSettingsLayout;
-import zotmc.onlysilver.config.gui.Element;
-import zotmc.onlysilver.config.gui.EmptyRow;
-import zotmc.onlysilver.config.gui.Holder;
-import zotmc.onlysilver.config.gui.Icon;
-import zotmc.onlysilver.config.gui.IconButton;
-import zotmc.onlysilver.config.gui.IconButtonLayout;
-import zotmc.onlysilver.config.gui.ItemIcon;
-import zotmc.onlysilver.config.gui.Row;
-import zotmc.onlysilver.config.gui.SliderRow;
-import zotmc.onlysilver.config.gui.SpriteIcon;
-import zotmc.onlysilver.config.gui.TextFieldRow;
-import zotmc.onlysilver.config.gui.TinyCheckbox;
-import zotmc.onlysilver.config.gui.ValueInjectionRow;
-import zotmc.onlysilver.data.LangData;
-import zotmc.onlysilver.data.ModData.MoCreatures;
-import zotmc.onlysilver.oregen.ExtSettings;
-import zotmc.onlysilver.util.Utils;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.google.common.primitives.Ints;
+import net.minecraft.block.Block;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableInt;
+import zotmc.onlysilver.Contents;
+import zotmc.onlysilver.ItemFeature;
+import zotmc.onlysilver.config.AbstractConfig.Property;
+import zotmc.onlysilver.config.gui.*;
+import zotmc.onlysilver.data.LangData;
+import zotmc.onlysilver.data.ModData.MoCreatures;
+import zotmc.onlysilver.oregen.ExtSettings;
+import zotmc.onlysilver.util.Utils;
 
+import java.util.List;
+import java.util.Set;
+
+@SuppressWarnings({"StaticPseudoFunctionalStyleMethod", "Guava"})
 @SideOnly(Side.CLIENT)
 public class ConfigGui extends AbstractConfigFactory {
 
@@ -95,13 +87,13 @@ public class ConfigGui extends AbstractConfigFactory {
         hide = !value;
       }
     };
-    return ImmutableList.of(new TinyCheckbox(state, Utils.<Boolean>doNothing()).setLeftTop(w / 2 + 48, 14));
+    return ImmutableList.of(new TinyCheckbox(state, Utils.doNothing()).setLeftTop(w / 2 + 48, 14));
   }
 
   @Override public Iterable<Row> getUpperRows(int w, Holder<List<String>> hoveringText) {
     List<Row> rows = Lists.newArrayList();
 
-    rows.add(new ItemIcon(Blocks.gravel).categoryRow(LangData.ORE_GENERATION));
+    rows.add(new ItemIcon(Blocks.GRAVEL).categoryRow(LangData.ORE_GENERATION));
 
     rows.add(new GenDefaultsRow() {
       @Override protected Property<GenDefaults> toProperty(Config t) {
@@ -114,7 +106,7 @@ public class ConfigGui extends AbstractConfigFactory {
 
     rows.add(EmptyRow.INSTANCE);
 
-    rows.add(new ItemIcon(Items.enchanted_book).setRenderEffect(false).categoryRow(LangData.ENCHANTMENTS));
+    /*rows.add(new ItemIcon(Items.enchanted_book).setRenderEffect(false).categoryRow(LangData.ENCHANTMENTS));
 
     rows.add(new EnchantmentRow() {
       @Override protected Property<Integer> toProperty(Config t) {
@@ -134,9 +126,9 @@ public class ConfigGui extends AbstractConfigFactory {
       }
     });
 
-    rows.add(EmptyRow.INSTANCE);
+    rows.add(EmptyRow.INSTANCE);*/
 
-    rows.add(new SpriteIcon(GuiScreen.statIcons, 36, 18, 128).categoryRow(LangData.STATS));
+    rows.add(new SpriteIcon(GuiScreen.STAT_ICONS, 36, 18, 128).categoryRow(LangData.STATS));
 
     rows.add(new BlockStatsRow() {
       @Override protected Property<BlockStats> toProperty(Config t) {
@@ -184,7 +176,7 @@ public class ConfigGui extends AbstractConfigFactory {
 
     rows.add(EmptyRow.INSTANCE);
 
-    rows.add(new ItemIcon(Items.lava_bucket).categoryRow(LangData.MISCELLANEOUS));
+    rows.add(new ItemIcon(Items.LAVA_BUCKET).categoryRow(LangData.MISCELLANEOUS));
 
     rows.add(new FeatureSetRow() {
       @Override protected Property<Set<String>> toProperty(Config t) {
@@ -336,7 +328,7 @@ public class ConfigGui extends AbstractConfigFactory {
     }
   }
 
-  private abstract class EnchantmentRow extends SliderRow {
+  /*private abstract class EnchantmentRow extends SliderRow {
     // row
     @Override protected int widgetPos(int k) {
       return k * 7 / 15;
@@ -373,7 +365,7 @@ public class ConfigGui extends AbstractConfigFactory {
     @Override public void next() {
       setValue(getValue() + 1);
     }
-  }
+  }*/
 
 
   private abstract class EditorRow<V> extends ValueInjectionRow<Config, V> {
@@ -404,7 +396,7 @@ public class ConfigGui extends AbstractConfigFactory {
     }
 
     @Override public Iterable<? extends Row> getUpperRows(int w, Holder<List<String>> hoveringText, GenDefaults defaultValue) {
-      List<Row> upper = ImmutableList.<Row>of(new TextFieldRow() {
+      List<Row> upper = ImmutableList.of(new TextFieldRow() {
         @Override public String getText() {
           return dimensions;
         }
@@ -415,7 +407,7 @@ public class ConfigGui extends AbstractConfigFactory {
           return LangData.DIMENSIONS.append(":");
         }
         @Override protected int widgetPos(int k) {
-          return k * 1 / 3;
+          return k / 3;
         }
       });
 
@@ -469,7 +461,7 @@ public class ConfigGui extends AbstractConfigFactory {
 
       if (defaultValue.harvestLevel >= 0)
         ret.add(new IntSliderRow(defaultValue.harvestLevel) {
-          final Icon<?> icon = new ItemIcon(Items.diamond, Icon.PHIM1).overlay(Blocks.stone);
+          final Icon<?> icon = new ItemIcon(Items.DIAMOND, Icon.PHIM1).overlay(Blocks.STONE);
 
           @Override protected Icon<?> icon() {
             return icon;
@@ -487,7 +479,7 @@ public class ConfigGui extends AbstractConfigFactory {
         });
 
       ret.add(new FloatSliderRow(defaultValue.hardness, 0.05) {
-        final Icon<?> icon = new ItemIcon(Items.iron_pickaxe, Icon.PHIM1).overlay(Blocks.stone);
+        final Icon<?> icon = new ItemIcon(Items.IRON_PICKAXE, Icon.PHIM1).overlay(Blocks.STONE);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -505,7 +497,7 @@ public class ConfigGui extends AbstractConfigFactory {
       });
 
       ret.add(new FloatSliderRow(defaultValue.resistance, 0.5) {
-        final Icon<?> icon = new ItemIcon(Items.gunpowder, Icon.PHIM1).overlay(Blocks.stone);
+        final Icon<?> icon = new ItemIcon(Items.GUNPOWDER, Icon.PHIM1).overlay(Blocks.STONE);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -548,7 +540,7 @@ public class ConfigGui extends AbstractConfigFactory {
       List<Row> ret = Lists.newArrayList();
 
       ret.add(new IntSliderRow(defaultValue.harvestLevel) {
-        final Icon<?> icon = new ItemIcon(Items.diamond, Icon.PHIM1).overlay(Items.iron_pickaxe);
+        final Icon<?> icon = new ItemIcon(Items.DIAMOND, Icon.PHIM1).overlay(Items.IRON_PICKAXE);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -566,7 +558,7 @@ public class ConfigGui extends AbstractConfigFactory {
       });
 
       ret.add(new IntSliderRow(defaultValue.maxUses) {
-        final Icon<?> icon = new SpriteIcon(Gui.statIcons, 72, 18, 128);
+        final Icon<?> icon = new SpriteIcon(Gui.STAT_ICONS, 72, 18, 128);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -620,7 +612,7 @@ public class ConfigGui extends AbstractConfigFactory {
       });
 
       ret.add(new IntSliderRow(defaultValue.enchantability) {
-        final Icon<?> icon = new ItemIcon(Blocks.enchanting_table);
+        final Icon<?> icon = new ItemIcon(Blocks.ENCHANTING_TABLE);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -662,7 +654,7 @@ public class ConfigGui extends AbstractConfigFactory {
       List<Row> ret = Lists.newArrayList();
 
       ret.add(new IntSliderRow(defaultValue.durability) {
-        final Icon<?> icon = new SpriteIcon(Gui.statIcons, 72, 18, 128);
+        final Icon<?> icon = new SpriteIcon(Gui.STAT_ICONS, 72, 18, 128);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -680,7 +672,7 @@ public class ConfigGui extends AbstractConfigFactory {
       });
 
       ret.add(new IntSliderRow(defaultValue.reductionAmounts.get(0)) {
-        final Icon<?> icon = new ItemIcon(Items.chainmail_helmet);
+        final Icon<?> icon = new ItemIcon(Items.CHAINMAIL_HELMET);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -698,7 +690,7 @@ public class ConfigGui extends AbstractConfigFactory {
       });
 
       ret.add(new IntSliderRow(defaultValue.reductionAmounts.get(1)) {
-        final Icon<?> icon = new ItemIcon(Items.chainmail_chestplate);
+        final Icon<?> icon = new ItemIcon(Items.CHAINMAIL_CHESTPLATE);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -716,7 +708,7 @@ public class ConfigGui extends AbstractConfigFactory {
       });
 
       ret.add(new IntSliderRow(defaultValue.reductionAmounts.get(2)) {
-        final Icon<?> icon = new ItemIcon(Items.chainmail_leggings);
+        final Icon<?> icon = new ItemIcon(Items.CHAINMAIL_LEGGINGS);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -734,7 +726,7 @@ public class ConfigGui extends AbstractConfigFactory {
       });
 
       ret.add(new IntSliderRow(defaultValue.reductionAmounts.get(3)) {
-        final Icon<?> icon = new ItemIcon(Items.chainmail_boots);
+        final Icon<?> icon = new ItemIcon(Items.CHAINMAIL_BOOTS);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -752,7 +744,7 @@ public class ConfigGui extends AbstractConfigFactory {
       });
 
       ret.add(new IntSliderRow(defaultValue.enchantability) {
-        final Icon<?> icon = new ItemIcon(Blocks.enchanting_table);
+        final Icon<?> icon = new ItemIcon(Blocks.ENCHANTING_TABLE);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -787,7 +779,7 @@ public class ConfigGui extends AbstractConfigFactory {
       return IconButtonLayout.SLOT_SIZE;
     }
     @Override protected Iterable<Row> getLowerRows() {
-      return ImmutableList.<Row>of(EmptyRow.INSTANCE);
+      return ImmutableList.of(EmptyRow.INSTANCE);
     }
 
     @Override public Iterable<? extends Row> getUpperRows(int w, Holder<List<String>> hoveringText, Set<String> defaultValue) {
@@ -807,9 +799,7 @@ public class ConfigGui extends AbstractConfigFactory {
           buttons.add(button);
         }
 
-      Predicate<IconButton> p = new Predicate<IconButton>() { public boolean apply(IconButton input) {
-        return !hide || accessible.contains(input);
-      }};
+      Predicate<IconButton> p = input -> !hide || accessible.contains(input);
       return new IconButtonLayout(Iterables.filter(buttons, p), w);
     }
 
@@ -825,7 +815,7 @@ public class ConfigGui extends AbstractConfigFactory {
       };
     }
     private Supplier<List<String>> tooltip(Supplier<String> name) {
-      return Suppliers.ofInstance(ItemIcon.colorTooltip(Lists.newArrayList(name.get()), EnumChatFormatting.DARK_GRAY));
+      return Suppliers.ofInstance(ItemIcon.colorTooltip(Lists.newArrayList(name.get()), TextFormatting.DARK_GRAY));
     }
   }
 

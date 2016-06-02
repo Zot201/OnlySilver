@@ -1,9 +1,22 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.List;
-
+import com.google.common.base.Supplier;
+import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -12,15 +25,15 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
-
+import net.minecraft.util.text.TextFormatting;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.logging.log4j.Logger;
-
 import zotmc.onlysilver.OnlySilver;
 import zotmc.onlysilver.util.ClientUtils;
 
-import com.google.common.base.Supplier;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ItemIcon extends Icon<ItemIcon> implements Supplier<String> {
 
@@ -105,12 +118,12 @@ public class ItemIcon extends Icon<ItemIcon> implements Supplier<String> {
     return iconButton(state, new ItemHoveringTexts(item), textHolder);
   }
 
-  public static List<String> colorTooltip(List<String> tooltips, EnumChatFormatting rarityColor) {
+  public static List<String> colorTooltip(List<String> tooltips, TextFormatting rarityColor) {
     int n = tooltips.size();
     if (n > 0) {
       tooltips.set(0, rarityColor + tooltips.get(0));
       for (int i = 1; i < n; i++)
-        tooltips.set(i, EnumChatFormatting.GRAY + tooltips.get(i));
+        tooltips.set(i, ChatFormatting.GRAY + tooltips.get(i));
     }
     return tooltips;
   }
