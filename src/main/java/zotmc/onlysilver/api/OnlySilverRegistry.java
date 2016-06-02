@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.api;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -15,6 +30,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 
+@SuppressWarnings({"Guava", "WeakerAccess"})
 public class OnlySilverRegistry {
 
   static final ListMultimap<String, DamageSourceHandler> damageSourceHandlers = ArrayListMultimap.create();
@@ -44,7 +60,7 @@ public class OnlySilverRegistry {
    *
    * <p>{@linkplain Predicate Predicates} are guaranteed to have non-{@code null} input.
    *
-   * @see OnlySilverUtils#isSilveryEquip
+   * @see OnlySilverUtils#isSilverEquip
    */
   public static void registerSilverPredicate(Predicate<? super ItemStack> silverPredicate) {
     silverPredicates.add(silverPredicate);

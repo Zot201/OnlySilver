@@ -55,6 +55,7 @@ public class EnchIncantation extends Enchantment {
     if (!event.entity.worldObj.isRemote) {
       AttackItem attackItem = OnlySilverUtils.getAttackItem(event.source);
 
+      // TODO: Consider widen the range of attacker to mobs
       if (attackItem != null && attackItem.getAttacker() instanceof EntityPlayer) {
         int lvl = attackItem.getEnchantmentLevel(this);
 

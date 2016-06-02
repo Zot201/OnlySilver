@@ -15,9 +15,6 @@
  */
 package zotmc.onlysilver;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.creativetab.CreativeTabs;
@@ -25,7 +22,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
@@ -33,9 +30,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.Loader;
@@ -58,14 +54,15 @@ import zotmc.onlysilver.data.ModData.WeaponMod;
 import zotmc.onlysilver.ench.EnchIncantation;
 import zotmc.onlysilver.ench.EnchSilverAura;
 import zotmc.onlysilver.entity.EntitySilverGolem;
-import zotmc.onlysilver.util.Feature;
 import zotmc.onlysilver.util.Fields;
 import zotmc.onlysilver.util.FluentMultiset;
 import zotmc.onlysilver.util.Reserve;
 import zotmc.onlysilver.util.Utils;
 
-import com.google.common.base.Predicate;
+import java.lang.reflect.Field;
+import java.util.Map;
 
+@SuppressWarnings("WeakerAccess")
 public class Contents {
   
   static final Map<String, String> renameMap = Utils.newHashMap();
@@ -78,6 +75,7 @@ public class Contents {
     {
       setRelevantEnchantmentTypes(TOOL, BREAKABLE);
     }
+    @SuppressWarnings("NullableProblems")
     @Override public Item getTabIconItem() {
       return Item.getItemFromBlock(silverBlock.get());
     }
@@ -107,15 +105,17 @@ public class Contents {
     // silver ore
     Block b = new BlockOnlyOre().setUnlocalizedName("silverOre").setCreativeTab(tabOnlySilver);
     Config.current().silverOreStats.get().setStatTo(b, "pickaxe");
-    GameRegistry.registerBlock(b, "silver_ore");
+    b.setRegistryName("silver_ore");
+    GameRegistry.register(b);
     silverOre.set(b);
     OnlySilver.INSTANCE.proxy.registerItemModels(b, "silver_ore");
     OreDictionary.registerOre("oreSilver", b);
     
     // silver block
-    b = new BlockOnlyCompressed(MapColor.quartzColor).setUnlocalizedName("silverBlock").setCreativeTab(tabOnlySilver);
+    b = new BlockOnlyCompressed(MapColor.QUARTZ).setUnlocalizedName("silverBlock").setCreativeTab(tabOnlySilver);
     Config.current().silverBlockStats.get().setStatTo(b, null);
-    GameRegistry.registerBlock(b, "silver_block");
+    b.setRegistryName("silver_block");
+    GameRegistry.register(b);
     silverBlock.set(b);
     OnlySilver.INSTANCE.proxy.registerItemModels(b, "silver_block");
     OreDictionary.registerOre("blockSilver", b);
@@ -146,7 +146,7 @@ public class Contents {
     if (id != -1) {
       EnchSilverAura ench = new EnchSilverAura(id, new ResourceLocation(OnlySilvers.MODID, "silver_aura"));
       ench.setName(OnlySilvers.MODID + ".silverAura");
-      Enchantment.addToBookList(ench);
+      //Enchantment.addToBookList(ench); // TODO: Check effect of previous addToBookList call
       silverAura.set(ench);
       CommonHooks.silverAuraExists = true;
     }
@@ -157,7 +157,7 @@ public class Contents {
       Enchantment ench = new EnchIncantation(id, new ResourceLocation(OnlySilvers.MODID, "incantation"))
         .subscribeEvent()
         .setName(OnlySilvers.MODID + ".incantation");
-      Enchantment.addToBookList(ench);
+      //Enchantment.addToBookList(ench); // TODO: Same as above
       incantation.set(ench);
     }
     
@@ -170,7 +170,7 @@ public class Contents {
     // achievement
     if (ItemFeature.silverBow.exists()) {
       Achievement achievement = new Achievement("silverBowAch", "silverBowAch", 1, 7,
-          ItemFeature.silverBow.get(), AchievementList.acquireIron).registerAchievement();
+          ItemFeature.silverBow.get(), AchievementList.ACQUIRE_IRON).registerStat();
       
       injectFinal("buildSilverBow", buildSilverBow.set(achievement).toOptional());
     }
@@ -178,14 +178,15 @@ public class Contents {
     
     
     // loots
-    addLootItem(ChestGenHooks.VILLAGE_BLACKSMITH, ItemFeature.silverHelm, 1, 1, 2);
+    // TODO: Loots
+    /*addLootItem(ChestGenHooks.VILLAGE_BLACKSMITH, ItemFeature.silverHelm, 1, 1, 2);
     addLootItem(ChestGenHooks.VILLAGE_BLACKSMITH, ItemFeature.silverChest, 1, 1, 2);
     addLootItem(ChestGenHooks.VILLAGE_BLACKSMITH, ItemFeature.silverLegs, 1, 1, 2);
     addLootItem(ChestGenHooks.VILLAGE_BLACKSMITH, ItemFeature.silverBoots, 1, 1, 2);
     addLootItem(ChestGenHooks.PYRAMID_DESERT_CHEST, ItemFeature.silverIngot, 4, 6, 4);
     addLootItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST, ItemFeature.silverIngot, 4, 6, 4);
     addLootItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST, ItemFeature.silverBoots, 1, 1, 2);
-    addLootItem(ChestGenHooks.DUNGEON_CHEST, ItemFeature.silverIngot, 3, 5, 1);
+    addLootItem(ChestGenHooks.DUNGEON_CHEST, ItemFeature.silverIngot, 3, 5, 1);*/
     
     // silver
     OnlySilverRegistry.registerSilverPredicate(
@@ -221,14 +222,14 @@ public class Contents {
       
       @Override public ItemStack getItem(DamageSource damage) {
         Entity entity = damage.getEntity();
-        return !(entity instanceof EntityLivingBase) ? null : ((EntityLivingBase) entity).getHeldItem();
+        return !(entity instanceof EntityLivingBase) ? null : ((EntityLivingBase) entity).getHeldItem(EnumHand.MAIN_HAND);
       }
       
       @Override public void updateItem(DamageSource damage, ItemStack item) {
         Entity entity = damage.getEntity();
-        if (!(entity instanceof EntityPlayer))
-          throw new UnsupportedOperationException("Unable to handle item damaging for mob with generic handler");
-        entity.setCurrentItemOrArmor(0, item);
+        if (entity != null) {
+          damage.getEntity().setItemStackToSlot(EntityEquipmentSlot.MAINHAND, item);
+        }
       }
     });
     
@@ -252,9 +253,9 @@ public class Contents {
     });
   }
   
-  private static void addLootItem(String category, Feature<Item> i, int min, int max, int weight) {
+  /*private static void addLootItem(String category, Feature<Item> i, int min, int max, int weight) {
     if (i.exists()) ChestGenHooks.addItem(category, new WeightedRandomChestContent(i.get(), 0, min, max, weight));
-  }
+  }*/
   
   private static void injectFinal(String name, Object value) {
     try {

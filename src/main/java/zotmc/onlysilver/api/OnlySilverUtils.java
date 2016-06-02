@@ -1,9 +1,27 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.api;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.ai.EntityAIArrowAttack;
+import net.minecraft.entity.ai.EntityAIAttackRangedBow;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
@@ -16,10 +34,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
-
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 
 /**
  * A utility class that provide access to OnlySilver features / functions. Fields are substituted upon the dispatch of
@@ -35,6 +49,7 @@ import com.google.common.base.Predicate;
  * 
  * @author Zot
  */
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "Guava", "unused"})
 public class OnlySilverUtils {
 
   public static final Optional<ToolMaterial> silverToolMaterial = Optional.absent();
@@ -102,12 +117,13 @@ public class OnlySilverUtils {
    *
    * <p><i>Note: Any attack action that is implemented with {@link Item#onPlayerStoppedUsing}, or is a call of
    * {@link IRangedAttackMob#attackEntityWithRangedAttack} from the <b>unoverriden</b> version of
-   * {@link EntityAIArrowAttack#updateTask}, is handled by default.</i>
+   * {@link EntityAIAttackRangedBow#updateTask}, is handled by default.</i>
    *
    * @param bowItem a item that may hold the Silver Aura enchantment
    * @param attackAction an attack action that involves spawning of arrows
    */
   public static void applySilverAuraToArrows(ItemStack bowItem, Runnable attackAction) {
+    //noinspection ConstantConditions
     applySilverAura.accept(bowItem, attackAction);
   }
 
