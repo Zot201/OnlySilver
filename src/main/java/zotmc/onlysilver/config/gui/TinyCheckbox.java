@@ -10,16 +10,15 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.mutable.Mutable;
 
 import zotmc.onlysilver.data.ModData.OnlySilvers;
-import zotmc.onlysilver.util.Consumer;
 
 public class TinyCheckbox implements Widget<TinyCheckbox> {
 	
 	private static final ResourceLocation textures = new ResourceLocation(OnlySilvers.MODID, "textures/gui/widgets.png");
 	private final GuiTinyCheckbox delegate = new GuiTinyCheckbox();
 	private final Mutable<Boolean> state;
-	private final Consumer<Boolean> hoverHandler;
+	private final java.util.function.Consumer<Boolean> hoverHandler;
 	
-	public TinyCheckbox(Mutable<Boolean> state, Consumer<Boolean> hoverHandler) {
+	public TinyCheckbox(Mutable<Boolean> state, java.util.function.Consumer<Boolean> hoverHandler) {
 		this.state = state;
 		this.hoverHandler = hoverHandler;
 	}

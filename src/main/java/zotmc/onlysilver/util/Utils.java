@@ -199,10 +199,10 @@ public class Utils {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> Consumer<T> doNothing() {
-		return (Consumer<T>) EmptyConsumer.INSTANCE;
+	public static <T> java.util.function.Consumer<T> doNothing() {
+		return (java.util.function.Consumer<T>) EmptyConsumer.INSTANCE;
 	}
-	private enum EmptyConsumer implements Consumer<Object> {
+	private enum EmptyConsumer implements java.util.function.Consumer<Object> {
 		INSTANCE;
 		@Override public void accept(Object t) { }
 	}
