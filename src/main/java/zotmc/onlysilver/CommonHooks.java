@@ -72,6 +72,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
 
+import javax.annotation.Nullable;
+
 public class CommonHooks {
   
   // item features (non-coremod callbacks)
@@ -130,7 +132,7 @@ public class CommonHooks {
     INSTANCE;
     private static final List<ItemStack> blockSilver = OreDictionary.getOres("blockSilver");
     
-    @Override public boolean apply(BlockWorldState input) {
+    @Override public boolean apply(@Nullable BlockWorldState input) {
       if (input != null) {
         IBlockState block = input.getBlockState();
         

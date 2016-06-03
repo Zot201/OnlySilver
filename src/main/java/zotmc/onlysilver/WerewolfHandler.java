@@ -33,7 +33,7 @@ import zotmc.onlysilver.item.ItemOnlyBow;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 
-public class WerewolfHandler<MoCEntityWerewolf extends EntityLivingBase> {
+class WerewolfHandler<MoCEntityWerewolf extends EntityLivingBase> {
 
   private final EventBus bus;
   private final Class<MoCEntityWerewolf> werewolfType;
@@ -41,7 +41,7 @@ public class WerewolfHandler<MoCEntityWerewolf extends EntityLivingBase> {
   private final Random rand = new Random();
   private boolean enabled;
   
-  public WerewolfHandler(EventBus bus) throws Throwable {
+  WerewolfHandler(EventBus bus) throws Throwable {
     this.bus = bus;
     //noinspection unchecked
     werewolfType = (Class<MoCEntityWerewolf>) Class.forName(MoCreatures.MOC_ENTITY_WEREWOLF);

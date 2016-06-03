@@ -60,8 +60,11 @@ import zotmc.onlysilver.util.FluentMultiset;
 import zotmc.onlysilver.util.Reserve;
 import zotmc.onlysilver.util.Utils;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @SuppressWarnings("WeakerAccess")
 public class Contents {
@@ -76,9 +79,8 @@ public class Contents {
     {
       setRelevantEnchantmentTypes(TOOL, BREAKABLE);
     }
-    @SuppressWarnings("NullableProblems")
     @Override public Item getTabIconItem() {
-      return Item.getItemFromBlock(silverBlock.get());
+      return checkNotNull(Item.getItemFromBlock(silverBlock.get()));
     }
   };
   
@@ -226,7 +228,7 @@ public class Contents {
         return !(entity instanceof EntityLivingBase) ? null : ((EntityLivingBase) entity).getHeldItem(EnumHand.MAIN_HAND);
       }
       
-      @Override public void updateItem(DamageSource damage, ItemStack item) {
+      @Override public void updateItem(DamageSource damage, @Nullable ItemStack item) {
         Entity entity = damage.getEntity();
         if (entity != null) {
           damage.getEntity().setItemStackToSlot(EntityEquipmentSlot.MAINHAND, item);

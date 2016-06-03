@@ -13,19 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package zotmc.onlysilver.api;
-
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
-
-import javax.annotation.Nullable;
-
-public interface DamageSourceHandler {
-
-  String[] getTargetDamageTypes();
-
-  @Nullable ItemStack getItem(DamageSource damage);
-
-  void updateItem(DamageSource damage, @Nullable ItemStack item);
-
-}
+@javax.annotation.ParametersAreNonnullByDefault
+@mcp.MethodsReturnNonnullByDefault
+package zotmc.onlysilver.util;

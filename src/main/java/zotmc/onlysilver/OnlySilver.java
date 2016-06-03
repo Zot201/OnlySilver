@@ -39,6 +39,8 @@ import zotmc.onlysilver.loading.OnlyLoading;
 import zotmc.onlysilver.oregen.SilverGenerator;
 import zotmc.onlysilver.util.Utils;
 
+import javax.annotation.Nullable;
+
 import static zotmc.onlysilver.data.ModData.OnlySilvers.*;
 import static zotmc.onlysilver.util.Utils.isClientSide;
 
@@ -86,14 +88,12 @@ public enum OnlySilver {
       switch (missing.type) {
       case ITEM:
         Item i = retrieve(Item.REGISTRY, missing.name);
-        //noinspection ConstantConditions
         if (i != null) missing.remap(i);
         else log.error("Unable to remap item instance for %s", missing.name);
         break;
         
       case BLOCK:
         Block b = retrieve(Block.REGISTRY, missing.name);
-        //noinspection ConstantConditions
         if (b != null) missing.remap(b);
         else log.error("Unable to remap block instance for %s", missing.name);
         break;
@@ -104,7 +104,8 @@ public enum OnlySilver {
     }
   }
   
-  private <I extends IForgeRegistryEntry<I>> I retrieve(RegistryNamespaced<ResourceLocation, I> registry, String oldId) {
+  private @Nullable <I extends IForgeRegistryEntry<I>> I retrieve(
+      RegistryNamespaced<ResourceLocation, I> registry, String oldId) {
     String camel = oldId.substring(oldId.indexOf(':') + 1), underscore = Contents.renameMap.get(camel);
     if (underscore == null) underscore = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, camel);
     return registry.getObject(new ResourceLocation(MODID, underscore));

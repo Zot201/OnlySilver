@@ -22,7 +22,10 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
+import javax.annotation.Nullable;
 import java.util.Random;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public class AttackItem {
 
@@ -36,17 +39,17 @@ public class AttackItem {
     this.cachedItem = cachedItem;
   }
 
-  public ItemStack getItem() {
+  public @Nullable ItemStack getItem() {
     return cachedItem != null ? cachedItem : (cachedItem = handler.getItem(damage));
   }
 
   @SuppressWarnings("WeakerAccess")
-  public void updateItem(ItemStack item) {
+  public void updateItem(@Nullable ItemStack item) {
     handler.updateItem(damage, item);
     cachedItem = null;
   }
 
-  public EntityLivingBase getAttacker() {
+  public @Nullable EntityLivingBase getAttacker() {
     Entity ret = damage.getEntity();
     return ret instanceof EntityLivingBase ? (EntityLivingBase) ret : null;
   }
@@ -58,8 +61,10 @@ public class AttackItem {
 
   public void damageItem(int amount, Random rand) {
     EntityLivingBase attacker = getAttacker();
-    if (attacker != null) getItem().damageItem(amount, attacker);
-    else getItem().attemptDamageItem(amount, rand);
+    ItemStack i = getItem();
+    checkState(i != null);
+    if (attacker != null) i.damageItem(amount, attacker);
+    else i.attemptDamageItem(amount, rand);
   }
 
   public boolean isItemRunOut() {

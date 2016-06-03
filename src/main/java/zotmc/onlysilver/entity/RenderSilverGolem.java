@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import zotmc.onlysilver.data.ModData.OnlySilvers;
 
 @SideOnly(Side.CLIENT)
-public class RenderSilverGolem extends RenderIronGolem {
+class RenderSilverGolem extends RenderIronGolem {
 
   private static final ResourceLocation silverGolemTextures =
       new ResourceLocation(OnlySilvers.MODID + ":textures/entity/silver_golem.png");
@@ -24,7 +24,7 @@ public class RenderSilverGolem extends RenderIronGolem {
     return silverGolemTextures;
   }
 
-  @Override protected void preRenderCallback(EntityLivingBase living, float f) {
+  @Override protected void preRenderCallback(EntityIronGolem living, float f) {
     GlStateManager.scale(8/14f, 19/29f, 8/14f);
   }
 

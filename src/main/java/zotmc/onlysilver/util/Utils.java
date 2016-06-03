@@ -41,6 +41,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import zotmc.onlysilver.util.init.MethodInfo;
 import zotmc.onlysilver.util.init.SimpleVersion;
 
+import javax.annotation.Nullable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -119,7 +120,7 @@ public class Utils {
   public static boolean hasEnch(ItemStack item, Feature<? extends Enchantment> ench) {
     return ench.exists() && hasEnch(item, ench.get());
   }
-  public static boolean hasEnch(ItemStack item, Enchantment ench) {
+  public static boolean hasEnch(@Nullable ItemStack item, Enchantment ench) {
     if (item != null) {
       int id = Enchantment.getEnchantmentID(ench);
       NBTTagList nbt = item.getItem() == Items.ENCHANTED_BOOK ?
@@ -219,7 +220,6 @@ public class Utils {
     return Sets.newSetFromMap(Utils.newIdentityHashMap());
   }
 
-  @SuppressWarnings("NullableProblems")
   private static class NullSafeMap<K, V> extends ForwardingMap<K, V> {
     private final Map<K, V> delegate;
     private Set<Entry<K, V>> entrySet;

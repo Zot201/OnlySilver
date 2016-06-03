@@ -35,6 +35,8 @@ import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 
+import javax.annotation.Nullable;
+
 /**
  * A utility class that provide access to OnlySilver features / functions. Fields are substituted upon the dispatch of
  * {@link FMLPreInitializationEvent}, through reflection.
@@ -82,7 +84,7 @@ public class OnlySilverUtils {
    *
    * @see OnlySilverRegistry#registerSilverPredicate
    */
-  public static boolean isSilverEquip(ItemStack item) {
+  public static boolean isSilverEquip(@Nullable ItemStack item) {
     if (item != null)
       for (Predicate<? super ItemStack> p : OnlySilverRegistry.silverPredicates)
         if (p.apply(item))
@@ -99,7 +101,7 @@ public class OnlySilverUtils {
    *
    * @see OnlySilverRegistry#registerWerewolfDamage
    */
-  public static float getWerewolfDamage(ItemStack item, float original) {
+  public static float getWerewolfDamage(@Nullable ItemStack item, float original) {
     if (item != null) {
       Function<? super ItemStack, Float> function = OnlySilverRegistry.werewolfDamages.get(item.getItem());
       if (function != null) {
@@ -116,7 +118,7 @@ public class OnlySilverUtils {
    * Strength of arrows is enhanced through {@link EntityArrow#getDamage} and {@link EntityArrow#setDamage}.
    *
    * <p><i>Note: Any attack action that is implemented with {@link Item#onPlayerStoppedUsing}, or is a call of
-   * {@link IRangedAttackMob#attackEntityWithRangedAttack} from the <b>unoverriden</b> version of
+   * {@link IRangedAttackMob#attackEntityWithRangedAttack} from the <b>unoverridden</b> version of
    * {@link EntityAIAttackRangedBow#updateTask}, is handled by default.</i>
    *
    * @param bowItem a item that may hold the Silver Aura enchantment
