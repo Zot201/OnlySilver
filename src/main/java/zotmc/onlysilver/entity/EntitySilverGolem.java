@@ -21,17 +21,23 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import zotmc.onlysilver.ClientProxy;
 import zotmc.onlysilver.ItemFeature;
-import zotmc.onlysilver.data.ModData.OnlySilvers;
+
+import static zotmc.onlysilver.data.ModData.OnlySilvers.MODID;
 
 @ClientProxy.EntityRenderer(RenderSilverGolem.class)
 public class EntitySilverGolem extends EntityIronGolem {
+
+  private SoundEvent HIT_SOUND = SoundEvent.REGISTRY.getObject(new ResourceLocation(MODID, "silvergolem.hit"));
+  private SoundEvent DEATH_SOUND = SoundEvent.REGISTRY.getObject(new ResourceLocation(MODID, "silvergolem.death"));
 
   public EntitySilverGolem(World world) {
     super(world);
@@ -44,32 +50,31 @@ public class EntitySilverGolem extends EntityIronGolem {
 
   @Override protected void applyEntityAttributes() {
     super.applyEntityAttributes();
-    this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(35);
-    getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.5);
+    this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(35);
+    getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5);
   }
 
   @Override public EntityItem dropItem(Item item, int stackSize) {
-    if (item == Items.iron_ingot)
+    if (item == Items.IRON_INGOT)
       return super.dropItem(ItemFeature.silverIngot.get(), stackSize);
     return super.dropItem(item, stackSize);
   }
 
 
-  @Override protected String getHurtSound() {
-    return OnlySilvers.MODID + ":silvergolem.hit";
+  @Override protected SoundEvent getHurtSound() {
+    return HIT_SOUND;
   }
 
-  @Override protected String getDeathSound() {
-    return OnlySilvers.MODID + ":silvergolem.death";
+  @Override protected SoundEvent getDeathSound() {
+    return DEATH_SOUND;
   }
 
   @Override protected void playStepSound(BlockPos pos, Block block) {
-    super.playSound("mob.irongolem.walk", 1.3322327F, 1);
+    super.playSound(SoundEvents.ENTITY_IRONGOLEM_STEP, 1.3322327F, 1);
   }
 
-  @Override public void playSound(String sound, float volume, float pitch) {
-    if (sound == "none") return;
-    if (!sound.equals("mob.irongolem.throw")) volume *= 1.6271853F;
+  @Override public void playSound(SoundEvent sound, float volume, float pitch) {
+    if (sound != SoundEvents.ENTITY_IRONGOLEM_ATTACK) volume *= 1.6271853F;
     super.playSound(sound, volume, pitch);
   }
 
