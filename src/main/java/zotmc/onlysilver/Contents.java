@@ -40,7 +40,7 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
-import zotmc.onlysilver.api.BiConsumer;
+import java.util.function.BiConsumer;
 import zotmc.onlysilver.api.DamageSourceHandler;
 import zotmc.onlysilver.api.OnlySilverRegistry;
 import zotmc.onlysilver.api.OnlySilverUtils;

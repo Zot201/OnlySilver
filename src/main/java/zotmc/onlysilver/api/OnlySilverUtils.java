@@ -36,6 +36,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 
 import javax.annotation.Nullable;
+import java.util.function.BiConsumer;
 
 /**
  * A utility class that provide access to OnlySilver features / functions. Fields are substituted upon the dispatch of
