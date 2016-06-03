@@ -41,6 +41,7 @@ public class OnlyLoading implements IFMLLoadingPlugin, IFMLCallHook {
 
   Iterable<Patcher> getPatchers() {
     return ImmutableSet.of();
+    // TODO: Re-enabled this.
     /*List<Iterable<Patcher>> l = Lists.newArrayList();
     for (Class<?> clz : new Class<?>[] {CommonAsm.class, ClientAsm.class, OreGenAsm.class}) {
       l.add(new ExplicitPatchLoader(clz));
