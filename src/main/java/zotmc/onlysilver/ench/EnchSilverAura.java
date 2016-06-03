@@ -15,9 +15,7 @@
  */
 package zotmc.onlysilver.ench;
 
-import java.util.Random;
-import java.util.UUID;
-
+import com.google.common.collect.Multimap;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -34,11 +32,13 @@ import zotmc.onlysilver.data.ReflData;
 import zotmc.onlysilver.util.Fields;
 import zotmc.onlysilver.util.Utils;
 
-import com.google.common.collect.Multimap;
+import javax.annotation.Nullable;
+import java.util.Random;
+import java.util.UUID;
 
 public class EnchSilverAura extends Enchantment {
 
-  private static final String ATTACK_DAMAGE = SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName();
+  private static final String ATTACK_DAMAGE = SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName();
   private static final UUID weaponModifierUUID = Fields.get(null, ReflData.ITEM_MODIFIER_UUID);
   private final ThreadLocal<Boolean> lock = Utils.newThreadLocal(false);
 
@@ -75,9 +75,9 @@ public class EnchSilverAura extends Enchantment {
     return false;
   }
 
-  @SuppressWarnings("unchecked")
   private static Multimap<String, AttributeModifier> getAttributeModifiers(ItemStack item) {
-    return item.getItem().getAttributeModifiers(item);
+    // TODO: Check if EntityEquipmentSlot.MAINHAND is already sufficient
+    return item.getItem().getAttributeModifiers(EntityEquipmentSlot.MAINHAND, item);
   }
 
   /**
@@ -85,7 +85,7 @@ public class EnchSilverAura extends Enchantment {
    */
   private static boolean hasWeaponModifier(ItemStack item) {
     for (AttributeModifier modifier : getAttributeModifiers(item).get(ATTACK_DAMAGE))
-      if (modifier.getID() == weaponModifierUUID) // identical instance is guaranteed by vanilla usage (1.8)
+      if (modifier.getID() == weaponModifierUUID) // identical instance is guaranteed by vanilla usage (1.8+)
         return true;
     return false;
   }
@@ -94,6 +94,7 @@ public class EnchSilverAura extends Enchantment {
     if (!lock.get()) {
       ItemStack item = CommonHooks.modifierContext.get();
 
+      //noinspection ConstantConditions
       if (item != null && item.getItem() != null) {
         lock.set(true);
         float ret = 0;
@@ -118,6 +119,7 @@ public class EnchSilverAura extends Enchantment {
     if (!lock.get()) {
       ItemStack item = CommonHooks.modifierContext.get();
 
+      //noinspection ConstantConditions
       if (item != null && item.getItem() != null) {
         lock.set(true);
         float f = 0;
@@ -137,6 +139,7 @@ public class EnchSilverAura extends Enchantment {
   }
 
   public int getAuraEfficiency(ItemStack item) {
+    //noinspection ConstantConditions
     if (!lock.get() && item.getItem() != null) {
       int lvl = Utils.getEnchLevel(item, this);
 
@@ -159,6 +162,7 @@ public class EnchSilverAura extends Enchantment {
   }
 
   public boolean negateDamage(ItemStack item, Random rand) {
+    //noinspection ConstantConditions
     if (!lock.get() && item.getItem() != null) {
       int lvl = Utils.getEnchLevel(item, this);
 
@@ -180,7 +184,8 @@ public class EnchSilverAura extends Enchantment {
     return false;
   }
 
-  public Double getAuraArrowDamage(ItemStack item) {
+  public @Nullable Double getAuraArrowDamage(ItemStack item) {
+    //noinspection ConstantConditions
     if (!lock.get() && item.getItem() != null) {
       int lvl = Utils.getEnchLevel(item, this);
 

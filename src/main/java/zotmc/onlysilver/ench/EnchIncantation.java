@@ -69,8 +69,8 @@ public class EnchIncantation extends Enchantment {
 
 
   @SubscribeEvent public void onLivingDrop(LivingDropsEvent event) {
-    if (!event.entity.worldObj.isRemote) {
-      AttackItem attackItem = OnlySilverUtils.getAttackItem(event.source);
+    if (!event.getEntity().worldObj.isRemote) {
+      AttackItem attackItem = OnlySilverUtils.getAttackItem(event.getSource());
 
       // TODO: Consider widen the range of attacker to mobs
       if (attackItem != null && attackItem.getAttacker() instanceof EntityPlayer) {
@@ -80,12 +80,13 @@ public class EnchIncantation extends Enchantment {
           int strength = lvl * 10 - 5;
           boolean changed = false;
 
-          for (EntityItem ei : event.drops) {
+          for (EntityItem ei : event.getDrops()) {
             ItemStack item = ei.getEntityItem();
 
+            //noinspection ConstantConditions
             if (item != null && !item.isItemEnchanted() && item.isItemEnchantable()) {
-              Random rand = event.entityLiving.getRNG();
-              EnchantmentHelper.addRandomEnchantment(rand, item, strength);
+              Random rand = event.getEntityLiving().getRNG();
+              EnchantmentHelper.addRandomEnchantment(rand, item, strength, false);
               ei.setEntityItemStack(item);
 
               attackItem.damageItem(strength * 2, rand);
