@@ -49,16 +49,16 @@ abstract class AbstractGenerator implements Iterable<Patcher> {
   private final LaunchClassLoader classLoader;
   private final boolean isClient = FMLLaunchHandler.side().isClient();
 
-  public AbstractGenerator(Class<?> clz, LaunchClassLoader classLoader) {
+  AbstractGenerator(Class<?> clz, LaunchClassLoader classLoader) {
     this.clz = checkNotNull(clz);
     this.classLoader = checkNotNull(classLoader);
   }
 
-  protected static boolean isSynthetic(int access) {
+  static boolean isSynthetic(int access) {
     return (access & Opcodes.ACC_SYNTHETIC) != 0;
   }
 
-  protected static <T> T valueOf(AnnotationNode an, String key, Class<T> clz) {
+  static <T> T valueOf(AnnotationNode an, String key, Class<T> clz) {
     List<Object> pairs = an.values;
     if (pairs != null)
       for (List<Object> pair : Lists.partition(pairs, 2))
@@ -69,21 +69,21 @@ abstract class AbstractGenerator implements Iterable<Patcher> {
     return null;
   }
 
-  protected boolean booleanValueOf(AnnotationNode an, String key, boolean defaultValue) {
+  boolean booleanValueOf(AnnotationNode an, String key, boolean defaultValue) {
     return Objects.firstNonNull(valueOf(an, key, Boolean.class), defaultValue);
   }
 
-  protected static <T extends Enum<T>> T enumValueOf(AnnotationNode an, String key, T defaultValue) {
+  static <T extends Enum<T>> T enumValueOf(AnnotationNode an, String key, T defaultValue) {
     String[] a = valueOf(an, key, String[].class);
     return a != null ? Enums.getIfPresent(defaultValue.getDeclaringClass(), a[1]).or(defaultValue) : checkNotNull(defaultValue);
   }
 
-  protected static Type staticOwner(MethodNode mn) {
+  static Type staticOwner(MethodNode mn) {
     AnnotationNode an = Tag.STATIC.of(mn);
     return an == null ? null : valueOf(an, "value", Type.class);
   }
 
-  protected static String targetName(MethodNode mn) {
+  static String targetName(MethodNode mn) {
     AnnotationNode name = Tag.NAME.of(mn);
     return name == null ? mn.name : valueOf(name, "value", String.class);
   }
@@ -173,7 +173,7 @@ abstract class AbstractGenerator implements Iterable<Patcher> {
   protected abstract Patcher processTarget(MethodPredicate target, MethodPredicate source, MethodNode sourceNode);
 
 
-  protected enum Tag implements Predicate<AnnotationNode> {
+  enum Tag implements Predicate<AnnotationNode> {
     SIDE_ONLY (SideOnly.class),
     HOOK (Hook.class),
     NAME (Name.class),
@@ -184,7 +184,7 @@ abstract class AbstractGenerator implements Iterable<Patcher> {
 
     private final String desc;
     private final boolean visible;
-    private Tag(Class<? extends Annotation> clz) {
+    Tag(Class<? extends Annotation> clz) {
       desc = Type.getDescriptor(clz);
       Retention retention = clz.getAnnotation(Retention.class);
       visible = retention != null && retention.value() == RetentionPolicy.RUNTIME;

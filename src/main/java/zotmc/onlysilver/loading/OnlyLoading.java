@@ -62,9 +62,9 @@ public class OnlyLoading implements IFMLLoadingPlugin, IFMLCallHook {
       checkState(classLoader != null, "Failed loading core mod");
 
       if (cl == classLoader) {
-        Set<String> errored = new MappedTransformer().transformAll();
+        Set<String> erred = new MappedTransformer().transformAll();
 
-        if (!errored.isEmpty()) {
+        if (!erred.isEmpty()) {
           List<String> msg = ImmutableList.of(
               "Found type(s) being loaded before they can be transformed.",
               "Loading cannot be proceeded without causing in-game errors.",
@@ -72,14 +72,14 @@ public class OnlyLoading implements IFMLLoadingPlugin, IFMLCallHook {
               "",
               "Type(s) affected:"
           );
-          IllegalStateException exception = new IllegalStateException(Joiner.on(" ").join(msg) + " " + errored);
+          IllegalStateException exception = new IllegalStateException(Joiner.on(" ").join(msg) + " " + erred);
 
           if (FMLLaunchHandler.side().isServer()) throw exception;
           try {
             // avoid directly calling new of a side only class.
             Constructor<? extends RuntimeException> ctor = TypesAlreadyLoadedErrorDisplayException.class
                 .getConstructor(IllegalStateException.class, Set.class, List.class);
-            throw ctor.newInstance(exception, errored, msg);
+            throw ctor.newInstance(exception, erred, msg);
 
           } catch (Throwable t) {
             throw Throwables.propagate(t);

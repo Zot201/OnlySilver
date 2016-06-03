@@ -17,7 +17,7 @@ class ExplicitPatchLoader implements Iterable<Patcher> {
 
   private final Class<?> clz;
 
-  public ExplicitPatchLoader(Class<?> clz) {
+  ExplicitPatchLoader(Class<?> clz) {
     this.clz = checkNotNull(clz);
   }
 

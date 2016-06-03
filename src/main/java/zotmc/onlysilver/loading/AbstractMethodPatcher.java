@@ -13,7 +13,7 @@ public abstract class AbstractMethodPatcher implements Patcher {
 
   final MethodPredicate target;
 
-  public AbstractMethodPatcher(MethodPredicate target) {
+  protected AbstractMethodPatcher(MethodPredicate target) {
     this.target = target;
   }
 
@@ -25,7 +25,7 @@ public abstract class AbstractMethodPatcher implements Patcher {
     return (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
   }
 
-  protected void addMethod(ClassNode classNode) { }
+  private void addMethod(ClassNode classNode) { }
 
   protected abstract void processMethod(MethodNode targetMethod);
 

@@ -10,7 +10,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 public abstract class AbstractInsnPatcher extends AbstractMethodPatcher {
 
-  public AbstractInsnPatcher(MethodPredicate target) {
+  protected AbstractInsnPatcher(MethodPredicate target) {
     super(target);
   }
 

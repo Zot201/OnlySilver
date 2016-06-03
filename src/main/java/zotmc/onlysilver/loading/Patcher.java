@@ -9,60 +9,60 @@ import org.apache.logging.log4j.Logger;
 
 public interface Patcher {
 
-  public TypePredicate targetType();
+  TypePredicate targetType();
 
-  public byte[] patch(byte[] basicClass, Logger log, boolean devEnv) throws Throwable;
+  byte[] patch(byte[] basicClass, Logger log, boolean devEnv) throws Throwable;
 
 
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ElementType.TYPE, ElementType.FIELD})
-  public @interface ClientOnly { }
+  @interface ClientOnly { }
 
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.FIELD)
-  public @interface Delegation { }
+  @interface Delegation { }
 
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ElementType.FIELD, ElementType.METHOD})
-  public @interface Hook {
-    public Strategy value() default Strategy.ARRIVAL;
+  @interface Hook {
+    Strategy value() default Strategy.ARRIVAL;
 
-    public enum Strategy {
+    enum Strategy {
       ARRIVAL (false),
       RETURN (false),
       AGENT (true);
 
       final boolean consuming;
-      private Strategy(boolean consuming) {
+      Strategy(boolean consuming) {
         this.consuming = consuming;
       }
     }
   }
 
   @Target(ElementType.METHOD)
-  public @interface Name {
-    public String value();
+  @interface Name {
+    String value();
   }
 
   @Target(ElementType.METHOD)
-  public @interface Srg {
-    public String value();
+  @interface Srg {
+    String value();
   }
 
   @Target(ElementType.METHOD)
-  public @interface Return {
-    public boolean condition();
+  @interface Return {
+    boolean condition();
   }
 
   @Target(ElementType.METHOD)
-  public @interface ReturnBoolean {
-    public boolean condition();
-    public boolean value();
+  @interface ReturnBoolean {
+    boolean condition();
+    boolean value();
   }
 
   @Target(ElementType.METHOD)
-  public @interface Static {
-    public Class<?> value();
+  @interface Static {
+    Class<?> value();
   }
 
 }

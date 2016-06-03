@@ -74,6 +74,7 @@ public final class InsnListBuilder extends InstructionAdapter {
     getfield(field.getOwner().toString(), m.getName(), m.getDescriptor());
   }
 
+  @SuppressWarnings("WeakerAccess")
   public void push(Object cst) {
     if (cst == null) aconst(null);
     else visitLdcInsn(cst);

@@ -1,13 +1,7 @@
 package zotmc.onlysilver.loading;
 
-import static java.lang.reflect.Modifier.isPrivate;
-import static java.lang.reflect.Modifier.isStatic;
-
-import java.lang.reflect.Field;
-import java.util.Iterator;
-
+import com.google.common.collect.ObjectArrays;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -17,17 +11,19 @@ import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
-
 import zotmc.onlysilver.loading.Patcher.Delegation;
 import zotmc.onlysilver.util.init.MethodInfo;
 
-import com.google.common.collect.ObjectArrays;
+import java.lang.reflect.Field;
+
+import static java.lang.reflect.Modifier.isPrivate;
+import static java.lang.reflect.Modifier.isStatic;
 
 class DelegationGenerator extends AbstractGenerator {
 
   private static final String SUFFIX = "_" + OnlyLoading.MODID;
 
-  public DelegationGenerator(Class<?> clz, LaunchClassLoader classLoader) {
+  DelegationGenerator(Class<?> clz, LaunchClassLoader classLoader) {
     super(clz, classLoader);
   }
 
@@ -56,10 +52,8 @@ class DelegationGenerator extends AbstractGenerator {
     @Override public byte[] patch(byte[] basicClass, Logger log, boolean dev) {
       ClassNode classNode = new ClassNode();
       new ClassReader(basicClass).accept(classNode, 0);
-      Iterator<MethodNode> it = classNode.methods.iterator();
 
-      while (it.hasNext()) {
-        MethodNode mn = it.next();
+      for (MethodNode mn : classNode.methods) {
         if (!isStatic(mn.access) || isSynthetic(mn.access)) continue;
         if (!isClient) {
           AnnotationNode sideOnly = Tag.SIDE_ONLY.of(mn);

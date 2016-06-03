@@ -26,7 +26,7 @@ import zotmc.onlysilver.loading.Patcher.Hook.Strategy;
 
 class MethodHookGenerator extends AbstractGenerator {
 
-  public MethodHookGenerator(Class<?> clz, LaunchClassLoader classLoader) {
+  MethodHookGenerator(Class<?> clz, LaunchClassLoader classLoader) {
     super(clz, classLoader);
   }
 
@@ -56,7 +56,7 @@ class MethodHookGenerator extends AbstractGenerator {
 
     AnnotationNode v = Tag.RETURN.of(sourceNode);
     if (v != null) {
-      checkArgument(cond == null);
+      //checkArgument(cond == null);
       cond = new Conditional(booleanValueOf(v, "condition", false));
     }
 

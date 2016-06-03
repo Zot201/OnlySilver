@@ -31,11 +31,11 @@ public final class MethodPredicate {
     return new MethodPredicate(owner, names, desc);
   }
 
-  public TypePredicate getOwner() {
+  TypePredicate getOwner() {
     return TypePredicate.of(owner);
   }
 
-  public MethodInfo toMethodInfo(int nameIndex) {
+  MethodInfo toMethodInfo(int nameIndex) {
     checkState(desc != null);
     return MethodInfo.of(names.get(nameIndex), desc);
   }
@@ -68,6 +68,7 @@ public final class MethodPredicate {
     return getOwner().covers(owner) && covers(name, desc);
   }
 
+  @SuppressWarnings("WeakerAccess")
   public boolean covers(MethodNode node) {
     return covers(node.name, node.desc);
   }

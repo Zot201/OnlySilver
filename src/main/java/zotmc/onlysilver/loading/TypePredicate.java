@@ -34,6 +34,7 @@ public final class TypePredicate {
   }
 
 
+  @SuppressWarnings("WeakerAccess")
   public boolean covers(String typeDesc) {
     return name.equals(typeDesc) || FMLDeobfuscatingRemapper.INSTANCE.unmap(name).equals(typeDesc);
   }
