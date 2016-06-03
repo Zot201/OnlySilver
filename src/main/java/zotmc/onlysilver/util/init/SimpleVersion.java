@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.util.init;
 
 import com.google.common.base.Function;
@@ -6,6 +21,8 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
+
+import javax.annotation.Nonnull;
 
 public final class SimpleVersion implements Comparable<SimpleVersion> {
 
@@ -18,6 +35,7 @@ public final class SimpleVersion implements Comparable<SimpleVersion> {
     this.parts = parse(s).toList();
   }
 
+  @SuppressWarnings("Guava")
   private static FluentIterable<Integer> parse(String s) {
     return FluentIterable
         .from(Splitter.on('.').split(s))
@@ -27,7 +45,7 @@ public final class SimpleVersion implements Comparable<SimpleVersion> {
   private int compareTo(Iterable<Integer> parts) {
     return ORDER.compare(this.parts, parts);
   }
-  @Override public int compareTo(SimpleVersion version) {
+  @Override public int compareTo(@Nonnull SimpleVersion version) {
     return compareTo(version.parts);
   }
 
@@ -44,10 +62,7 @@ public final class SimpleVersion implements Comparable<SimpleVersion> {
   }
 
   @Override public boolean equals(Object obj) {
-    if (obj == this) return true;
-    if (obj instanceof SimpleVersion)
-      return parts.equals(((SimpleVersion) obj).parts);
-    return false;
+    return obj == this || obj instanceof SimpleVersion && parts.equals(((SimpleVersion) obj).parts);
   }
 
   @Override public String toString() {

@@ -18,6 +18,7 @@ package zotmc.onlysilver;
 import com.google.common.base.*;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.*;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.crafting.IRecipe;
@@ -40,6 +41,7 @@ import zotmc.onlysilver.util.Feature;
 import zotmc.onlysilver.util.Utils;
 import zotmc.onlysilver.util.Utils.Localization;
 
+import javax.annotation.Nullable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -51,6 +53,7 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static net.minecraft.inventory.EntityEquipmentSlot.*;
 
 @SuppressWarnings("Guava")
 public enum ItemFeature implements Feature<Item> {
@@ -67,10 +70,10 @@ public enum ItemFeature implements Feature<Item> {
   @Models({"silver_bow", "silver_bow_pulling_0", "silver_bow_pulling_1", "silver_bow_pulling_2"})
   silverBow,
   
-  @Recipes("σσσ|σ σ|···") @OnlyArmor(0) @ItemId("silver_helmet") silverHelm,
-  @Recipes("σ σ|σσσ|σσσ") @OnlyArmor(1) @ItemId("silver_chestplate") silverChest,
-  @Recipes("σσσ|σ σ|σ σ") @OnlyArmor(2) @ItemId("silver_leggings") silverLegs,
-  @Recipes("···|σ σ|σ σ") @OnlyArmor(3) silverBoots,
+  @Recipes("σσσ|σ σ|···") @OnlyArmor(HEAD) @ItemId("silver_helmet") silverHelm,
+  @Recipes("σ σ|σσσ|σσσ") @OnlyArmor(CHEST) @ItemId("silver_chestplate") silverChest,
+  @Recipes("σσσ|σ σ|σ σ") @OnlyArmor(LEGS) @ItemId("silver_leggings") silverLegs,
+  @Recipes("···|σ σ|σ σ") @OnlyArmor(FEET) silverBoots,
   
   
   // mods
@@ -220,7 +223,7 @@ public enum ItemFeature implements Feature<Item> {
     return Utils.localize("item." + name() + ".name");
   }
   
-  public boolean enabled(Config config) {
+  public boolean enabled(@Nullable Config config) {
     Field f = Enums.getField(this);
     
     if (config != null && !important() && config.disabledFeatures.get().contains(getItemId()))
@@ -473,7 +476,7 @@ public enum ItemFeature implements Feature<Item> {
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.FIELD)
   private @interface OnlyArmor {
-    int value();
+    EntityEquipmentSlot value();
   }
   
   @Retention(RetentionPolicy.RUNTIME)

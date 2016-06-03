@@ -38,6 +38,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.Invokable;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings({"Guava", "WeakerAccess"})
 public class Dynamic {
   
@@ -161,7 +163,7 @@ public class Dynamic {
     private final Supplier<?> obj;
     private final String field;
     
-    private Refer(Klas<?> clz, Supplier<?> obj, String field) {
+    private Refer(@Nullable Klas<?> clz, Supplier<?> obj, String field) {
       this.clz = clz;
       this.obj = obj;
       this.field = field;
@@ -190,14 +192,14 @@ public class Dynamic {
     private final Supplier<?> obj;
     private final String method;
     
-    private Invoke(Klas<?> clz, Supplier<?> obj, String method,
+    private Invoke(@Nullable Klas<?> clz, Supplier<?> obj, String method,
         ImmutableList<Supplier<TypeArg<?>>> args) {
       super(args);
       this.clz = clz;
       this.obj = obj;
       this.method = method;
     }
-    private Invoke(Klas<?> clz, Supplier<?> obj, String method) {
+    private Invoke(@Nullable Klas<?> clz, Supplier<?> obj, String method) {
       this(clz, obj, method, ImmutableList.of());
     }
     @Override protected Invoke<T> derive(ImmutableList<Supplier<TypeArg<?>>> args) {
@@ -346,14 +348,14 @@ public class Dynamic {
   
   private enum TypeAdapter implements Function<TypeArg<?>, Type> {
     INSTANCE;
-    @Override public Type apply(TypeArg<?> input) {
+    @Override public Type apply(@SuppressWarnings("NullableProblems") TypeArg<?> input) {
       return input.type.toType();
     }
   }
   
   private static class Wrap<T> implements Function<T, Supplier<T>> {
     static final Wrap<TypeArg<?>> TYPE_ARG = new Wrap<>();
-    @Override public Supplier<T> apply(T input) {
+    @Override public Supplier<T> apply(@SuppressWarnings("NullableProblems") T input) {
       return Suppliers.ofInstance(input);
     }
   }

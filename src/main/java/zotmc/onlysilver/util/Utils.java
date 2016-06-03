@@ -174,8 +174,8 @@ public class Utils {
 
   // misc
 
-  @SuppressWarnings("unchecked")
   public static <T> Feature<T> missingFeature() {
+    //noinspection unchecked
     return (Feature<T>) MissingFeature.INSTANCE;
   }
   private enum MissingFeature implements Feature<Object> {
@@ -188,11 +188,11 @@ public class Utils {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static <T> Consumer<T> doNothing() {
+    //noinspection unchecked
     return (Consumer<T>) EmptyConsumer.INSTANCE;
   }
-  private enum EmptyConsumer implements java.util.function.Consumer<Object> {
+  private enum EmptyConsumer implements Consumer<Object> {
     INSTANCE;
     @Override public void accept(Object t) { }
   }
@@ -339,7 +339,7 @@ public class Utils {
 
     private enum ClassNameFunction implements Function<Class<?>, String> {
       INSTANCE;
-      @Override public String apply(Class<?> input) {
+      @Override public String apply(@Nullable Class<?> input) {
         return input == null ? "null" : input.getName();
       }
     }
@@ -358,11 +358,12 @@ public class Utils {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static <T> T[] newArray(final String componentType, final int length) {
     try {
+      //noinspection unchecked
       return (T[]) Array.newInstance(Class.forName(componentType), length);
-    } catch (Throwable t) {
+    }
+    catch (Throwable t) {
       throw propagate(t);
     }
   }

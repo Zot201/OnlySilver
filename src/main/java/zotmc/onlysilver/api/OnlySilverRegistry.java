@@ -55,7 +55,7 @@ public class OnlySilverRegistry {
    * Register your own {@linkplain Predicate predicate} to help OnlySilver determining whether or not an item is made from silver.
    * The current purpose for this method is to determine whether an instrument should have silver enchantments.
    *
-   * <p>At runtime use of {@link OnlySilverUtils#isSilveryEquip}, registered {@linkplain Predicate predicates}
+   * <p>At runtime use of {@link OnlySilverUtils#isSilverEquip}, registered {@linkplain Predicate predicates}
    * are applied one by one until they have been all applied or once {@code true} is returned. (Short circuit evaluation)
    *
    * <p>{@linkplain Predicate Predicates} are guaranteed to have non-{@code null} input.
