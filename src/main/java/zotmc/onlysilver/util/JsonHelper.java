@@ -29,6 +29,8 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings({"WeakerAccess", "Guava"})
 public class JsonHelper {
 
@@ -68,7 +70,7 @@ public class JsonHelper {
     return this;
   }
 
-  public JsonHelper set(String key, String value) {
+  public JsonHelper set(String key, @Nullable String value) {
     backing.addProperty(key, value);
     return this;
   }

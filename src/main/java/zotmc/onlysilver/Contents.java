@@ -40,7 +40,6 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
-import java.util.function.BiConsumer;
 import zotmc.onlysilver.api.DamageSourceHandler;
 import zotmc.onlysilver.api.OnlySilverRegistry;
 import zotmc.onlysilver.api.OnlySilverUtils;
@@ -63,6 +62,7 @@ import zotmc.onlysilver.util.Utils;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -145,8 +145,7 @@ public class Contents {
     
 
     // silver aura
-    // TODO: Allow disabling
-    {
+    if (Config.current().silverAuraEnabled.get()) {
       EnchSilverAura ench = new EnchSilverAura(new ResourceLocation(OnlySilvers.MODID, "silver_aura"));
       ench.setName(OnlySilvers.MODID + ".silverAura");
       //Enchantment.addToBookList(ench); // TODO: Check effect of previous addToBookList call
@@ -155,8 +154,7 @@ public class Contents {
     }
     
     // incantation
-    // TODO: Allow disabling
-    {
+    if (Config.current().incantationEnabled.get()) {
       Enchantment ench = new EnchIncantation(new ResourceLocation(OnlySilvers.MODID, "incantation"))
           .subscribeEvent()
           .setName(OnlySilvers.MODID + ".incantation");

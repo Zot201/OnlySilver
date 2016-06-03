@@ -45,7 +45,7 @@ import zotmc.onlysilver.util.Utils;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings({"StaticPseudoFunctionalStyleMethod", "Guava"})
+@SuppressWarnings({"StaticPseudoFunctionalStyleMethod", "Guava", "unused"})
 @SideOnly(Side.CLIENT)
 public class ConfigGui extends AbstractConfigFactory {
 
@@ -106,27 +106,27 @@ public class ConfigGui extends AbstractConfigFactory {
 
     rows.add(EmptyRow.INSTANCE);
 
-    /*rows.add(new ItemIcon(Items.enchanted_book).setRenderEffect(false).categoryRow(LangData.ENCHANTMENTS));
+    rows.add(new ItemIcon(Items.ENCHANTED_BOOK).setRenderEffect(false).categoryRow(LangData.ENCHANTMENTS));
 
-    rows.add(new EnchantmentRow() {
-      @Override protected Property<Integer> toProperty(Config t) {
-        return t.silverAuraId;
+    rows.add(new BooleanRow() {
+      @Override protected Property<Boolean> toProperty(Config t) {
+        return t.silverAuraEnabled;
       }
       @Override protected Supplier<String> title() {
         return LangData.SILVER_AURA;
       }
     });
 
-    rows.add(new EnchantmentRow() {
-      @Override protected Property<Integer> toProperty(Config t) {
-        return t.incantationId;
+    rows.add(new BooleanRow() {
+      @Override protected Property<Boolean> toProperty(Config t) {
+        return t.incantationEnabled;
       }
       @Override protected Supplier<String> title() {
         return LangData.INCANTATION;
       }
     });
 
-    rows.add(EmptyRow.INSTANCE);*/
+    rows.add(EmptyRow.INSTANCE);
 
     rows.add(new SpriteIcon(GuiScreen.STAT_ICONS, 36, 18, 128).categoryRow(LangData.STATS));
 
@@ -258,7 +258,7 @@ public class ConfigGui extends AbstractConfigFactory {
 
 
   private static abstract class LogSliderRow extends SliderRow {
-    protected static final double A = Math.log(0.3819660112501051);
+    static final double A = Math.log(0.3819660112501051);
   }
 
   private static abstract class IntSliderRow extends LogSliderRow {
@@ -266,7 +266,7 @@ public class ConfigGui extends AbstractConfigFactory {
     private final int defaultValue;
     private final double k, l;
 
-    public IntSliderRow(int defaultValue) {
+    IntSliderRow(int defaultValue) {
       this.defaultValue = defaultValue;
       k = A / (-B + Math.log(Math.max(1, defaultValue)));
       l = Math.pow(Integer.MAX_VALUE, k);
@@ -299,7 +299,7 @@ public class ConfigGui extends AbstractConfigFactory {
     private final float defaultValue;
     private final double step, k, l;
 
-    public FloatSliderRow(float defaultValue, double step) {
+    FloatSliderRow(float defaultValue, double step) {
       this.defaultValue = defaultValue;
       this.step = step;
       k = A / (-B + Math.log(Math.max(1, defaultValue)));
@@ -327,45 +327,6 @@ public class ConfigGui extends AbstractConfigFactory {
       setValue(Utils.next(getValue(), step));
     }
   }
-
-  /*private abstract class EnchantmentRow extends SliderRow {
-    // row
-    @Override protected int widgetPos(int k) {
-      return k * 7 / 15;
-    }
-
-    // config
-    protected abstract Property<Integer> toProperty(Config t);
-
-    private int getValue() {
-      return toProperty(temp).get();
-    }
-    private void setValue(int v) {
-      toProperty(temp).set(v);
-    }
-
-    // slider
-    @Override public String getText() {
-      int v = getValue();
-      if (v == -1) return LangData.DISABLED.get();
-      String s = "ID: " + v;
-      Enchantment ench = Enchantment.getEnchantmentById(v);
-      return ench == null ? s : s + " / " + I18n.format(ench.getName());
-    }
-
-    @Override public double getPosition() {
-      return (1 + getValue()) / 256.0;
-    }
-    @Override public void setPosition(double position) {
-      setValue((int) (position * 256) - 1);
-    }
-    @Override public void previous() {
-      setValue(getValue() - 1);
-    }
-    @Override public void next() {
-      setValue(getValue() + 1);
-    }
-  }*/
 
 
   private abstract class EditorRow<V> extends ValueInjectionRow<Config, V> {
@@ -637,6 +598,7 @@ public class ConfigGui extends AbstractConfigFactory {
     private int durability;
     private int[] reductionAmounts;
     private int enchantability;
+    private float toughness;
 
     // value
     @Override protected void injectValue(ArmorStats v) {
@@ -646,7 +608,7 @@ public class ConfigGui extends AbstractConfigFactory {
     }
     @Override protected ArmorStats toImmutable() {
       int[] r = reductionAmounts;
-      return new ArmorStats(durability, r[0], r[1], r[2], r[3], enchantability);
+      return new ArmorStats(durability, r[0], r[1], r[2], r[3], enchantability, toughness);
     }
 
     // screen
@@ -758,6 +720,23 @@ public class ConfigGui extends AbstractConfigFactory {
         }
         @Override protected void setValue(int value) {
           enchantability = value;
+        }
+      });
+
+      ret.add(new FloatSliderRow(defaultValue.toughness, 0.1) {
+        final Icon<?> icon = new ItemIcon(Blocks.DIAMOND_BLOCK);
+
+        @Override protected Icon<?> icon() {
+          return icon;
+        }
+        @Override protected Supplier<String> title() {
+          return LangData.TOUGHNESS;
+        }
+        @Override protected float getValue() {
+          return toughness;
+        }
+        @Override protected void setValue(float value) {
+          toughness = value;
         }
       });
 

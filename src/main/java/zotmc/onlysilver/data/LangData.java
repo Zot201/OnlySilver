@@ -34,6 +34,7 @@ public class LangData {
   EFFICIENCY = Utils.localize("onlysilver.options.efficiency"),
   DAMAGE = Utils.localize("onlysilver.options.damage"),
   ENCHANTABILITY = Utils.localize("onlysilver.options.enchantability"),
+  TOUGHNESS = Utils.localize("onlysilver.options.toughness"),
   SILVER_ARMOR = Utils.localize("onlysilver.options.silverArmor"),
   DURABILITY = Utils.localize("onlysilver.options.durability"),
   HELMET_DEFENSE_POINT = Utils.localize("onlysilver.options.helmetDefensePoint"),

@@ -30,10 +30,10 @@ public class Config extends AbstractConfig<Config> {
   @Local public final Property<GenDefaults>
   silverGenDefaults = base(new GenDefaults(null, 5, 8, 0, 42));
 
-  // enchantment ids
-  /*@Restart public final Property<Integer>
-  silverAuraId = base(141),
-  incantationId = base(142);*/
+  // enchantments
+  @Restart public final Property<Boolean>
+  silverAuraEnabled = base(true),
+  incantationEnabled = base(true);
 
   // stats
   @Restart public final Property<BlockStats>
@@ -44,11 +44,11 @@ public class Config extends AbstractConfig<Config> {
   silverToolStats = base(new ToolStats(2, 226, 8, 2, 30));
 
   @Restart public final Property<ArmorStats>
-  silverArmorStats = base(new ArmorStats(15, 3, 5, 4, 3, 30));
+  silverArmorStats = base(new ArmorStats(15, 3, 5, 4, 3, 30, 0));
 
   // misc
   @Restart public final Property<Set<String>>
-  disabledFeatures = base(ImmutableSet.<String>of());
+  disabledFeatures = base(ImmutableSet.of());
 
   public final Property<Boolean>
   meleeBowKnockback = base(true),

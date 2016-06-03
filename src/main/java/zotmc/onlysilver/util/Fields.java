@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 
 public class Fields {
 
-  public static <T> T get(@Nullable Object obj, Field field) {
+  public static @Nullable <T> T get(@Nullable Object obj, Field field) {
     try {
       //noinspection unchecked
       return (T) field.get(obj);

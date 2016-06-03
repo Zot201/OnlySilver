@@ -67,6 +67,7 @@ onlysilver.options.maxUses=Max Uses
 onlysilver.options.efficiency=Efficiency
 onlysilver.options.damage=Damage
 onlysilver.options.enchantability=Enchantability
+onlysilver.options.toughness=Toughness
 onlysilver.options.silverArmor=Silver Armor
 onlysilver.options.durability=Durability
 onlysilver.options.helmetDefensePoint=Helmet Defense Point

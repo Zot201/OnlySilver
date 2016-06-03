@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -22,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
@@ -42,7 +58,6 @@ import zotmc.onlysilver.util.Fields;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -57,6 +72,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 
+import javax.annotation.Nullable;
+
 public abstract class AbstractConfig<T extends AbstractConfig<T>> {
 
   // post by the host mod to notify config the server state
@@ -64,12 +81,15 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
   public static class NotifyServerStop extends Event { }
 
   // post by config to notify changes
+  @SuppressWarnings("WeakerAccess")
   public static class Init extends Event { }
+  @SuppressWarnings("WeakerAccess")
   public static class Change extends Event { }
   public static class Accept extends Change { }
   public static class Discard extends Change { }
 
-  protected static final int IN_FILE = 0, LOCAL = 1, CURRENT = 2;
+  @SuppressWarnings("WeakerAccess")
+  static final int IN_FILE = 0, LOCAL = 1, CURRENT = 2;
   private Holder holder;
 
   protected static <E, F extends E> Property<E> base(F value) {
@@ -78,7 +98,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
 
   protected abstract GsonBuilder getGsonBuilder();
 
-  protected final void initConfig(String name, EventBus bus, File file) {
+  final void initConfig(String name, EventBus bus, File file) {
     SimpleNetworkWrapper network = new SimpleNetworkWrapper(name);
     @SuppressWarnings("unchecked") Class<T> clz = (Class<T>) getClass();
 
@@ -112,7 +132,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
         f.setAccessible(true);
 
         BaseProperty<?> base = Fields.get(this, f);
-        Property<?> p = new UserProperty<>(base);
+        Property<?> p = new UserProperty<>(checkNotNull(base));
         Fields.setFinal(a[IN_FILE], f, p);
 
         if (f.getAnnotation(Restart.class) != null) p = new UserProperty<>(base);
@@ -122,10 +142,10 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
       a[CURRENT] = a[LOCAL];
     }
 
-    EventSubsriber<T> subscriber = new EventSubsriber<>(network, bus, a, holder.log);
+    EventSubscriber<T> subscriber = new EventSubscriber<>(network, bus, a, holder.log);
     network.registerMessage(subscriber, Message.class, 0, Side.CLIENT);
     bus.register(subscriber);
-    FMLCommonHandler.instance().bus().register(subscriber);
+    MinecraftForge.EVENT_BUS.register(subscriber);
 
     a[IN_FILE].loadFromFile();
     a[LOCAL].apply(a[IN_FILE]);
@@ -148,7 +168,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
         holder.log.error("Error loading config from file", e);
 
         try {
-          Files.move(file, new File(file.getParent(), file.getName() + ".errored"));
+          Files.move(file, new File(file.getParent(), file.getName() + ".erred"));
         } catch (IOException ignored) { }
       }
     }
@@ -167,6 +187,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
     T ret = newInstance();
     for (Field f : getFieldsOfType(getClass(), Property.class)) {
       f.setAccessible(true);
+      //noinspection ConstantConditions
       Fields.<Property<?>>setFinal(ret, f, Fields.<Property<?>>get(this, f).copy());
     }
     return ret;
@@ -175,6 +196,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
   final void clear() {
     for (Field f : getFieldsOfType(getClass(), Property.class)) {
       f.setAccessible(true);
+      //noinspection ConstantConditions
       Fields.<Property<?>>get(this, f).setRaw(null);
     }
   }
@@ -182,6 +204,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
   final void apply(T config) {
     for (Field f : getFieldsOfType(getClass(), Property.class)) {
       f.setAccessible(true);
+      //noinspection ConstantConditions
       Fields.<Property<Object>>get(this, f).setRaw(Fields.<Property<?>>get(config, f).getRaw());
     }
   }
@@ -205,6 +228,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
       if (!isNetwork || f.getAnnotation(Local.class) == null && f.getAnnotation(Restart.class) == null) {
         f.setAccessible(true);
         Property<?> p = Fields.get(this, f);
+        //noinspection ConstantConditions
         ret.put(f.getName(), isNetwork ? p.get() : p.getRaw());
       }
     return ret;
@@ -212,16 +236,14 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
 
   private static Iterable<Field> getAnnotatedFields(Class<?> clz, final Class<? extends Annotation> annotationClass) {
     List<Field> unfiltered = Arrays.asList(clz.getDeclaredFields());
-    return Iterables.filter(unfiltered, new Predicate<Field>() { public boolean apply(Field input) {
-      return input.getAnnotation(annotationClass) != null;
-    }});
+    //noinspection StaticPseudoFunctionalStyleMethod
+    return Iterables.filter(unfiltered, input -> input.getAnnotation(annotationClass) != null);
   }
 
   private static Iterable<Field> getFieldsOfType(Class<?> clz, final Class<?> type) {
     List<Field> unfiltered = Arrays.asList(clz.getDeclaredFields());
-    return Iterables.filter(unfiltered, new Predicate<Field>() { public boolean apply(Field input) {
-      return type.isAssignableFrom(input.getType());
-    }});
+    //noinspection StaticPseudoFunctionalStyleMethod
+    return Iterables.filter(unfiltered, input -> type.isAssignableFrom(input.getType()));
   }
 
 
@@ -235,20 +257,20 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
     }
   }
 
-  public static class EventSubsriber<T extends AbstractConfig<T>> implements IMessageHandler<Message, IMessage> {
+  private static class EventSubscriber<T extends AbstractConfig<T>> implements IMessageHandler<Message, IMessage> {
     private final SimpleNetworkWrapper network;
     private final EventBus bus;
     private final T[] configs;
     private final Logger log;
 
-    public EventSubsriber(SimpleNetworkWrapper network, EventBus bus, T[] configs, Logger log) {
+    EventSubscriber(SimpleNetworkWrapper network, EventBus bus, T[] configs, Logger log) {
       this.network = network;
       this.bus = bus;
       this.configs = configs;
       this.log = log;
     }
 
-    @Override public IMessage onMessage(Message message, MessageContext unused) {
+    @Override public @Nullable IMessage onMessage(Message message, @Nullable MessageContext unused) {
       if (message.throwable != null) log.catching(message.throwable);
       else {
         T[] a = configs;
@@ -289,7 +311,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
       if (event.player instanceof EntityPlayerMP)
         network.sendTo(new Message(configs[LOCAL]), (EntityPlayerMP) event.player);
     }
-    @SubscribeEvent public void onServerDisconnected(ClientDisconnectionFromServerEvent unused) {
+    @SubscribeEvent public void onServerDisconnected(@Nullable ClientDisconnectionFromServerEvent unused) {
       if (configs[CURRENT] != configs[LOCAL]) {
         configs[CURRENT] = configs[LOCAL];
         bus.post(new Discard());
@@ -297,10 +319,11 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
     }
   }
 
-  public static class Message implements IMessage {
+  static class Message implements IMessage {
     private String json;
     private Throwable throwable;
 
+    @SuppressWarnings("unused")
     @Deprecated public Message() { }
     private Message(AbstractConfig<?> config) {
       json = config.getGsonBuilder().create().toJson(config.toMap(true));
@@ -324,17 +347,17 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
     public abstract E get();
     abstract E getRaw();
     abstract void set(E e);
-    abstract void setRaw(E e);
+    abstract void setRaw(@Nullable E e);
     public abstract BaseProperty<E> base();
     abstract Property<E> copy();
 
-    static <E> E notNull(E e) {
+    static <E> E notNull(@Nullable E e) {
       if (e == null) throw new IllegalArgumentException();
       return e;
     }
   }
 
-  public static class BaseProperty<E> extends Property<E> {
+  private static class BaseProperty<E> extends Property<E> {
     private final E base;
     private E raw;
     private BaseProperty(E base) {
@@ -379,7 +402,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
     @Override void set(E e) {
       raw = !Objects.equal(e, parent.get()) ? notNull(e) : null;
     }
-    @Override void setRaw(E e) {
+    @Override void setRaw(@Nullable E e) {
       raw = e;
     }
     @Override public BaseProperty<E> base() {
@@ -409,6 +432,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
         if (j != null) {
           Object obj = context.deserialize(j, type);
           f.setAccessible(true);
+          //noinspection ConstantConditions
           Fields.<Property<Object>>get(config, f).setRaw(obj);
         }
       }
@@ -420,14 +444,14 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
 
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.FIELD)
-  protected @interface Instances { }
+  @interface Instances { }
 
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.FIELD)
-  protected @interface Local { }
+  @interface Local { }
 
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.FIELD)
-  protected @interface Restart { }
+  @interface Restart { }
 
 }
