@@ -38,14 +38,14 @@ public class Instrumenti {
 
   private static final MethodInfo
   GET_IS_REPAIRABLE = Utils.findMethod(Item.class, "getIsRepairable", "func_82789_a")
-    .asMethodInfo(ItemStack.class, ItemStack.class),
+      .asMethodInfo(ItemStack.class, ItemStack.class),
   GET_ITEM_ENCHANTABILITY = Utils.findMethod(Item.class, "getItemEnchantability", "func_77619_b")
-    .asMethodInfo();
+      .asMethodInfo();
 
   public static final Invokable<Item, Item>
   SET_MAX_DAMAGE = Utils.findMethod(Item.class, "setMaxDamage", "func_77656_e")
-    .asInvokable(int.class)
-    .returning(Item.class);
+      .asInvokable(int.class)
+      .returning(Item.class);
 
 
   public static final java.util.function.Consumer<KlastWriter<?>>

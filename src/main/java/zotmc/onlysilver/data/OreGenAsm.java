@@ -15,6 +15,7 @@ import zotmc.onlysilver.loading.Patcher.Hook;
 import zotmc.onlysilver.loading.TypePredicate;
 
 // TODO: Forge PR to eliminate needs for low level hooks
+@SuppressWarnings("WeakerAccess")
 public class OreGenAsm {
 
   @Hook

@@ -15,6 +15,7 @@ import zotmc.onlysilver.loading.Patcher.Delegation;
 import zotmc.onlysilver.loading.Patcher.Hook;
 import zotmc.onlysilver.loading.TypePredicate;
 
+@SuppressWarnings("WeakerAccess")
 @ClientOnly
 public class ClientAsm {
 

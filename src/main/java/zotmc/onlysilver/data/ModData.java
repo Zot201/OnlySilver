@@ -38,7 +38,7 @@ import com.google.common.reflect.TypeToken;
 import javax.annotation.Nullable;
 
 @MCVersion(Loader.MC_VERSION)
-@Requirements("1.8 = 1.8")
+@Requirements("1.9 = 1.9")
 public class ModData {
   
   public static class OnlySilvers {
@@ -50,7 +50,7 @@ public class ModData {
   
   
   @Dependency
-  @Requirements("1.8 = 11.14.1.1336")
+  @Requirements("1.9.4 = 12.17.0.1937")
   public static class Forge {
     @Modid public static final String MODID = "Forge";
   }
@@ -86,17 +86,17 @@ public class ModData {
     
     public static void registerEntityTag(Class<? extends Entity> entity, Multiset<Aspect> aspects) {
       Dynamic.<Void>invoke(THAUMCRAFT_API, "registerEntityTag")
-        .via(Utils.getEntityString(entity))
-        .via(ASPECT_LIST, Aspect.adapt(aspects))
-        .via(Utils.newArray(THAUMCRAFT_API + "$EntityTagsNBT", 0))
-        .get();
+          .via(Utils.getEntityString(entity))
+          .via(ASPECT_LIST, Aspect.adapt(aspects))
+          .via(Utils.newArray(THAUMCRAFT_API + "$EntityTagsNBT", 0))
+          .get();
     }
     
     public static void registerObjectTag(ItemStack item, Multiset<Aspect> aspects) {
       Dynamic.<Void>invoke(THAUMCRAFT_API, "registerObjectTag")
-        .via(ItemStack.class, item)
-        .via(ASPECT_LIST, Aspect.adapt(aspects))
-        .get();
+          .via(ItemStack.class, item)
+          .via(ASPECT_LIST, Aspect.adapt(aspects))
+          .get();
     }
   }
   

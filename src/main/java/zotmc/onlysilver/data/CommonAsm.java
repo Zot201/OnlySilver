@@ -14,6 +14,7 @@ import zotmc.onlysilver.loading.Patcher;
 import zotmc.onlysilver.loading.Patcher.Hook;
 import zotmc.onlysilver.loading.TypePredicate;
 
+@SuppressWarnings("WeakerAccess")
 public class CommonAsm {
 
   public static final String MODID = OnlySilvers.MODID;
