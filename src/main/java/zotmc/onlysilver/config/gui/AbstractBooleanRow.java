@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
 import zotmc.onlysilver.config.AbstractConfig;
@@ -6,6 +21,8 @@ import zotmc.onlysilver.data.LangData;
 import zotmc.onlysilver.util.Utils.Localization;
 
 import com.google.common.base.Supplier;
+
+import javax.annotation.Nullable;
 
 public abstract class AbstractBooleanRow<T extends AbstractConfig<T>> extends WidgetRow {
 
@@ -44,18 +61,18 @@ public abstract class AbstractBooleanRow<T extends AbstractConfig<T>> extends Wi
 
     final Boolean value;
     private final Localization localization;
-    private State(Boolean value, Localization localization) {
+    State(Boolean value, Localization localization) {
       this.value = value;
       this.localization = localization;
     }
-    static State of(Boolean value) {
+    static State of(@Nullable Boolean value) {
       return value == null ? DEFAULT : value ? ON : OFF;
     }
     State next() {
       return values()[(ordinal() + 1) % values().length];
     }
 
-    public static String getLocalized(Boolean raw, Property<Boolean> p) {
+    public static String getLocalized(@Nullable Boolean raw, Property<Boolean> p) {
       return raw != null ? (raw ? ON : OFF).localization.toString()
           : DEFAULT.localization.toString((p.get() ? ON : OFF).localization);
     }

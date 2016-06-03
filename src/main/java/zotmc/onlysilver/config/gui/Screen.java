@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
 import java.util.List;
@@ -5,16 +20,16 @@ import java.util.List;
 /**
  * A reusable object defining a screen.
  */
-public interface Screen {
+interface Screen {
 
-  public void create();
+  void create();
 
-  public void destroy();
+  void destroy();
 
-  public Iterable<Element> getElements(int w, int h, Holder<List<String>> hoveringText, Runnable quit);
+  Iterable<Element> getElements(int w, int h, Holder<List<String>> hoveringText, Runnable quit);
 
-  public int getRowHeight();
+  int getRowHeight();
 
-  public Iterable<Row> getRows(int w, Holder<List<String>> hoveringText);
+  Iterable<Row> getRows(int w, Holder<List<String>> hoveringText);
 
 }

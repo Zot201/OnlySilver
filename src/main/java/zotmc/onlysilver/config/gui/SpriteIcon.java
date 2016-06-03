@@ -1,11 +1,21 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.ResourceLocation;
-import zotmc.onlysilver.util.ClientUtils;
 
 public class SpriteIcon extends Icon<SpriteIcon> {
 
@@ -26,7 +36,8 @@ public class SpriteIcon extends Icon<SpriteIcon> {
   }
 
   @Override public void drawIcon(int x, int y, int z) {
-    x -= (w - 16) / 2;
+    // TODO: Re-implementation
+    /*x -= (w - 16) / 2;
     y -= (h - 16) / 2;
 
     GlStateManager.enableAlpha();
@@ -39,7 +50,7 @@ public class SpriteIcon extends Icon<SpriteIcon> {
     worldrenderer.addVertexWithUV(x + w, y + h, z, (u + w) / r, (v + h) / r);
     worldrenderer.addVertexWithUV(x + w, y + 0, z, (u + w) / r, (v + 0) / r);
     worldrenderer.addVertexWithUV(x + 0, y + 0, z, (u + 0) / r, (v + 0) / r);
-    tessellator.draw();
+    tessellator.draw();*/
   }
 
 }

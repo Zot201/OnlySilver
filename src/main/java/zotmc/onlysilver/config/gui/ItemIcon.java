@@ -21,7 +21,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -35,6 +35,7 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class ItemIcon extends Icon<ItemIcon> implements Supplier<String> {
 
   private static final Logger log = OnlySilver.INSTANCE.log;
@@ -139,7 +140,6 @@ public class ItemIcon extends Icon<ItemIcon> implements Supplier<String> {
 
     @Override public List<String> get() {
       Minecraft mc = Minecraft.getMinecraft();
-      @SuppressWarnings("unchecked")
       List<String> ret = item.getTooltip(mc.thePlayer, mc.gameSettings.advancedItemTooltips);
       return colorTooltip(ret, item.getRarity().rarityColor);
     }

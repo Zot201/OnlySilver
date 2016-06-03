@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
 import java.util.List;
@@ -10,9 +25,10 @@ import org.apache.commons.lang3.mutable.Mutable;
 import com.google.common.base.Supplier;
 import com.google.common.primitives.Floats;
 
+@SuppressWarnings("WeakerAccess")
 public abstract class Icon<T extends Icon<T>> {
 
-  public static final float PHIM1 = 0.618034f;
+  public static final float PHI_M1 = 0.618034f;
   protected int color = 0xFFFFFFFF;
 
   public final void drawIcon(int x, int y) {

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -10,18 +25,18 @@ import zotmc.onlysilver.util.Utils;
 
 import com.google.common.primitives.Doubles;
 
-public class Slider implements Widget<Slider> {
+class Slider implements Widget<Slider> {
 
-  public interface Slidable {
-    public String getText();
+  interface Slidable {
+    String getText();
 
-    public double getPosition();
+    double getPosition();
 
-    public void setPosition(double position);
+    void setPosition(double position);
 
-    public void next();
+    void next();
 
-    public void previous();
+    void previous();
   }
 
   private static final int W = 8;
@@ -31,7 +46,7 @@ public class Slider implements Widget<Slider> {
   private double tracking = -1;
   private int ticks;
 
-  public Slider(Slidable slidable) {
+  Slider(Slidable slidable) {
     this.slidable = slidable;
   }
 
@@ -121,10 +136,10 @@ public class Slider implements Widget<Slider> {
 
       int x = getHandle(), y = yPosition, w = W / 2, h = height / 2;
       GlStateManager.color(1, 1, 1, 1);
-      drawTexturedModalRect(x    , y    , 0              , 66                  ,     w,          h);
-      drawTexturedModalRect(x + w, y    , 0 + 200 - W + w, 66                  , W - w,          h);
-      drawTexturedModalRect(x    , y + h, 0              , 66 + 20 - height + h,     w, height - h);
-      drawTexturedModalRect(x + w, y + h, 0 + 200 - W + w, 66 + 20 - height + h, W - w, height - h);
+      drawTexturedModalRect(x    , y    , 0          , 66                  ,     w,          h);
+      drawTexturedModalRect(x + w, y    , 200 - W + w, 66                  , W - w,          h);
+      drawTexturedModalRect(x    , y + h, 0          , 66 + 20 - height + h,     w, height - h);
+      drawTexturedModalRect(x + w, y + h, 200 - W + w, 66 + 20 - height + h, W - w, height - h);
     }
   }
 

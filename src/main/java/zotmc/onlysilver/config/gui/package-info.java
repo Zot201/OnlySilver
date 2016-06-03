@@ -13,19 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@javax.annotation.ParametersAreNonnullByDefault
+@mcp.MethodsReturnNonnullByDefault
 package zotmc.onlysilver.config.gui;
-
-/**
- * Elements on a screen. Static element usually locate on a header or a footer.
- */
-public interface Element {
-
-  void draw(int mouseX, int mouseY);
-
-  boolean click(int mouseX, int mouseY);
-
-  void release(int mouseX, int mouseY);
-
-  void keyTyped(char typedChar, int keyCode);
-
-}

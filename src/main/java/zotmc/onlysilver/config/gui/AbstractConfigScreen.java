@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
 import java.util.Collections;
@@ -24,10 +39,10 @@ abstract class AbstractConfigScreen implements Screen {
   }
 
   @Override public Iterable<Element> getElements(int w, int h, Holder<List<String>> hoveringText, final Runnable quit) {
-    Runnable saveQuit = new Runnable() { public void run() {
+    Runnable saveQuit = () -> {
       save();
       quit.run();
-    }};
+    };
 
     List<Element> ret = Lists.newArrayList();
 
@@ -53,7 +68,7 @@ abstract class AbstractConfigScreen implements Screen {
   protected abstract Iterable<? extends Row> getUpperRows(int w, Holder<List<String>> hoveringText);
 
   protected Iterable<Row> getLowerRows() {
-    return Collections.<Row>nCopies(2, EmptyRow.INSTANCE);
+    return Collections.nCopies(2, EmptyRow.INSTANCE);
   }
 
   @Override public Iterable<Row> getRows(int w, Holder<List<String>> hoveringText) {

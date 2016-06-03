@@ -461,7 +461,7 @@ public class ConfigGui extends AbstractConfigFactory {
 
       if (defaultValue.harvestLevel >= 0)
         ret.add(new IntSliderRow(defaultValue.harvestLevel) {
-          final Icon<?> icon = new ItemIcon(Items.DIAMOND, Icon.PHIM1).overlay(Blocks.STONE);
+          final Icon<?> icon = new ItemIcon(Items.DIAMOND, Icon.PHI_M1).overlay(Blocks.STONE);
 
           @Override protected Icon<?> icon() {
             return icon;
@@ -479,7 +479,7 @@ public class ConfigGui extends AbstractConfigFactory {
         });
 
       ret.add(new FloatSliderRow(defaultValue.hardness, 0.05) {
-        final Icon<?> icon = new ItemIcon(Items.IRON_PICKAXE, Icon.PHIM1).overlay(Blocks.STONE);
+        final Icon<?> icon = new ItemIcon(Items.IRON_PICKAXE, Icon.PHI_M1).overlay(Blocks.STONE);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -497,7 +497,7 @@ public class ConfigGui extends AbstractConfigFactory {
       });
 
       ret.add(new FloatSliderRow(defaultValue.resistance, 0.5) {
-        final Icon<?> icon = new ItemIcon(Items.GUNPOWDER, Icon.PHIM1).overlay(Blocks.STONE);
+        final Icon<?> icon = new ItemIcon(Items.GUNPOWDER, Icon.PHI_M1).overlay(Blocks.STONE);
 
         @Override protected Icon<?> icon() {
           return icon;
@@ -540,7 +540,7 @@ public class ConfigGui extends AbstractConfigFactory {
       List<Row> ret = Lists.newArrayList();
 
       ret.add(new IntSliderRow(defaultValue.harvestLevel) {
-        final Icon<?> icon = new ItemIcon(Items.DIAMOND, Icon.PHIM1).overlay(Items.IRON_PICKAXE);
+        final Icon<?> icon = new ItemIcon(Items.DIAMOND, Icon.PHI_M1).overlay(Items.IRON_PICKAXE);
 
         @Override protected Icon<?> icon() {
           return icon;

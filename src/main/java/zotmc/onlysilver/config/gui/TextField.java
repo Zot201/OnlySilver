@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
 import java.util.Collection;
@@ -5,14 +20,14 @@ import java.util.Collection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 
-public class TextField implements Widget<TextField> {
+class TextField implements Widget<TextField> {
 
-  public interface Handler {
-    public boolean getIsFocus();
+  interface Handler {
+    boolean getIsFocus();
 
-    public String getText();
+    String getText();
 
-    public void setText(String text);
+    void setText(String text);
   }
 
   private final GuiTextField delegate = new GuiTextField(-1, Minecraft.getMinecraft().fontRendererObj, 0, 0, 0, 0);
@@ -20,7 +35,7 @@ public class TextField implements Widget<TextField> {
   private boolean isFocus;
   private String text;
 
-  public TextField(Handler handler) {
+  TextField(Handler handler) {
     this.handler = handler;
     delegate.setMaxStringLength(Short.MAX_VALUE);
     delegate.setFocused(isFocus = handler.getIsFocus());
@@ -50,6 +65,7 @@ public class TextField implements Widget<TextField> {
     if (this.isFocus ^ isFocus) delegate.setFocused(this.isFocus = isFocus);
 
     String text = handler.getText();
+    //noinspection StringEquality
     if (this.text != text) {
       delegate.setText(this.text = text);
       delegate.setCursorPositionZero();
@@ -70,6 +86,7 @@ public class TextField implements Widget<TextField> {
     delegate.textboxKeyTyped(typedChar, keyCode);
 
     String text = delegate.getText();
+    //noinspection StringEquality
     if (this.text != text) handler.setText(this.text = text);
   }
 

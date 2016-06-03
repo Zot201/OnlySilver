@@ -1,35 +1,47 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
-import java.util.Collection;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.opengl.GL11;
-
 import zotmc.onlysilver.data.LangData;
 
-import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
 
-// TODO: refinement
 public class IconButton implements Widget<IconButton> {
 
-  public interface Handler {
-    public Icon<?> icon();
+  interface Handler {
+    Icon<?> icon();
 
-    public boolean isCommon();
+    boolean isCommon();
 
-    public boolean getState();
+    boolean getState();
 
-    public void toggleState();
+    void toggleState();
 
-    public Holder<List<String>> hoveringTextHolder();
+    @Nullable Holder<List<String>> hoveringTextHolder();
 
-    public List<String> getHoveringTexts();
+    @Nullable List<String> getHoveringTexts();
   }
 
   private static final ResourceLocation achievementBackground =
@@ -70,13 +82,15 @@ public class IconButton implements Widget<IconButton> {
     return false;
   }
 
-  @Override public void release(int mouseX, int mouseY) { }
+  @Override public void release(int mouseX, int mouseY) {
+  }
 
-  @Override public void keyTyped(char typedChar, int keyCode) { }
+  @Override public void keyTyped(char typedChar, int keyCode) {
+  }
 
 
   private class GuiIconButton extends GuiButton {
-    public GuiIconButton() {
+    GuiIconButton() {
       super(-1, 0, 0, 22, 22, "");
     }
 
@@ -84,22 +98,25 @@ public class IconButton implements Widget<IconButton> {
       if (visible) {
         int x = xPosition, y = yPosition;
 
-        hovered = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
+        hovered =
+            mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
         float brightness = hovered ? 1 : 0.75F;
         boolean state = handler.getState();
-        if (!state) brightness /= 2.5F;
+        if (!state) {
+          brightness /= 2.5F;
+        }
         GlStateManager.color(brightness, brightness, brightness, 1);
 
         GlStateManager.enableBlend();
         GlStateManager.depthMask(false);
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         mc.getTextureManager().bindTexture(achievementBackground);
-        mc.getRenderItem().func_175039_a(false);
+        mc.getRenderItem().isNotRenderingEffectsInGUI(false);
         drawTexturedModalRect(x - 2, y - 2, handler.isCommon() ? 0 : 26, 202, 26, 26);
 
         handler.icon()
-          .setBrightness(brightness)
-          .drawIcon(x + 3, y + 3);
+            .setBrightness(brightness)
+            .drawIcon(x + 3, y + 3);
 
         if (hovered) {
           Holder<List<String>> holder = handler.hoveringTextHolder();
@@ -110,8 +127,8 @@ public class IconButton implements Widget<IconButton> {
             if (texts != null) {
               if (texts.size() > 0) {
                 texts = Lists.newLinkedList(texts);
-                texts.add(1, state ? EnumChatFormatting.GREEN + LangData.ENABLED.get()
-                    : EnumChatFormatting.DARK_RED + LangData.DISABLED.get());
+                texts.add(1, state ? TextFormatting.GREEN + LangData.ENABLED.get()
+                    : TextFormatting.DARK_RED + LangData.DISABLED.get());
               }
 
               holder.set(texts);

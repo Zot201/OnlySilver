@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -10,15 +25,17 @@ import net.minecraft.client.gui.GuiScreen;
 
 import org.lwjgl.input.Keyboard;
 
-public class GuiScreenWrapper extends GuiScreen {
+import javax.annotation.Nullable;
+
+class GuiScreenWrapper extends GuiScreen {
 
   private final GuiScreen parent; // nullable
   private final Holder<List<String>> hoveringText = Holder.absent();
   private Screen screen;
   private Iterable<Element> elements;
-  private GuiEmbeddedList embededList;
+  private GuiEmbeddedList embeddedList;
 
-  private GuiScreenWrapper(GuiScreen parent, Screen screen) {
+  private GuiScreenWrapper(@Nullable GuiScreen parent, Screen screen) {
     this.parent = parent;
     this.screen = checkNotNull(screen);
     screen.create();
@@ -30,7 +47,7 @@ public class GuiScreenWrapper extends GuiScreen {
     screen.create();
   }
 
-  Screen createScreen() {
+  @Nullable Screen createScreen() {
     return null;
   }
 
@@ -41,11 +58,11 @@ public class GuiScreenWrapper extends GuiScreen {
 
   @Override public void initGui() {
     Keyboard.enableRepeatEvents(true);
-    elements = screen.getElements(width, height, hoveringText, new Runnable() { public void run() {
+    elements = screen.getElements(width, height, hoveringText, () -> {
       screen.destroy();
       mc.displayGuiScreen(parent);
-    }});
-    embededList = new GuiEmbeddedList(this, screen.getRowHeight(), screen.getRows(width, hoveringText));
+    });
+    embeddedList = new GuiEmbeddedList(this, screen.getRowHeight(), screen.getRows(width, hoveringText));
   }
 
   @Override public void onGuiClosed() {
@@ -55,7 +72,7 @@ public class GuiScreenWrapper extends GuiScreen {
   @Override public void drawScreen(int mouseX, int mouseY, float tickFrac) {
     drawDefaultBackground();
     hoveringText.clear();
-    embededList.drawScreen(mouseX, mouseY, tickFrac);
+    embeddedList.drawScreen(mouseX, mouseY, tickFrac);
     for (Element e : elements)
       e.draw(mouseX, mouseY);
     super.drawScreen(mouseX, mouseY, tickFrac);
@@ -63,22 +80,22 @@ public class GuiScreenWrapper extends GuiScreen {
   }
 
   @Override public void handleMouseInput() throws IOException {
-    embededList.handleMouseInput();
+    embeddedList.handleMouseInput();
     super.handleMouseInput();
   }
 
   @Override protected void keyTyped(char typedChar, int keyCode) throws IOException {
-    embededList.keyTyped(typedChar, keyCode);
+    embeddedList.keyTyped(typedChar, keyCode);
   }
 
   @Override protected void mouseClicked(int x, int y, int mouseEvent) throws IOException {
-    if (!embededList.mouseClicked(x, y, mouseEvent) && mouseEvent == 0)
+    if (!embeddedList.mouseClicked(x, y, mouseEvent) && mouseEvent == 0)
       for (Element e : elements)
         if (e.click(x, y)) return;
   }
 
   @Override protected void mouseReleased(int x, int y, int mouseEvent) {
-    if (!embededList.mouseReleased(x, y, mouseEvent) && mouseEvent == 0)
+    if (!embeddedList.mouseReleased(x, y, mouseEvent) && mouseEvent == 0)
       for (Element e : elements)
         e.release(x, y);
   }

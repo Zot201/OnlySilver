@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.config.gui;
 
 import java.util.Set;
@@ -16,6 +31,9 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 
+import javax.annotation.Nullable;
+
+@SuppressWarnings("Guava")
 public abstract class AbstractConfigFactory extends AbstractConfigScreen implements IModGuiFactory {
 
   protected abstract Supplier<String> getTitle();
@@ -30,8 +48,12 @@ public abstract class AbstractConfigFactory extends AbstractConfigScreen impleme
 
 
   @Override public void initialize(Minecraft minecraftInstance) { }
-  @Override public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() { return null; }
-  @Override public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) { return null; }
+  @Override public @Nullable Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
+    return null;
+  }
+  @Override public @Nullable RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
+    return null;
+  }
 
   @Override public Class<? extends GuiScreen> mainConfigGuiClass() {
     return mainConfigGuiClass.get();
@@ -39,9 +61,8 @@ public abstract class AbstractConfigFactory extends AbstractConfigScreen impleme
 
   private static long counts;
 
-  private final Supplier<Class<? extends GuiScreen>>
-  mainConfigGuiClass = Suppliers.memoize(new Supplier<Class<? extends GuiScreen>>() { public Class<? extends GuiScreen> get() {
-    Class<?> f = AbstractConfigFactory.this.getClass();
+  private final Supplier<Class<? extends GuiScreen>> mainConfigGuiClass = Suppliers.memoize(() -> {
+    Class<?> f = getClass();
     KlastWriter<GuiConfigImpl> cw = new KlastWriter<>(f.getName() + "_" + counts++, GuiConfigImpl.class);
 
     cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER);
@@ -56,8 +77,8 @@ public abstract class AbstractConfigFactory extends AbstractConfigScreen impleme
     mg.endMethod();
 
     Class<? extends GuiConfigImpl> ret = cw.define().toClass();
-    GuiConfigImpl.setScreen(ret, AbstractConfigFactory.this);
+    GuiConfigImpl.setScreen(ret, this);
     return ret;
-  }});
+  });
 
 }
