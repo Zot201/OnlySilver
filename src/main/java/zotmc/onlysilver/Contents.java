@@ -27,6 +27,7 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
@@ -110,6 +111,7 @@ public class Contents {
     Config.current().silverOreStats.get().setStatTo(b, "pickaxe");
     b.setRegistryName("silver_ore");
     GameRegistry.register(b);
+    GameRegistry.register(new ItemBlock(b));
     silverOre.set(b);
     OnlySilver.INSTANCE.proxy.registerItemModels(b, "silver_ore");
     OreDictionary.registerOre("oreSilver", b);
@@ -119,6 +121,7 @@ public class Contents {
     Config.current().silverBlockStats.get().setStatTo(b, null);
     b.setRegistryName("silver_block");
     GameRegistry.register(b);
+    GameRegistry.register(new ItemBlock(b));
     silverBlock.set(b);
     OnlySilver.INSTANCE.proxy.registerItemModels(b, "silver_block");
     OreDictionary.registerOre("blockSilver", b);
