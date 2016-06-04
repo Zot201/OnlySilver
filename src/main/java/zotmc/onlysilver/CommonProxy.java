@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver;
 
 import net.minecraft.block.Block;
@@ -14,17 +29,19 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 import zotmc.onlysilver.data.ModData.OnlySilvers;
 import zotmc.onlysilver.util.Utils;
 
-public class CommonProxy {
+import static com.google.common.base.Preconditions.checkNotNull;
+
+class CommonProxy {
 
   CommonProxy() { }
 
-  public void registerItemModels(Block b, String... models) {
-    registerItemModels(Item.getItemFromBlock(b), models);
+  void registerItemModels(Block b, String... models) {
+    registerItemModels(checkNotNull(Item.getItemFromBlock(b)), models);
   }
 
   public void registerItemModels(Item i, String... models) { }
 
-  public void registerEntityRenderer(Class<? extends Entity> entity) { }
+  public <T extends Entity> void registerEntityRenderer(Class<T> entity) { }
 
   public void spawnEntityInWorld(Entity entity) {
     entity.worldObj.spawnEntityInWorld(entity);
@@ -42,18 +59,18 @@ public class CommonProxy {
 
   @SubscribeEvent public void onItemExpire(ItemExpireEvent event) {
     if (CommonHooks.silverAuraExists) {
-      ItemStack item = event.entityItem.getEntityItem();
+      ItemStack item = event.getEntityItem().getEntityItem();
 
       if (Utils.hasEnch(item, Contents.silverAura.get())) {
-        if (item.getItem() == Items.enchanted_book) {
-          event.extraLife = 96000;
+        if (item.getItem() == Items.ENCHANTED_BOOK) {
+          event.setExtraLife(96000);
           event.setCanceled(true);
         }
         else {
-          NBTTagCompound data = event.entityItem.getEntityData();
+          NBTTagCompound data = event.getEntityItem().getEntityData();
 
           if (!data.getBoolean(OnlySilvers.MODID + "-lifeExtended")) {
-            event.extraLife = 12000;
+            event.setExtraLife(12000);
             event.setCanceled(true);
             data.setBoolean(OnlySilvers.MODID + "-lifeExtended", true);
           }
@@ -63,16 +80,16 @@ public class CommonProxy {
   }
 
   @SubscribeEvent public void onEntityJoinWorld(EntityJoinWorldEvent event) {
-    if (event.entity instanceof EntityArrow) {
+    if (event.getEntity() instanceof EntityArrow) {
       Double extraDamage = CommonHooks.arrowLooseContext.get();
 
       if (extraDamage != null) {
-        EntityArrow arrow = (EntityArrow) event.entity;
+        EntityArrow arrow = (EntityArrow) event.getEntity();
 
         try {
           arrow.setDamage(extraDamage + arrow.getDamage());
-
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
           OnlySilver.INSTANCE.log.catching(t);
         }
       }

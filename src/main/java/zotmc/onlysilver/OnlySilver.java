@@ -68,13 +68,14 @@ public enum OnlySilver {
     Contents.init();
     
     GameRegistry.registerWorldGenerator(new SilverGenerator(), 0xC22F0082);
+    eventBus.post(new PreInit());
   }
-  
+
   @EventHandler public void init(FMLInitializationEvent event) {
     eventBus.post(new Init());
   }
-  
-  
+
+
   @EventHandler public void onServerStart(FMLServerAboutToStartEvent event) {
     eventBus.post(new AbstractConfig.NotifyServerStart());
   }
@@ -110,8 +111,10 @@ public enum OnlySilver {
     if (underscore == null) underscore = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, camel);
     return registry.getObject(new ResourceLocation(MODID, underscore));
   }
-  
-  
+
+
+  public static class PreInit extends Event { }
+
   public static class Init extends Event { }
   
 }

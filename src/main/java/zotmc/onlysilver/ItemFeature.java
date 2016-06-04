@@ -186,7 +186,7 @@ public enum ItemFeature implements Feature<Item> {
     return value;
   }
   
-  public Item orNull() {
+  public @Nullable Item orNull() {
     return value;
   }
   
