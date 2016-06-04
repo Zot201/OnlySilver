@@ -119,7 +119,7 @@ public class ClientProxy extends CommonProxy {
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.TYPE)
   public @interface EntityRenderer {
-    public Class<? extends Render> value();
+    Class<? extends Render> value();
   }
 
 }
