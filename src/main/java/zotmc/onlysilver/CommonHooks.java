@@ -37,6 +37,7 @@ import zotmc.onlysilver.loading.Patcher.ReturnBoolean;
 import zotmc.onlysilver.loading.Patcher.Srg;
 import zotmc.onlysilver.loading.Patcher.Static;
 import zotmc.onlysilver.util.Fields;
+import zotmc.onlysilver.util.Utils;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -144,12 +145,12 @@ public class CommonHooks {
   
   // enchantments
 
-  /*static boolean silverAuraExists = false;
+  static boolean silverAuraExists = false;
   public static final ThreadLocal<Boolean> enchantingContext = Utils.newThreadLocal(false); // false for enchanting table type usage
   public static final ThreadLocal<ItemStack> modifierContext = new ThreadLocal<>();
   public static final ThreadLocal<Double> arrowLooseContext = new ThreadLocal<>();
   
-  @Hook @Srg("func_77557_a") @ReturnBoolean(condition = true, value = true)
+  /*@Hook @Srg("func_77557_a") @ReturnBoolean(condition = true, value = true)
   public static boolean canEnchantItem(EnumEnchantmentType type, Item i) {
     if (type == Contents.TOOL)
       return i instanceof ItemSword || i instanceof ItemTool;
@@ -179,13 +180,13 @@ public class CommonHooks {
       if (lvl > 0) return originalValue + lvl;
     }
     return originalValue;
-  }
+  }*/
   
   public static void onStoppedUsing(ItemStack item) {
     if (silverAuraExists) arrowLooseContext.set(Contents.silverAura.get().getAuraArrowDamage(item));
   }
   
-  public static void onMobStoppedUsing(IRangedAttackMob mob) {
+  /*public static void onMobStoppedUsing(IRangedAttackMob mob) {
     ItemStack item = ((EntityLivingBase) mob).getHeldItem();
     if (item != null) onStoppedUsing(item);
   }

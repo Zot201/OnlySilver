@@ -48,7 +48,7 @@ public class ExtSettings {
 
 
   @SuppressWarnings("WeakerAccess")
-  static class WorldPredicate extends CacheLoader<World, Boolean> implements Predicate<World> {
+  public static class WorldPredicate extends CacheLoader<World, Boolean> implements Predicate<World> {
     public final String regex;
     private final LoadingCache<World, Boolean> cache = CacheBuilder.newBuilder().weakKeys().build(this);
     WorldPredicate(String regex) {
