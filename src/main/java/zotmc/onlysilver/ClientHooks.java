@@ -1,13 +1,30 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.entity.layers.LayerArmorBase;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -18,16 +35,16 @@ import zotmc.onlysilver.loading.Patcher.Return;
 import zotmc.onlysilver.loading.Patcher.Static;
 import zotmc.onlysilver.util.Utils;
 
+@SuppressWarnings("WeakerAccess")
 @SideOnly(Side.CLIENT)
 public class ClientHooks {
 
   // silver aura rendering
 
   private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
-  public static final ThreadLocal<Integer> renderArmorContext = new ThreadLocal<>();
+  public static final ThreadLocal<EntityEquipmentSlot> renderArmorContext = new ThreadLocal<>();
 
-  public static boolean renderSilverAura(RenderItem renderItem,
-      @SuppressWarnings("deprecation") net.minecraft.client.resources.model.IBakedModel model, ItemStack item) {
+  public static boolean renderSilverAura(RenderItem renderItem, IBakedModel model, ItemStack item) {
 
     if (Utils.hasEnch(item, Contents.silverAura)) {
       TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
@@ -57,7 +74,7 @@ public class ClientHooks {
       GlStateManager.enableLighting();
       GlStateManager.depthFunc(515);
       GlStateManager.depthMask(true);
-      textureManager.bindTexture(TextureMap.locationBlocksTexture);
+      textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
       return true;
     }
@@ -68,12 +85,12 @@ public class ClientHooks {
   public static boolean renderArmorSilverAura(EntityLivingBase living, ModelBase model,
       float p3, float p4, float p5, float p6, float p7, float p8, float p9) {
 
-    Integer slot = renderArmorContext.get();
+    EntityEquipmentSlot slot = renderArmorContext.get();
     if (slot == null) return false;
 
-    ItemStack item = living.getCurrentArmor(slot - 1);
+    ItemStack item = living.getItemStackFromSlot(slot);
 
-    if (Utils.hasEnch(item, Contents.silverAura)) {
+    if (item != null && Utils.hasEnch(item, Contents.silverAura)) {
       TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
 
       float f7 = living.ticksExisted + p5;

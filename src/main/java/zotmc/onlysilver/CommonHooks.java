@@ -15,65 +15,33 @@
  */
 package zotmc.onlysilver;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import net.minecraft.block.Block;
+import com.google.common.base.Predicate;
 import net.minecraft.block.BlockPumpkin;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockPattern;
 import net.minecraft.block.state.pattern.BlockPattern.PatternHelper;
-import net.minecraft.block.state.pattern.BlockStateHelper;
 import net.minecraft.block.state.pattern.FactoryBlockPattern;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.EnumEnchantmentType;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.ai.EntityAIAttackOnCollide;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityIronGolem;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
-import net.minecraft.item.ItemTool;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
-import zotmc.onlysilver.api.OnlySilverUtils;
 import zotmc.onlysilver.config.Config;
 import zotmc.onlysilver.data.ReflData;
 import zotmc.onlysilver.entity.EntitySilverGolem;
-import zotmc.onlysilver.item.ItemOnlyBow;
 import zotmc.onlysilver.loading.Patcher.Hook;
-import zotmc.onlysilver.loading.Patcher.Hook.Strategy;
-import zotmc.onlysilver.loading.Patcher.Return;
 import zotmc.onlysilver.loading.Patcher.ReturnBoolean;
 import zotmc.onlysilver.loading.Patcher.Srg;
 import zotmc.onlysilver.loading.Patcher.Static;
-import zotmc.onlysilver.util.Feature;
 import zotmc.onlysilver.util.Fields;
-import zotmc.onlysilver.util.Utils;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.MapMaker;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class CommonHooks {
   
   // item features (non-coremod callbacks)
@@ -107,7 +75,7 @@ public class CommonHooks {
       
       if (match != null) {
         for (int j = 0; j < SilverBlockPredicate.golemPattern.getThumbLength(); j++)
-          world.setBlockState(match.translateOffset(0, j, 0).getPos(), Blocks.air.getDefaultState(), 2);
+          world.setBlockState(match.translateOffset(0, j, 0).getPos(), Blocks.AIR.getDefaultState(), 2);
         
         BlockPos golemPos = match.translateOffset(0, 1, 0).getPos();
         EntitySilverGolem golem = new EntitySilverGolem(world);
@@ -123,7 +91,7 @@ public class CommonHooks {
               0, 0, 0);
         
         for (int j = 0; j < SilverBlockPredicate.golemPattern.getThumbLength(); j++)
-          world.notifyNeighborsRespectDebug(match.translateOffset(0, j, 0).getPos(), Blocks.air);
+          world.notifyNeighborsRespectDebug(match.translateOffset(0, j, 0).getPos(), Blocks.AIR);
       }
     }
   }
@@ -135,21 +103,27 @@ public class CommonHooks {
     @Override public boolean apply(@Nullable BlockWorldState input) {
       if (input != null) {
         IBlockState block = input.getBlockState();
-        
+
+        //noinspection ConstantConditions
         if (block != null) {
-          Block b = block.getBlock();
-          Item i = Item.getItemFromBlock(b);
-          int damage = b.getDamageValue(Fields.<World>get(input, ReflData.WORLD), input.getPos());
-          
-          for (ItemStack ore : blockSilver)
-            if (itemMatches(ore, i, damage))
-              return true;
+          try {
+            //noinspection ConstantConditions
+            ItemStack item = block.getBlock().getPickBlock(
+                block, null, Fields.get(input, ReflData.WORLD), input.getPos(), null);
+
+            for (ItemStack ore : blockSilver)
+              if (itemMatches(ore, item.getItem(), item.getItemDamage()))
+                return true;
+          }
+          catch (Exception e) {
+            OnlySilver.INSTANCE.log.catching(e);
+          }
         }
       }
       return false;
     }
     
-    private static boolean itemMatches(ItemStack ore, Item i, int damage) {
+    private static boolean itemMatches(@Nullable ItemStack ore, Item i, int damage) {
       return ore != null && i == ore.getItem()
           && (ore.getItemDamage() == OreDictionary.WILDCARD_VALUE || ore.getItemDamage() == damage);
     }
@@ -161,7 +135,7 @@ public class CommonHooks {
     
     static final BlockPattern golemPattern = FactoryBlockPattern.start()
         .aisle("^", "#")
-        .where('^', BlockWorldState.hasState(BlockStateHelper.forBlock(Blocks.pumpkin)))
+        .where('^', BlockWorldState.hasState(input -> false)) // TODO: Use BlockPumpkin.IS_PUMPKIN
         .where('#', INSTANCE)
         .build();
   }
@@ -170,7 +144,7 @@ public class CommonHooks {
   
   // enchantments
 
-  static boolean silverAuraExists = false;
+  /*static boolean silverAuraExists = false;
   public static final ThreadLocal<Boolean> enchantingContext = Utils.newThreadLocal(false); // false for enchanting table type usage
   public static final ThreadLocal<ItemStack> modifierContext = new ThreadLocal<>();
   public static final ThreadLocal<Double> arrowLooseContext = new ThreadLocal<>();
@@ -382,6 +356,6 @@ public class CommonHooks {
     if (item != null && ItemFeature.silverSword.exists() && !item.isItemEnchanted()
         && item.getItem() == ItemFeature.silverSword.get() && rand.nextFloat() < 0.25F)
       EnchantmentHelper.addRandomEnchantment(rand, item, 5 + rand.nextInt(18));
-  }
+  }*/
   
 }

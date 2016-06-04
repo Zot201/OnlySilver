@@ -110,14 +110,14 @@ public class Utils {
     }
   }
 
-  public static int getEnchLevel(ItemStack item, Enchantment ench) {
+  public static int getEnchLevel(@Nullable ItemStack item, Enchantment ench) {
     return EnchantmentHelper.getEnchantmentLevel(ench, item);
   }
 
   public static boolean hasEnch(EntityItem item, Feature<? extends Enchantment> ench) {
     return ench.exists() && hasEnch(item.getEntityItem(), ench.get());
   }
-  public static boolean hasEnch(ItemStack item, Feature<? extends Enchantment> ench) {
+  public static boolean hasEnch(@Nullable ItemStack item, Feature<? extends Enchantment> ench) {
     return ench.exists() && hasEnch(item, ench.get());
   }
   public static boolean hasEnch(@Nullable ItemStack item, Enchantment ench) {
