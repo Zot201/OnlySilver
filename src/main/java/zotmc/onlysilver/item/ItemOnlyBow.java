@@ -1,19 +1,37 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.item;
 
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemArrow;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.ArrowLooseEvent;
+import net.minecraftforge.event.ForgeEventFactory;
 import zotmc.onlysilver.config.Config;
 import zotmc.onlysilver.data.LangData;
 import zotmc.onlysilver.data.ModData.OnlySilvers;
@@ -62,48 +80,89 @@ public class ItemOnlyBow extends ItemBow {
     }
   }
 
-  private void onPlayerStoppedUsing(ItemStack item, World world, EntityPlayer player, int timeLeft) {
-    int charge = getMaxItemUseDuration(item) - timeLeft;
-    ArrowLooseEvent event = new ArrowLooseEvent(player, item, charge);
-    if (MinecraftForge.EVENT_BUS.post(event))
-      return;
+  private ItemStack findAmmo(EntityPlayer player) {
+    ItemStack item = player.getHeldItem(EnumHand.OFF_HAND);
+    if (isArrow(item)) {
+      return item;
+    }
+    item = player.getHeldItem(EnumHand.MAIN_HAND);
+    if (isArrow(item)) {
+      return item;
+    }
+    for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+      item = player.inventory.getStackInSlot(i);
+      if (isArrow(item)) {
+        return item;
+      }
+    }
+    return null;
+  }
 
-    charge = event.charge;
-    boolean infinity = player.capabilities.isCreativeMode || Utils.getEnchLevel(item, Enchantment.infinity) > 0;
-    if (!infinity && !player.inventory.hasItem(Items.arrow))
-      return;
+  private void onPlayerStoppedUsing(ItemStack bow, World world, EntityPlayer player, int timeLeft) {
+    boolean canShoot = player.capabilities.isCreativeMode || Utils.getEnchLevel(bow, Enchantments.INFINITY) > 0;
+    ItemStack arrow = findAmmo(player);
+    canShoot |= arrow != null;
 
-    float f = charge / 20.0F;
-    f = (f * f + f * 2.0F) / 3.0F;
-    if (f < 0.1D)
-      return;
+    int charge = getMaxItemUseDuration(bow) - timeLeft;
+    charge = ForgeEventFactory.onArrowLoose(bow, world, player, charge, canShoot);
 
-    if (f > 1.0F) f = 1.0F;
+    if (canShoot && charge >= 0) {
+      if (arrow == null) {
+        arrow = new ItemStack(Items.ARROW);
+      }
 
-    EntityArrow entityarrow = new EntityArrow(world, player, f * 2.0F);
-    entityarrow.getEntityData().setBoolean(ARROW_FX, true);
-    if (f == 1.0F)
-      entityarrow.setIsCritical(true);
+      float f = getArrowVelocity(charge);
 
-    int power = Utils.getEnchLevel(item, Enchantment.power);
-    if (power > 0)
-      entityarrow.setDamage(entityarrow.getDamage() + power * 0.5D + 0.5D);
+      if (f >= 0.1) {
+        boolean infinity = player.capabilities.isCreativeMode
+            || (arrow.getItem() instanceof ItemArrow && ((ItemArrow) arrow.getItem()).isInfinite(arrow, bow, player));
 
-    entityarrow.setKnockbackStrength(Utils.getEnchLevel(item, Enchantment.punch) + 2); // +2 for silver bow
+        if (!world.isRemote) {
+          ItemArrow i = (ItemArrow) (arrow.getItem() instanceof ItemArrow ? arrow.getItem() : Items.ARROW);
+          EntityArrow entity = i.createArrow(world, arrow, player);
+          entity.setAim(player, player.rotationPitch, player.rotationYaw, 0.0F, f * 3.0F, 1.0F);
+          entity.getEntityData().setBoolean(ARROW_FX, true);
 
-    if (Utils.getEnchLevel(item, Enchantment.flame) > 0)
-      entityarrow.setFire(100);
+          if (f == 1) {
+            entity.setIsCritical(true);
+          }
 
-    item.damageItem(1, player);
-    world.playSoundAtEntity(player, "random.bow", 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
+          int power = Utils.getEnchLevel(bow, Enchantments.POWER);
+          if (power > 0) {
+            entity.setDamage(entity.getDamage() + power * 0.5 + 0.5);
+          }
 
-    if (infinity)
-      entityarrow.canBePickedUp = 2;
-    else
-      player.inventory.consumeInventoryItem(Items.arrow);
+          entity.setKnockbackStrength(Utils.getEnchLevel(bow, Enchantments.PUNCH) + 2); // +2 for silver bow
 
-    if (!world.isRemote)
-      world.spawnEntityInWorld(entityarrow);
+          if (Utils.getEnchLevel(bow, Enchantments.FLAME) > 0) {
+            entity.setFire(100);
+          }
+
+          bow.damageItem(1, player);
+
+          if (infinity) {
+            entity.pickupStatus = EntityArrow.PickupStatus.CREATIVE_ONLY;
+          }
+
+          world.spawnEntityInWorld(entity);
+        }
+
+        world.playSound(null, player.posX, player.posY, player.posZ,
+            SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.NEUTRAL, 1,
+            1 / (itemRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
+
+        if (!infinity) {
+          arrow.stackSize--;
+
+          if (arrow.stackSize == 0) {
+            player.inventory.deleteStack(arrow);
+          }
+        }
+
+        //noinspection ConstantConditions // Vanilla usage
+        player.addStat(StatList.getObjectUseStats(this));
+      }
+    }
   }
 
   @Override public int getItemEnchantability() {

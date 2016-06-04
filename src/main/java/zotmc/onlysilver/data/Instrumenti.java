@@ -15,24 +15,22 @@
  */
 package zotmc.onlysilver.data;
 
-import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
-
-import java.util.Map;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.reflect.Invokable;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
-
 import zotmc.onlysilver.CommonHooks;
 import zotmc.onlysilver.util.Klas.KlastWriter;
 import zotmc.onlysilver.util.Utils;
 import zotmc.onlysilver.util.init.MethodInfo;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.Invokable;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 
 public class Instrumenti {
 
@@ -48,7 +46,7 @@ public class Instrumenti {
       .returning(Item.class);
 
 
-  public static final java.util.function.Consumer<KlastWriter<?>>
+  public static final Consumer<KlastWriter<?>>
   GET_IS_REPAIRABLE_SILVER = cw -> {
     GeneratorAdapter mg = new GeneratorAdapter(ACC_PUBLIC, GET_IS_REPAIRABLE, null, null, cw);
     mg.loadArg(1);
