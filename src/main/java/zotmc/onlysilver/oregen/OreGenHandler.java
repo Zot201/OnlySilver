@@ -1,10 +1,26 @@
+/*
+ * Copyright 2016 Zot201
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package zotmc.onlysilver.oregen;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Objects;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.*;
+import com.google.gson.*;
 import net.minecraft.client.gui.GuiCreateWorld;
 import net.minecraft.client.gui.GuiCustomizeWorldScreen;
 import net.minecraft.client.gui.GuiPageButtonList.GuiLabelEntry;
@@ -38,28 +54,16 @@ import zotmc.onlysilver.util.Fields;
 import zotmc.onlysilver.util.JsonHelper;
 import zotmc.onlysilver.util.Utils;
 
-import com.google.common.base.Objects;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.DiscreteDomain;
-import com.google.common.collect.ImmutableRangeSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.ObjectArrays;
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeSet;
-import com.google.common.collect.TreeRangeSet;
-import com.google.gson.Gson;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSyntaxException;
+import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 //TODO: Forge PR to eliminate needs for low level hooks
+@SuppressWarnings("WeakerAccess")
 public class OreGenHandler extends CacheLoader<WorldInfo, ExtSettings> {
 
   public static final OreGenHandler INSTANCE = new OreGenHandler();
@@ -70,9 +74,13 @@ public class OreGenHandler extends CacheLoader<WorldInfo, ExtSettings> {
     return settings.getUnchecked(world.getWorldInfo());
   }
 
-  @Deprecated @Override public ExtSettings load(WorldInfo worldInfo) {
-    if (worldInfo instanceof DerivedWorldInfo)
-      return settings.getUnchecked(Fields.<WorldInfo>get(worldInfo, ReflData.THE_WORLD_INFO));
+  @Deprecated @Override public ExtSettings load(@Nullable WorldInfo worldInfo) {
+    checkNotNull(worldInfo);
+
+    if (worldInfo instanceof DerivedWorldInfo) {
+      //noinspection ConstantConditions
+      return settings.getUnchecked(Fields.get(worldInfo, ReflData.THE_WORLD_INFO));
+    }
 
     try {
       String silverGen = ((NBTTagString) getSilverGen(worldInfo)).getString();
@@ -87,8 +95,9 @@ public class OreGenHandler extends CacheLoader<WorldInfo, ExtSettings> {
     JsonHelper ext = null;
     String generatorOptions = worldInfo.getGeneratorOptions();
 
+    //noinspection ConstantConditions
     if (generatorOptions != null && !generatorOptions.isEmpty()) {
-      Factory factory = Factory.func_177865_a(generatorOptions);
+      Factory factory = Factory.jsonToFactory(generatorOptions);
       ext = INSTANCE.factories.get(factory);
     }
     if (ext == null) ext = Config.current().silverGenDefaults.base().get().get();
@@ -116,8 +125,9 @@ public class OreGenHandler extends CacheLoader<WorldInfo, ExtSettings> {
       JsonHelper ext = null;
       String generatorOptions = worldInfo.getGeneratorOptions();
 
+      //noinspection ConstantConditions
       if (generatorOptions != null && !generatorOptions.isEmpty()) {
-        Factory factory = Factory.func_177865_a(generatorOptions);
+        Factory factory = Factory.jsonToFactory(generatorOptions);
         ext = INSTANCE.factories.get(factory);
       }
       if (ext == null) ext = Config.current().silverGenDefaults.get().get();
@@ -217,7 +227,7 @@ public class OreGenHandler extends CacheLoader<WorldInfo, ExtSettings> {
     for (GuiListEntry[] a : entries)
       for (GuiListEntry entry : a)
         if (entry != null)
-          freeIds.remove(entry.func_178935_b());
+          freeIds.remove(entry.getId());
 
     GenDefaults genDefaults = Config.current().silverGenDefaults.get();
     Holder.genDefaults.put(gui, genDefaults.get());
@@ -249,7 +259,7 @@ public class OreGenHandler extends CacheLoader<WorldInfo, ExtSettings> {
       for (int i = 0; i < 4; i++) {
         GuiListEntry entry = extraEntries.get(i).get();
 
-        if (entry != null && entry.func_178935_b() == elementId) {
+        if (entry != null && entry.getId() == elementId) {
           String s;
           switch (i) {
             case 0: s = "size"; break;

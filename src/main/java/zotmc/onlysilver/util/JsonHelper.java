@@ -192,11 +192,11 @@ public class JsonHelper {
     return defaultValueFactory.get();
   }
 
-  public String getAsString(String key) {
+  public @Nullable String getAsString(String key) {
     return getAsString(key, "");
   }
 
-  public String getAsString(String key, String defaultValue) {
+  public @Nullable String getAsString(String key, @Nullable String defaultValue) {
     try {
       JsonElement j = backing.get(key);
       return present(j) ? j.getAsString() : defaultValue;

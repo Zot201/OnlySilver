@@ -357,7 +357,8 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
     }
   }
 
-  private static class BaseProperty<E> extends Property<E> {
+  @SuppressWarnings("WeakerAccess")
+  public static class BaseProperty<E> extends Property<E> {
     private final E base;
     private E raw;
     private BaseProperty(E base) {
