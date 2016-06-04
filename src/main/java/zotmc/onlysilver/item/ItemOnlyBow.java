@@ -1,39 +1,36 @@
 package zotmc.onlysilver.item;
 
-import java.util.List;
-
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import zotmc.onlysilver.config.Config;
 import zotmc.onlysilver.data.LangData;
 import zotmc.onlysilver.data.ModData.OnlySilvers;
 import zotmc.onlysilver.util.Utils;
 
+import java.util.List;
+
 public class ItemOnlyBow extends ItemBow {
 
-  @SideOnly(Side.CLIENT)
+  /*@SideOnly(Side.CLIENT)
   private static class Models {
     static final ModelResourceLocation[] inventoryModels = {
       new ModelResourceLocation(new ResourceLocation(OnlySilvers.MODID, "silver_bow_pulling_0"), "inventory"),
       new ModelResourceLocation(new ResourceLocation(OnlySilvers.MODID, "silver_bow_pulling_1"), "inventory"),
       new ModelResourceLocation(new ResourceLocation(OnlySilvers.MODID, "silver_bow_pulling_2"), "inventory")
     };
-  }
+  }*/
 
   public static final String ARROW_FX = OnlySilvers.MODID + "-arrowFx";
   private final ToolMaterial material;
@@ -44,7 +41,8 @@ public class ItemOnlyBow extends ItemBow {
     setMaxDamage(material.getMaxUses() * 2 + 1);
   }
 
-  @SideOnly(Side.CLIENT)
+  // TODO: Re-implement model overriding
+  /*@SideOnly(Side.CLIENT)
   @Override public ModelResourceLocation getModel(ItemStack item, EntityPlayer player, int useRemaining) {
     if (player.getItemInUse() != null) {
       if (useRemaining >= 18) return Models.inventoryModels[2];
@@ -52,14 +50,19 @@ public class ItemOnlyBow extends ItemBow {
       if (useRemaining > 0) return Models.inventoryModels[0];
     }
     return null;
-  }
+  }*/
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  @Override public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
+  @Override public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean par4) {
     list.add(LangData.KNOCKBACK_TOOLTIP.get());
   }
 
-  @Override public void onPlayerStoppedUsing(ItemStack item, World world, EntityPlayer player, int timeLeft) {
+  @Override public void onPlayerStoppedUsing(ItemStack item, World world, EntityLivingBase player, int timeLeft) {
+    if (player instanceof EntityPlayer) {
+      onPlayerStoppedUsing(item, world, (EntityPlayer) player, timeLeft);
+    }
+  }
+
+  private void onPlayerStoppedUsing(ItemStack item, World world, EntityPlayer player, int timeLeft) {
     int charge = getMaxItemUseDuration(item) - timeLeft;
     ArrowLooseEvent event = new ArrowLooseEvent(player, item, charge);
     if (MinecraftForge.EVENT_BUS.post(event))
@@ -109,7 +112,7 @@ public class ItemOnlyBow extends ItemBow {
 
   @Override public boolean hitEntity(ItemStack item, EntityLivingBase target, EntityLivingBase attacker) {
     if (Config.current().meleeBowKnockback.get()) {
-      int punch = Utils.getEnchLevel(item, Enchantment.punch) + 3;
+      int punch = Utils.getEnchLevel(item, Enchantments.PUNCH) + 3;
       double x = -MathHelper.sin(attacker.rotationYaw * Utils.PI / 180.0F) * punch * 0.5;
       double z = MathHelper.cos(attacker.rotationYaw * Utils.PI / 180.0F) * punch * 0.5;
       target.addVelocity(x, 0.2, z);
