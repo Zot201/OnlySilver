@@ -111,7 +111,7 @@ public class Contents {
     Config.current().silverOreStats.get().setStatTo(b, "pickaxe");
     b.setRegistryName("silver_ore");
     GameRegistry.register(b);
-    GameRegistry.register(new ItemBlock(b));
+    GameRegistry.register(new ItemBlock(b).setRegistryName(b.getRegistryName()));
     silverOre.set(b);
     OnlySilver.INSTANCE.proxy.registerItemModels(b, "silver_ore");
     OreDictionary.registerOre("oreSilver", b);
@@ -121,7 +121,7 @@ public class Contents {
     Config.current().silverBlockStats.get().setStatTo(b, null);
     b.setRegistryName("silver_block");
     GameRegistry.register(b);
-    GameRegistry.register(new ItemBlock(b));
+    GameRegistry.register(new ItemBlock(b).setRegistryName(b.getRegistryName()));
     silverBlock.set(b);
     OnlySilver.INSTANCE.proxy.registerItemModels(b, "silver_block");
     OreDictionary.registerOre("blockSilver", b);

@@ -28,14 +28,15 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 
-class MappedTransformer implements IClassTransformer {
+@SuppressWarnings("WeakerAccess")
+public class MappedTransformer implements IClassTransformer {
 
   private static final Set<String> transformedTypes = Sets.newConcurrentHashSet();
   private final Logger log = LogManager.getFormatterLogger(OnlyLoading.MODID);
   private final boolean devEnv = (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
   private final ListMultimap<String, Patcher> patchers;
 
-  MappedTransformer() {
+  public MappedTransformer() {
     this.patchers = LinkedListMultimap.create();
     for (Patcher patcher : new OnlyLoading().getPatchers())
       this.patchers.put(patcher.targetType().toString().replace('/', '.'), patcher);
