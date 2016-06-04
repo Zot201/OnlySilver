@@ -1,18 +1,20 @@
 package zotmc.onlysilver.oregen;
 
-import java.util.Random;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import zotmc.onlysilver.Contents;
 
+import java.util.Random;
+
 public class SilverGenerator implements IWorldGenerator {
 
-  @Override public void generate(Random rand, int chX, int chZ, World world, IChunkProvider generator, IChunkProvider provider) {
+  @Override public void generate(Random rand, int chX, int chZ, World world,
+      IChunkGenerator generator, IChunkProvider provider) {
     if (!world.isRemote) {
       ExtSettings ext = OreGenHandler.INSTANCE.loadExtSettings(world);
 

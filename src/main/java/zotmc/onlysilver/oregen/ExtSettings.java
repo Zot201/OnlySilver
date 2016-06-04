@@ -32,7 +32,8 @@ public class ExtSettings {
   }
 
 
-  private static class WorldPredicate extends CacheLoader<World, Boolean> implements Predicate<World> {
+  @SuppressWarnings("WeakerAccess")
+  static class WorldPredicate extends CacheLoader<World, Boolean> implements Predicate<World> {
     public final String regex;
     private final LoadingCache<World, Boolean> cache = CacheBuilder.newBuilder().weakKeys().build(this);
     WorldPredicate(String regex) {
