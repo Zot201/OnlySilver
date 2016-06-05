@@ -33,6 +33,7 @@ import zotmc.onlysilver.data.Instrumenti;
 import zotmc.onlysilver.data.ModData.OnlySilvers;
 import zotmc.onlysilver.data.ModData.WeaponMod;
 import zotmc.onlysilver.item.ItemOnlyArmor;
+import zotmc.onlysilver.item.ItemOnlyAxe;
 import zotmc.onlysilver.item.ItemOnlyBow;
 import zotmc.onlysilver.item.ItemOnlyIngot;
 import zotmc.onlysilver.util.Dynamic;
@@ -62,7 +63,7 @@ public enum ItemFeature implements Feature<Item> {
   @Recipes("σ|σ") @Ores("rodSilver") @PlainItem(Item.class) silverRod,
   
   @Recipes("σσσ| ι | ι ") @Tool(ItemPickaxe.class) @ItemId("silver_pickaxe") silverPick,
-  @Recipes("σσ·|σι·| ι·") @Tool(ItemAxe.class) silverAxe,
+  @Recipes("σσ·|σι·| ι·") @Tool(ItemOnlyAxe.class) silverAxe,
   @Recipes("·σ·|·ι·|·ι·") @Tool(ItemSpade.class) silverShovel,
   @Recipes("·σ·|·σ·|·ι·") @Tool(ItemSword.class) silverSword,
   @Recipes("σσ·| ι·| ι·") @Tool(ItemHoe.class) silverHoe,

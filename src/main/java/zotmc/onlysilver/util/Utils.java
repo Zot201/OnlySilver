@@ -47,6 +47,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.*;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -169,6 +172,10 @@ public class Utils {
     for (double f : a)
       ret = Math.min(ret, f);
     return ret;
+  }
+
+  public static float roundToFloatDecimal(double a, RoundingMode mode, int precision) {
+    return new BigDecimal(a).round(new MathContext(precision, mode)).floatValue();
   }
 
 
