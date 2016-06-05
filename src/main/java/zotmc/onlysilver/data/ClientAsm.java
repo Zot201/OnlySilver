@@ -25,7 +25,7 @@ public class ClientAsm {
   // callbacks
   static final MethodPredicate
   RENDER_SILVER_AURA = HOOKS.method("renderSilverAura")
-      .desc("(Lnet/minecraft/client/renderer/entity/RenderItem;Lnet/minecraft/client/resources/model/IBakedModel;" +
+      .desc("(Lnet/minecraft/client/renderer/RenderItem;Lnet/minecraft/client/renderer/block/model/IBakedModel;" +
           "Lnet/minecraft/item/ItemStack;)Z"),
   RENDER_ARMOR_CONTEXT = HOOKS.method("renderArmorContext")
       .desc("Ljava/lang/ThreadLocal;");
@@ -46,7 +46,8 @@ public class ClientAsm {
     public static final Patcher
     RENDER_ITEM_PATCHER = new AbstractInsnPatcher(RENDER_ITEM) {
       @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
-        return RENDER_EFFECT.covers(Opcodes.INVOKEVIRTUAL, insnNode);
+        return RENDER_EFFECT.covers(Opcodes.INVOKESPECIAL, insnNode)
+            || RENDER_EFFECT.covers(Opcodes.INVOKEVIRTUAL, insnNode);
       }
 
       @Override protected void processInsn(InsnList list, AbstractInsnNode targetInsn) {
