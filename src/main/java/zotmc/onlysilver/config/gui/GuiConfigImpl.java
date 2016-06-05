@@ -21,7 +21,7 @@ import net.minecraft.client.gui.GuiScreen;
 
 import com.google.common.collect.Maps;
 
-class GuiConfigImpl extends GuiScreenWrapper {
+public class GuiConfigImpl extends GuiScreenWrapper {
 
   private static final Map<Class<? extends GuiConfigImpl>, Screen> screens = Maps.newIdentityHashMap();
 

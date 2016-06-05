@@ -53,7 +53,7 @@ onlysilver.customize.silverOre=%s (%s)
 
 # OnlySilver Options
 onlysilver.options.title=%s %s
-onlysilver.options.default=%s - %s
+onlysilver.options.default=%s: %s
 onlysilver.options.oreGeneration=Ore Generation
 onlysilver.options.silverGenDefaults=Silver Gen. Defaults
 onlysilver.options.dimensions=Dimensions

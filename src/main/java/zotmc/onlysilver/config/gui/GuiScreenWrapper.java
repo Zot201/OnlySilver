@@ -27,7 +27,8 @@ import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nullable;
 
-class GuiScreenWrapper extends GuiScreen {
+@SuppressWarnings("WeakerAccess")
+public class GuiScreenWrapper extends GuiScreen {
 
   private final GuiScreen parent; // nullable
   private final Holder<List<String>> hoveringText = Holder.absent();
