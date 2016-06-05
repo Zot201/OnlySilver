@@ -134,9 +134,10 @@ public class CommonHooks {
         .where('#', INSTANCE)
         .build();
     
+    @SuppressWarnings("ConstantConditions")
     static final BlockPattern golemPattern = FactoryBlockPattern.start()
         .aisle("^", "#")
-        .where('^', BlockWorldState.hasState(input -> false)) // TODO: Use BlockPumpkin.IS_PUMPKIN
+        .where('^', BlockWorldState.hasState(Fields.<Predicate<IBlockState>>get(null, ReflData.IS_PUMPKIN)))
         .where('#', INSTANCE)
         .build();
   }
