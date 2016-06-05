@@ -312,9 +312,6 @@ public class CommonAsm {
       /*
        * - ...getItem()
        * + getPrototype(...getItem())
-       *
-       * + setCombatTaskAgainstGolem(aiTask, this);
-       *   [addTask](..., aiTask);
        */
 
       @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
