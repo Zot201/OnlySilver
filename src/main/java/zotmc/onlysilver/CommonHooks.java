@@ -17,39 +17,54 @@ package zotmc.onlysilver;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.BlockPumpkin;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockPattern;
 import net.minecraft.block.state.pattern.BlockPattern.PatternHelper;
 import net.minecraft.block.state.pattern.FactoryBlockPattern;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntityTippedArrow;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EntityEquipmentSlot.Type;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTool;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 import zotmc.onlysilver.config.Config;
 import zotmc.onlysilver.data.ReflData;
 import zotmc.onlysilver.entity.EntitySilverGolem;
-import zotmc.onlysilver.loading.Patcher.Hook;
-import zotmc.onlysilver.loading.Patcher.ReturnBoolean;
-import zotmc.onlysilver.loading.Patcher.Srg;
-import zotmc.onlysilver.loading.Patcher.Static;
+import zotmc.onlysilver.item.ItemOnlyBow;
+import zotmc.onlysilver.loading.Patcher.*;
+import zotmc.onlysilver.loading.Patcher.Hook.Strategy;
 import zotmc.onlysilver.util.Feature;
 import zotmc.onlysilver.util.Fields;
 import zotmc.onlysilver.util.Utils;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 @SuppressWarnings("WeakerAccess")
@@ -156,24 +171,24 @@ public class CommonHooks {
   public static final ThreadLocal<ItemStack> modifierContext = new ThreadLocal<>();
   public static final ThreadLocal<Double> arrowLooseContext = new ThreadLocal<>();
   
-  /*@Hook @Srg("func_77557_a") @ReturnBoolean(condition = true, value = true)
+  @Hook @Srg("func_77557_a") @ReturnBoolean(condition = true, value = true)
   public static boolean canEnchantItem(EnumEnchantmentType type, Item i) {
-    if (type == Contents.TOOL)
-      return i instanceof ItemSword || i instanceof ItemTool;
-    if (type == Contents.BREAKABLE)
-      return i.isDamageable();
-    return false;
+    return type == Contents.TOOL && (i instanceof ItemSword || i instanceof ItemTool) ||
+        type == Contents.BREAKABLE && i.isDamageable();
   }
   
   @Hook(Strategy.AGENT) @Srg("func_77519_f") @Static(EnchantmentHelper.class)
   public static int getLootingModifier(int i, EntityLivingBase living) {
-    return Contents.incantation.exists() && Utils.getEnchLevel(living.getHeldItem(), Contents.incantation.get()) > 0 ? i + 1 : i;
+    Feature<Enchantment> incantation = Contents.incantation;
+    return !incantation.exists() ? i :
+        i + (1 + EnchantmentHelper.getMaxEnchantmentLevel(incantation.get(), living)) / 2;
   }
   
   @Hook(Strategy.AGENT) @Srg("func_77509_b") @Static(EnchantmentHelper.class)
   public static int getEfficiencyModifier(int i, EntityLivingBase living) {
-    return !silverAuraExists ? i : i + Contents.silverAura.get().getAuraEfficiency(living.getHeldItem());
-  }*/
+    // Consider active item only
+    return !silverAuraExists ? i : i + Contents.silverAura.get().getAuraEfficiency(living.getActiveItemStack());
+  }
   
   public static boolean getSilverAuraDamageNegation(ItemStack item, Random rand) {
     return silverAuraExists && Contents.silverAura.get().negateDamage(item, rand);
@@ -181,7 +196,7 @@ public class CommonHooks {
   
   public static int getSilverAuraHarvestLevel(int originalValue, EntityPlayer player) {
     if (originalValue >= 0 && silverAuraExists) {
-      ItemStack item = player.inventory.getCurrentItem(); // TODO: Made handedness sensitive?
+      ItemStack item = player.getHeldItemMainhand(); // See PlayerInteractionManager#tryHarvestBlock
       int lvl = Utils.getEnchLevel(item, Contents.silverAura.get());
       if (lvl > 0) return originalValue + lvl;
     }
@@ -193,12 +208,12 @@ public class CommonHooks {
   }
   
   public static void onMobStoppedUsing(IRangedAttackMob mob) {
-    // TODO: Take care of handedness
-    ItemStack item = ((EntityLivingBase) mob).getHeldItem(EnumHand.MAIN_HAND);
+    // Use active item only
+    ItemStack item = ((EntityLivingBase) mob).getActiveItemStack();
     if (item != null) onStoppedUsing(item);
   }
   
-  /*@Hook @Srg("func_70097_a") @ReturnBoolean(condition = true, value = false)
+  @Hook @Srg("func_70097_a") @ReturnBoolean(condition = true, value = false)
   public static boolean attackEntityFrom(EntityItem entityItem, DamageSource damage, float amount) {
     return damage != DamageSource.outOfWorld && Utils.hasEnch(entityItem, Contents.silverAura);
   }
@@ -211,18 +226,23 @@ public class CommonHooks {
       if (rand.nextInt(8) == 0) {
         float f = difficulty.getClampedAdditionalDifficulty();
         
-        ItemStack item = living.getHeldItem();
-        if (item != null && !item.isItemEnchanted() && rand.nextFloat() < 0.25F * f)
-          EnchantmentHelper.addRandomEnchantment(rand, item, 5 + (int) (f * rand.nextInt(18)));
-        
-        for (int i = 0; i < 4; i++) {
-          item = living.getCurrentArmor(i);
-          if (item != null && !item.isItemEnchanted() && rand.nextFloat() < 0.5F * f)
-            EnchantmentHelper.addRandomEnchantment(rand, item, 5 + (int) (f * rand.nextInt(18)));
+        ItemStack item = living.getHeldItemMainhand();
+        if (item != null && !item.isItemEnchanted() && rand.nextFloat() < 0.25F * f) {
+          EnchantmentHelper.addRandomEnchantment(rand, item, 5 + (int) (f * rand.nextInt(18)), false);
+        }
+
+        for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+          if (slot.getSlotType() == Type.ARMOR) {
+            item = living.getItemStackFromSlot(slot);
+
+            if (item != null && !item.isItemEnchanted() && rand.nextFloat() < 0.5F * f) {
+              EnchantmentHelper.addRandomEnchantment(rand, item, 5 + (int) (f * rand.nextInt(18)), false);
+            }
+          }
         }
       }
     }
-  }*/
+  }
   
   
   
@@ -232,44 +252,50 @@ public class CommonHooks {
     return i != null && i == ItemFeature.silverBow.orNull() ? Items.BOW : i;
   }
 
-  /*@Hook @Srg("func_82196_d") @Return(condition = true)
+  @Hook @Srg("func_82196_d") @Return(condition = true)
   public static boolean attackEntityWithRangedAttack(EntitySkeleton attacker, EntityLivingBase target, float strength) {
-    ItemStack item = attacker.getHeldItem();
+    // Use active item only
+    ItemStack item = attacker.getActiveItemStack();
     
     if (item != null && ItemFeature.silverBow.exists() && item.getItem() == ItemFeature.silverBow.get()) {
       World world = attacker.worldObj;
-      int difficuly = world.getDifficulty().getDifficultyId();
+      int difficulty = world.getDifficulty().getDifficultyId();
       
-      EntityArrow arrow = new EntityArrow(world, attacker, target, 1.6F, 14 - difficuly * 4);
+      EntityArrow arrow = new EntityTippedArrow(world, attacker);
+      double d0 = target.posX - attacker.posX;
+      double d1 = target.getEntityBoundingBox().minY + target.height / 3.0F - arrow.posY;
+      double d2 = target.posZ - attacker.posZ;
+      double d3 = Math.sqrt(d0 * d0 + d2 * d2);
+      arrow.setThrowableHeading(d0, d1 + d3 * 0.2, d2, 1.6F, 14 - difficulty * 4);
       arrow.getEntityData().setBoolean(ItemOnlyBow.ARROW_FX, true);
       
-      double damage = strength * 2 + attacker.getRNG().nextGaussian() * 0.25 + difficuly * 0.11;
-      int power = Utils.getEnchLevel(item, Enchantment.power);
+      double damage = strength * 2 + attacker.getRNG().nextGaussian() * 0.25 + difficulty * 0.11;
+      int power = Utils.getEnchLevel(item, Enchantments.POWER);
       if (power > 0) damage += power * 0.5 + 0.5;
       arrow.setDamage(damage);
       
-      arrow.setKnockbackStrength(2 + Utils.getEnchLevel(item, Enchantment.punch));
+      arrow.setKnockbackStrength(2 + Utils.getEnchLevel(item, Enchantments.PUNCH));
       
-      if (Utils.getEnchLevel(item, Enchantment.flame) > 0 || attacker.getSkeletonType() == 1) arrow.setFire(100);
+      if (Utils.getEnchLevel(item, Enchantments.FLAME) > 0 || attacker.getSkeletonType() == 1) arrow.setFire(100);
       
-      attacker.playSound("random.bow", 1, 1 / (attacker.getRNG().nextFloat() * 0.4F + 0.8F));
+      attacker.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1, 1 / (attacker.getRNG().nextFloat() * 0.4F + 0.8F));
       attacker.worldObj.spawnEntityInWorld(arrow);
       
       return true;
     }
     
     return false;
-  }*/
+  }
   
   
   
   // equips randomization
   
-  private static final List<Feature<Item>> armorList = ImmutableList.<Feature<Item>>of(
-      ItemFeature.silverBoots,
-      ItemFeature.silverLegs,
-      ItemFeature.silverChest,
-      ItemFeature.silverHelm
+  private static final Map<EntityEquipmentSlot, Feature<Item>> armorList = ImmutableMap.of(
+      EntityEquipmentSlot.FEET, ItemFeature.silverBoots,
+      EntityEquipmentSlot.LEGS, ItemFeature.silverLegs,
+      EntityEquipmentSlot.CHEST, ItemFeature.silverChest,
+      EntityEquipmentSlot.HEAD, ItemFeature.silverHelm
   );
   private static final List<Feature<Item>> weaponList = ImmutableList.of(
       ItemFeature.silverSword,
@@ -278,7 +304,7 @@ public class CommonHooks {
       Utils.missingFeature()
   );
   
-  /*@Hook @Srg("func_180481_a")
+  @Hook @Srg("func_180481_a")
   public static void setEquipmentBasedOnDifficulty(EntityLiving living, DifficultyInstance difficulty) {
     Random rand = living.getRNG();
     
@@ -290,14 +316,18 @@ public class CommonHooks {
       
       if (tier == 2) {
         float f = living.worldObj.getDifficulty() == EnumDifficulty.HARD ? 0.9F : 0.75F;
-        
-        for (int slot = 0; slot < 4; slot++) {
-          ItemStack item = living.getCurrentArmor(slot);
-          
-          if (item == null && (slot >= 3 || rand.nextFloat() < f)) {
-            Feature<Item> i = armorList.get(slot);
-            
-            if (i.exists()) living.setCurrentItemOrArmor(1 + slot, new ItemStack(i.get()));
+
+        for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+          if (slot.getSlotType() == Type.ARMOR) {
+            ItemStack item = living.getItemStackFromSlot(slot);
+
+            if (item == null && (slot == EntityEquipmentSlot.HEAD || rand.nextFloat() < f)) {
+              Feature<Item> i = armorList.get(slot);
+
+              if (i != null && i.exists()) {
+                living.setItemStackToSlot(slot, new ItemStack(i.get()));
+              }
+            }
           }
         }
       }
@@ -320,7 +350,7 @@ public class CommonHooks {
       Feature<Item> i = weaponList.get(j);
       
       if (i.exists()) {
-        skeleton.setCurrentItemOrArmor(0, new ItemStack(i.get()));
+        skeleton.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(i.get()));
         skeleton.setCombatTask();
         break;
       }
@@ -328,19 +358,22 @@ public class CommonHooks {
   }
   
   private static boolean hasSilverArmor(EntityLiving skeleton) {
-    for (int j = 0; j < 4; j++) {
-      Feature<Item> i = armorList.get(j);
-      
+    return armorList.entrySet().stream().anyMatch(e -> {
+      Feature<Item> i = e.getValue();
+
       if (i.exists()) {
-        ItemStack item = skeleton.getCurrentArmor(j);
-        if (item != null && item.getItem() == i.get()) return true;
+        ItemStack item = skeleton.getItemStackFromSlot(e.getKey());
+
+        if (item != null && item.getItem() == i.get()) {
+          return true;
+        }
       }
-    }
-    return false;
-  }*/
+      return false;
+    });
+  }
   
   public static void enchantSilverSword(EntitySkeleton owner) {
-    ItemStack item = owner.getHeldItem(EnumHand.MAIN_HAND); // TODO: Handedness?
+    ItemStack item = owner.getHeldItemMainhand(); // See EntityLiving#setEnchantmentBasedOnDifficulty
     Random rand = owner.getRNG();
     
     if (item != null && ItemFeature.silverSword.exists() && !item.isItemEnchanted()

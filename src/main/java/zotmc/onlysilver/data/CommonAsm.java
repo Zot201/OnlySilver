@@ -287,14 +287,6 @@ public class CommonAsm {
     };
   }
 
-  private static class EntityLivings {
-    // targets
-    public static final MethodPredicate
-    SET_ENCHANTMENT_BASED_ON_DIFFICULTY = TypePredicate.of("net/minecraft/entity/EntityLiving")
-        .method("setEnchantmentBasedOnDifficulty", "func_180483_b")
-        .desc("(Lnet/minecraft/world/DifficultyInstance;)V");
-  }
-
   public static class EntitySkeletons {
     private static final TypePredicate TYPE = TypePredicate.of("net/minecraft/entity/monster/EntitySkeleton");
 
@@ -304,7 +296,11 @@ public class CommonAsm {
         .desc("()V"),
     ON_INITIAL_SPAWN = TYPE.method("onInitialSpawn", "func_180482_a")
         .desc("(Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/entity/IEntityLivingData;)" +
-            "Lnet/minecraft/entity/IEntityLivingData;");
+            "Lnet/minecraft/entity/IEntityLivingData;"),
+    SET_ENCHANTMENT_BASED_ON_DIFFICULTY = TYPE.method("setEnchantmentBasedOnDifficulty", "func_180483_b")
+        .desc("(Lnet/minecraft/world/DifficultyInstance;)V"),
+    ATTACK_ENTITY_WITH_RANGED_ATTACK = TYPE.method("attackEntityWithRangedAttack", "func_82196_d")
+        .desc("(Lnet/minecraft/entity/EntityLivingBase;F)V");
 
     // patches
     public static final Patcher
@@ -333,7 +329,7 @@ public class CommonAsm {
       */
 
       @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
-        return EntityLivings.SET_ENCHANTMENT_BASED_ON_DIFFICULTY.covers(Opcodes.INVOKEVIRTUAL, insnNode);
+        return SET_ENCHANTMENT_BASED_ON_DIFFICULTY.covers(Opcodes.INVOKEVIRTUAL, insnNode);
       }
 
       @Override protected void processInsn(InsnList list, AbstractInsnNode targetInsn) {
@@ -345,14 +341,6 @@ public class CommonAsm {
         list.insert(targetInsn, post.build());
       }
     };
-  }
-
-  private static class IRangedAttackMobs {
-    // targets
-    public static final MethodPredicate
-    ATTACK_ENTITY_WITH_RANGED_ATTACK = TypePredicate.of("net/minecraft/entity/IRangedAttackMob")
-        .method("attackEntityWithRangedAttack", "func_82196_d")
-        .desc("(Lnet/minecraft/entity/EntityLivingBase;F)V");
   }
 
   public static class EntityAIAttackRangedBows {
@@ -375,7 +363,7 @@ public class CommonAsm {
        */
 
       @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
-        return IRangedAttackMobs.ATTACK_ENTITY_WITH_RANGED_ATTACK.covers(Opcodes.INVOKEINTERFACE, insnNode);
+        return EntitySkeletons.ATTACK_ENTITY_WITH_RANGED_ATTACK.covers(Opcodes.INVOKEVIRTUAL, insnNode);
       }
 
       @Override protected void processInsn(InsnList list, AbstractInsnNode targetInsn) {

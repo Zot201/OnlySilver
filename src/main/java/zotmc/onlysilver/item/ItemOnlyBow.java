@@ -50,7 +50,7 @@ public class ItemOnlyBow extends ItemBow {
     };
   }*/
 
-  private static final String ARROW_FX = OnlySilvers.MODID + "-arrowFx";
+  public static final String ARROW_FX = OnlySilvers.MODID + "-arrowFx";
   private final ToolMaterial material;
 
   public ItemOnlyBow(ToolMaterial material) {

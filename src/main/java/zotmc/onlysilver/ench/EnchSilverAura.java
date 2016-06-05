@@ -42,7 +42,7 @@ public class EnchSilverAura extends Enchantment {
   private final ThreadLocal<Boolean> lock = Utils.newThreadLocal(false);
 
   public EnchSilverAura() {
-    super(Rarity.UNCOMMON, Contents.BREAKABLE, new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND});
+    super(Rarity.UNCOMMON, Contents.BREAKABLE, EntityEquipmentSlot.values());
   }
 
   @Override public int getMinLevel() {
@@ -136,9 +136,9 @@ public class EnchSilverAura extends Enchantment {
     return 0;
   }
 
-  public int getAuraEfficiency(ItemStack item) {
+  public int getAuraEfficiency(@Nullable ItemStack item) {
     //noinspection ConstantConditions
-    if (!lock.get() && item.getItem() != null) {
+    if (!lock.get() && item != null && item.getItem() != null) {
       int lvl = Utils.getEnchLevel(item, this);
 
       if (lvl > 0) {
