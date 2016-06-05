@@ -319,7 +319,7 @@ public abstract class AbstractConfig<T extends AbstractConfig<T>> {
     }
   }
 
-  static class Message implements IMessage {
+  public static class Message implements IMessage {
     private String json;
     private Throwable throwable;
 
