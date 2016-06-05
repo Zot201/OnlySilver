@@ -21,7 +21,6 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -33,9 +32,8 @@ import java.util.Random;
 
 public class EnchIncantation extends Enchantment {
 
-  public EnchIncantation(ResourceLocation uid) {
+  public EnchIncantation() {
     super(Rarity.RARE, Contents.TOOL, new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND});
-    setRegistryName(uid);
   }
 
   public EnchIncantation subscribeEvent() {

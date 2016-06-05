@@ -33,7 +33,6 @@ import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.Loader;
@@ -149,8 +148,10 @@ public class Contents {
 
     // silver aura
     if (Config.current().silverAuraEnabled.get()) {
-      EnchSilverAura ench = new EnchSilverAura(new ResourceLocation(OnlySilvers.MODID, "silver_aura"));
-      ench.setName(OnlySilvers.MODID + ".silverAura");
+      EnchSilverAura ench = new EnchSilverAura();
+      ench.setName(OnlySilvers.MODID + ".silverAura")
+          .setRegistryName("silver_aura");
+      GameRegistry.register(ench);
       //Enchantment.addToBookList(ench); // TODO: Check effect of previous addToBookList call
       silverAura.set(ench);
       CommonHooks.silverAuraExists = true;
@@ -158,9 +159,11 @@ public class Contents {
     
     // incantation
     if (Config.current().incantationEnabled.get()) {
-      Enchantment ench = new EnchIncantation(new ResourceLocation(OnlySilvers.MODID, "incantation"))
+      Enchantment ench = new EnchIncantation()
           .subscribeEvent()
-          .setName(OnlySilvers.MODID + ".incantation");
+          .setName(OnlySilvers.MODID + ".incantation")
+          .setRegistryName("incantation");
+      GameRegistry.register(ench);
       //Enchantment.addToBookList(ench); // TODO: Same as above
       incantation.set(ench);
     }

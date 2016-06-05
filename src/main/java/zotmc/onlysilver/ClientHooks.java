@@ -20,6 +20,7 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.layers.LayerArmorBase;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -29,10 +30,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import zotmc.onlysilver.loading.Patcher.Hook;
-import zotmc.onlysilver.loading.Patcher.Name;
-import zotmc.onlysilver.loading.Patcher.Return;
-import zotmc.onlysilver.loading.Patcher.Static;
+import zotmc.onlysilver.loading.Patcher.*;
 import zotmc.onlysilver.util.Utils;
 
 @SuppressWarnings("WeakerAccess")
@@ -45,7 +43,6 @@ public class ClientHooks {
   public static final ThreadLocal<EntityEquipmentSlot> renderArmorContext = new ThreadLocal<>();
 
   public static boolean renderSilverAura(RenderItem renderItem, IBakedModel model, ItemStack item) {
-
     if (Utils.hasEnch(item, Contents.silverAura)) {
       TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
 
@@ -81,31 +78,28 @@ public class ClientHooks {
     return false;
   }
 
-  @Hook @Name("func_177183_a") @Return(condition = true) @Static(LayerArmorBase.class)
-  public static boolean renderArmorSilverAura(EntityLivingBase living, ModelBase model,
+  @Hook @Name("renderEnchantedGlint") @Srg("func_188364_a") @Return(condition = true) @Static(LayerArmorBase.class)
+  public static boolean renderArmorSilverAura(RenderLivingBase<?> render, EntityLivingBase living, ModelBase model,
       float p3, float p4, float p5, float p6, float p7, float p8, float p9) {
-
     EntityEquipmentSlot slot = renderArmorContext.get();
     if (slot == null) return false;
 
     ItemStack item = living.getItemStackFromSlot(slot);
 
     if (item != null && Utils.hasEnch(item, Contents.silverAura)) {
-      TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
-
       float f7 = living.ticksExisted + p5;
-      textureManager.bindTexture(RES_ITEM_GLINT);
+      render.bindTexture(RES_ITEM_GLINT);
       GlStateManager.enableBlend();
       GlStateManager.depthFunc(514);
       GlStateManager.depthMask(false);
       float f8 = 0.5F;
       GlStateManager.color(f8, f8, f8, 1.0F);
 
-      for (int i = 0; i < 2; ++i) {
+      for (int i = 0; i < 2; i++) {
         GlStateManager.disableLighting();
-        GlStateManager.blendFunc(768, 1);
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_COLOR, GlStateManager.DestFactor.ONE);
         float f9 = 0.76F;
-        GlStateManager.color(0.75F * f9, 0.75F * f9, 0.75F * f9, 1.0F);
+        GlStateManager.color(0.75F * f9, 0.75F * f9, 0.75F * f9, 1.0F); // silver
         GlStateManager.matrixMode(5890);
         GlStateManager.loadIdentity();
         float f10 = 0.33333334F;

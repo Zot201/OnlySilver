@@ -24,7 +24,6 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import zotmc.onlysilver.CommonHooks;
 import zotmc.onlysilver.Contents;
 import zotmc.onlysilver.api.OnlySilverUtils;
@@ -42,9 +41,8 @@ public class EnchSilverAura extends Enchantment {
   private static final UUID weaponModifierUUID = Fields.get(null, ReflData.ATTACK_DAMAGE_MODIFIER);
   private final ThreadLocal<Boolean> lock = Utils.newThreadLocal(false);
 
-  public EnchSilverAura(ResourceLocation uid) {
+  public EnchSilverAura() {
     super(Rarity.UNCOMMON, Contents.BREAKABLE, new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND});
-    setRegistryName(uid);
   }
 
   @Override public int getMinLevel() {

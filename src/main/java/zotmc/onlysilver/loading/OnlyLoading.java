@@ -18,13 +18,15 @@ package zotmc.onlysilver.loading;
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLCallHook;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 import org.apache.logging.log4j.LogManager;
+import zotmc.onlysilver.data.ClientAsm;
 import zotmc.onlysilver.data.CommonAsm;
 
 import java.lang.reflect.Constructor;
@@ -55,15 +57,14 @@ public class OnlyLoading implements IFMLLoadingPlugin, IFMLCallHook {
   }
 
   Iterable<Patcher> getPatchers() {
-    return ImmutableSet.of();
     // TODO: Re-enabled this.
-    /*List<Iterable<Patcher>> l = Lists.newArrayList();
-    for (Class<?> clz : new Class<?>[] {CommonAsm.class, ClientAsm.class, OreGenAsm.class}) {
+    List<Iterable<Patcher>> l = Lists.newArrayList();
+    for (Class<?> clz : new Class<?>[] {/*CommonAsm.class, */ClientAsm.class/*, OreGenAsm.class*/}) {
       l.add(new ExplicitPatchLoader(clz));
       l.add(new MethodHookGenerator(clz, classLoader));
       l.add(new DelegationGenerator(clz, classLoader));
     }
-    return Iterables.concat(l);*/
+    return Iterables.concat(l);
   }
 
   public void validate() {

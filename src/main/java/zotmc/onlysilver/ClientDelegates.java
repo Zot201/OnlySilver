@@ -30,8 +30,7 @@ public class ClientDelegates {
   public static void renderModel(RenderItem renderItem, IBakedModel model, int color) { }
 
   @Srg("func_175045_a")
-  public static void renderModel(RenderItem renderItem, IBakedModel model,
-      int color, ItemStack item) { }
+  public static void renderModel(RenderItem renderItem, IBakedModel model, int color, ItemStack item) { }
 
   @Srg("func_180451_a")
   public static void renderEffect(RenderItem renderItem, IBakedModel model) { }
