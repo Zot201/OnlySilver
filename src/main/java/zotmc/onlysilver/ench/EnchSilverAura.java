@@ -39,7 +39,7 @@ import java.util.UUID;
 public class EnchSilverAura extends Enchantment {
 
   private static final String ATTACK_DAMAGE = SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName();
-  private static final UUID weaponModifierUUID = Fields.get(null, ReflData.ITEM_MODIFIER_UUID);
+  private static final UUID weaponModifierUUID = Fields.get(null, ReflData.ATTACK_DAMAGE_MODIFIER);
   private final ThreadLocal<Boolean> lock = Utils.newThreadLocal(false);
 
   public EnchSilverAura(ResourceLocation uid) {

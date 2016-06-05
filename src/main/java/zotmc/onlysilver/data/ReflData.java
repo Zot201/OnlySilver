@@ -12,7 +12,7 @@ public class ReflData {
 
   public static final Field
   WORLD = Utils.findField(BlockWorldState.class, "world", "field_177515_a"),
-  ITEM_MODIFIER_UUID = Utils.findField(Item.class, "itemModifierUUID", "field_111210_e"),
+  ATTACK_DAMAGE_MODIFIER = Utils.findField(Item.class, "ATTACK_DAMAGE_MODIFIER", "field_111210_e"),
   AI_ATTACK_ON_COLLIDE = Utils.findField(EntitySkeleton.class, "aiAttackOnCollide", "field_85038_e"),
   THE_WORLD_INFO = Utils.findField(DerivedWorldInfo.class, "theWorldInfo", "field_76115_a");
 
