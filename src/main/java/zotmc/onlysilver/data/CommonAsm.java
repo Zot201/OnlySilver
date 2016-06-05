@@ -4,15 +4,9 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodInsnNode;
-
 import zotmc.onlysilver.data.ModData.OnlySilvers;
-import zotmc.onlysilver.loading.AbstractInsnPatcher;
-import zotmc.onlysilver.loading.InsnListBuilder;
-import zotmc.onlysilver.loading.MethodPredicate;
-import zotmc.onlysilver.loading.Patcher;
+import zotmc.onlysilver.loading.*;
 import zotmc.onlysilver.loading.Patcher.Hook;
-import zotmc.onlysilver.loading.TypePredicate;
 
 @SuppressWarnings("WeakerAccess")
 public class CommonAsm {
@@ -41,8 +35,6 @@ public class CommonAsm {
       .desc("(Lnet/minecraft/entity/IRangedAttackMob;)V"),
   GET_PROTOTYPE = HOOKS.method("getPrototype")
       .desc("(Lnet/minecraft/item/Item;)Lnet/minecraft/item/Item;"),
-  SET_COMBAT_TASK_AGAINST_GOLEM = HOOKS.method("setCombatTaskAgainstGolem")
-      .desc("(Lnet/minecraft/entity/ai/EntityAIBase;Lnet/minecraft/entity/monster/EntitySkeleton;)V"),
   ENCHANT_SILVER_SWORD = HOOKS.method("enchantSilverSword")
       .desc("(Lnet/minecraft/entity/monster/EntitySkeleton;)V");
 
@@ -295,14 +287,6 @@ public class CommonAsm {
     };
   }
 
-  private static class EntityAITaskss {
-    // targets
-    public static final MethodPredicate
-    ADD_TASK = TypePredicate.of("net/minecraft/entity/ai/EntityAITasks")
-        .method("addTask", "func_75776_a")
-        .desc("(ILnet/minecraft/entity/ai/EntityAIBase;)V");
-  }
-
   private static class EntityLivings {
     // targets
     public static final MethodPredicate
@@ -334,30 +318,15 @@ public class CommonAsm {
        */
 
       @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
-        if (insnNode.getOpcode() == Opcodes.INVOKEVIRTUAL) {
-          MethodInsnNode min = (MethodInsnNode) insnNode;
-          return ItemStacks.GET_ITEM.covers(min) || EntityAITaskss.ADD_TASK.covers(min);
-        }
-        return false;
+        return ItemStacks.GET_ITEM.covers(Opcodes.INVOKEVIRTUAL, insnNode);
       }
 
       @Override protected void processInsn(InsnList list, AbstractInsnNode targetInsn) {
-        if (ItemStacks.GET_ITEM.covers((MethodInsnNode) targetInsn)) {
-          InsnListBuilder post = new InsnListBuilder();
+        InsnListBuilder post = new InsnListBuilder();
 
-          post.invokestatic(GET_PROTOTYPE, false);
+        post.invokestatic(GET_PROTOTYPE, false);
 
-          list.insert(targetInsn, post.build());
-        }
-        else {
-          InsnListBuilder pre = new InsnListBuilder();
-
-          pre.dup();
-          pre.aload(0);
-          pre.invokestatic(SET_COMBAT_TASK_AGAINST_GOLEM, false);
-
-          list.insertBefore(targetInsn, pre.build());
-        }
+        list.insert(targetInsn, post.build());
       }
     },
     ON_INITIAL_SPAWN_PATCHER = new AbstractInsnPatcher(ON_INITIAL_SPAWN) {

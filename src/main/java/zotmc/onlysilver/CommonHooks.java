@@ -17,7 +17,6 @@ package zotmc.onlysilver;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.MapMaker;
 import net.minecraft.block.BlockPumpkin;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
@@ -27,7 +26,6 @@ import net.minecraft.block.state.pattern.FactoryBlockPattern;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -52,7 +50,6 @@ import zotmc.onlysilver.util.Utils;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 @SuppressWarnings("WeakerAccess")
@@ -231,30 +228,10 @@ public class CommonHooks {
   
   // skeleton AI
 
-  // TODO: Avoid memory leak due to strong reference in values
-  private static final Map<EntitySkeleton, EntityAIBase> collideGolemTasks = new MapMaker().weakKeys().makeMap();
-  
   public static @Nullable Item getPrototype(@Nullable Item i) {
     return i != null && i == ItemFeature.silverBow.orNull() ? Items.BOW : i;
   }
-  
-  public static void setCombatTaskAgainstGolem(EntityAIBase mainAttack, EntitySkeleton skeleton) {
-    // TODO
-    /*EntityAIBase task = collideGolemTasks.get(skeleton);
-    if (task != null) skeleton.tasks.removeTask(task);
-    
-    if (mainAttack == Fields.<EntityAIAttackMelee>get(skeleton, ReflData.AI_ATTACK_ON_COLLIDE)
-        && OnlySilverUtils.isSilverEquip(skeleton.getHeldItem())) {
-      
-      if (task == null) {
-        task = new EntityAIAttackMelee(skeleton, EntityIronGolem.class, 1.2, false);
-        collideGolemTasks.put(skeleton, task);
-      }
-      
-      skeleton.tasks.addTask(4, task);
-    }*/
-  }
-  
+
   /*@Hook @Srg("func_82196_d") @Return(condition = true)
   public static boolean attackEntityWithRangedAttack(EntitySkeleton attacker, EntityLivingBase target, float strength) {
     ItemStack item = attacker.getHeldItem();
