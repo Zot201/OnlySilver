@@ -26,33 +26,33 @@ public class CommonAsm {
   // callbacks
   static final MethodPredicate
   ENCHANTING_CONTEXT = HOOKS.method("enchantingContext")
-    .desc("Ljava/lang/ThreadLocal;"),
+      .desc("Ljava/lang/ThreadLocal;"),
   MODIFIER_CONTEXT = HOOKS.method("modifierContext")
-    .desc("Ljava/lang/ThreadLocal;"),
+      .desc("Ljava/lang/ThreadLocal;"),
   ARROW_LOOSE_CONTEXT = HOOKS.method("arrowLooseContext")
-    .desc("Ljava/lang/ThreadLocal;"),
+      .desc("Ljava/lang/ThreadLocal;"),
   GET_SILVER_AURA_DAMAGE_NEGATION = HOOKS.method("getSilverAuraDamageNegation")
-    .desc("(Lnet/minecraft/item/ItemStack;Ljava/util/Random;)Z"),
+      .desc("(Lnet/minecraft/item/ItemStack;Ljava/util/Random;)Z"),
   GET_SILVER_AURA_HARVEST_LEVEL = HOOKS.method("getSilverAuraHarvestLevel")
-    .desc("(ILnet/minecraft/entity/player/EntityPlayer;)I"),
+      .desc("(ILnet/minecraft/entity/player/EntityPlayer;)I"),
   ON_STOPPED_USING = HOOKS.method("onStoppedUsing")
-    .desc("(Lnet/minecraft/item/ItemStack;)V"),
+      .desc("(Lnet/minecraft/item/ItemStack;)V"),
   ON_MOB_STOPPED_USING = HOOKS.method("onMobStoppedUsing")
-    .desc("(Lnet/minecraft/entity/IRangedAttackMob;)V"),
+      .desc("(Lnet/minecraft/entity/IRangedAttackMob;)V"),
   GET_PROTOTYPE = HOOKS.method("getPrototype")
-    .desc("(Lnet/minecraft/item/Item;)Lnet/minecraft/item/Item;"),
+      .desc("(Lnet/minecraft/item/Item;)Lnet/minecraft/item/Item;"),
   SET_COMBAT_TASK_AGAINST_GOLEM = HOOKS.method("setCombatTaskAgainstGolem")
-    .desc("(Lnet/minecraft/entity/ai/EntityAIBase;Lnet/minecraft/entity/monster/EntitySkeleton;)V"),
+      .desc("(Lnet/minecraft/entity/ai/EntityAIBase;Lnet/minecraft/entity/monster/EntitySkeleton;)V"),
   ENCHANT_SILVER_SWORD = HOOKS.method("enchantSilverSword")
-    .desc("(Lnet/minecraft/entity/monster/EntitySkeleton;)V");
+      .desc("(Lnet/minecraft/entity/monster/EntitySkeleton;)V");
 
 
   static class ThreadLocals {
     // callbacks
     public static final MethodPredicate
     SET = TypePredicate.of("java/lang/ThreadLocal")
-      .method("set")
-      .desc("(Ljava/lang/Object;)V");
+        .method("set")
+        .desc("(Ljava/lang/Object;)V");
   }
 
   private static class Booleans {
@@ -68,8 +68,8 @@ public class CommonAsm {
     // targets
     public static final MethodPredicate
     CALCULATE_MODIFIER = TypePredicate.of("net/minecraft/enchantment/EnchantmentHelper$IModifier")
-      .method("calculateModifier", "func_77493_a")
-      .desc("(Lnet/minecraft/enchantment/Enchantment;I)V");
+        .method("calculateModifier", "func_77493_a")
+        .desc("(Lnet/minecraft/enchantment/Enchantment;I)V");
   }
 
   public static class EnchantmentHelpers {
@@ -78,11 +78,11 @@ public class CommonAsm {
     // targets
     private static final MethodPredicate
     ADD_RANDOM_ENCHANTMENT = TYPE.method("addRandomEnchantment", "func_77504_a")
-      .desc("(Ljava/util/Random;Lnet/minecraft/item/ItemStack;I)Lnet/minecraft/item/ItemStack;"),
+        .desc("(Ljava/util/Random;Lnet/minecraft/item/ItemStack;IZ)Lnet/minecraft/item/ItemStack;"),
     BUILD_ENCHANTMENT_LIST = TYPE.method("buildEnchantmentList", "func_77513_b")
-      .desc("(Ljava/util/Random;Lnet/minecraft/item/ItemStack;I)Ljava/util/List;"),
+        .desc("(Ljava/util/Random;Lnet/minecraft/item/ItemStack;IZ)Ljava/util/List;"),
     APPLY_ENCHANTMENT_MODIFIER = TYPE.method("applyEnchantmentModifier", "func_77518_a")
-      .desc("(Lnet/minecraft/enchantment/EnchantmentHelper$IModifier;Lnet/minecraft/item/ItemStack;)V");
+        .desc("(Lnet/minecraft/enchantment/EnchantmentHelper$IModifier;Lnet/minecraft/item/ItemStack;)V");
 
     // patches
     public static final Patcher
@@ -170,8 +170,8 @@ public class CommonAsm {
     // targets
     public static final MethodPredicate
     NEGATE_DAMAGE = TypePredicate.of("net/minecraft/enchantment/EnchantmentDurability")
-      .method("negateDamage", "func_92097_a")
-      .desc("(Lnet/minecraft/item/ItemStack;ILjava/util/Random;)Z");
+        .method("negateDamage", "func_92097_a")
+        .desc("(Lnet/minecraft/item/ItemStack;ILjava/util/Random;)Z");
   }
 
   public static class ItemStacks {
@@ -180,11 +180,11 @@ public class CommonAsm {
     // targets
     private static final MethodPredicate
     ATTEMPT_DAMAGE_ITEM = TYPE.method("attemptDamageItem", "func_96631_a")
-      .desc("(ILjava/util/Random;)Z"),
+        .desc("(ILjava/util/Random;)Z"),
     GET_ITEM = TYPE.method("getItem", "func_77973_b")
-      .desc("()Lnet/minecraft/item/Item;"),
+        .desc("()Lnet/minecraft/item/Item;"),
     ON_PLAYER_STOPPED_USING = TYPE.method("onPlayerStoppedUsing", "func_77974_b")
-      .desc("(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;I)V");
+        .desc("(Lnet/minecraft/world/World;Lnet/minecraft/entity/EntityLivingBase;I)V");
 
     // patches
     public static final Patcher
@@ -259,25 +259,25 @@ public class CommonAsm {
     // targets
     public static final MethodPredicate
     GET_HARVEST_LEVEL = TYPE.method("getHarvestLevel")
-      .desc("(Lnet/minecraft/item/ItemStack;Ljava/lang/String;)I"),
+        .desc("(Lnet/minecraft/item/ItemStack;Ljava/lang/String;)I"),
     ON_PLAYER_STOPPED_USING = TYPE.method("onPlayerStoppedUsing", "func_77615_a")
-      .desc("(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;I)V");
+        .desc("(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/EntityLivingBase;I)V");
   }
 
   public static class ForgeHookss {
     // targets
     private static final MethodPredicate
     CAN_HARVEST_BLOCK = TypePredicate.of("net/minecraftforge/common/ForgeHooks")
-      .method("canHarvestBlock")
-      .desc("(Lnet/minecraft/block/Block;Lnet/minecraft/entity/player/EntityPlayer;"
-          + "Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;)Z");
+        .method("canHarvestBlock")
+        .desc("(Lnet/minecraft/block/Block;Lnet/minecraft/entity/player/EntityPlayer;" +
+            "Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Z");
 
     // patches
     public static final Patcher
     CAN_HARVEST_BLOCK_PATCHER = new AbstractInsnPatcher(CAN_HARVEST_BLOCK) {
       /*
        * - ...getHarvestLevel(...)
-       * + getSilverAuraHarvestLevel(...getHarvestLevel(...))
+       * + getSilverAuraHarvestLevel(...getHarvestLevel(...), player)
        */
 
       @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
@@ -299,8 +299,16 @@ public class CommonAsm {
     // targets
     public static final MethodPredicate
     ADD_TASK = TypePredicate.of("net/minecraft/entity/ai/EntityAITasks")
-      .method("addTask", "func_75776_a")
-      .desc("(ILnet/minecraft/entity/ai/EntityAIBase;)V");
+        .method("addTask", "func_75776_a")
+        .desc("(ILnet/minecraft/entity/ai/EntityAIBase;)V");
+  }
+
+  private static class EntityLivings {
+    // targets
+    public static final MethodPredicate
+    SET_ENCHANTMENT_BASED_ON_DIFFICULTY = TypePredicate.of("net/minecraft/entity/EntityLiving")
+        .method("setEnchantmentBasedOnDifficulty", "func_180483_b")
+        .desc("(Lnet/minecraft/world/DifficultyInstance;)V");
   }
 
   public static class EntitySkeletons {
@@ -309,12 +317,10 @@ public class CommonAsm {
     // targets
     private static final MethodPredicate
     SET_COMBAT_TASK = TYPE.method("setCombatTask", "func_85036_m")
-      .desc("()V"),
-    SET_ENCHANTMENT_BASED_ON_DIFFICULTY = TYPE.method("setEnchantmentBasedOnDifficulty", "func_180483_b")
-      .desc("(Lnet/minecraft/world/DifficultyInstance;)V"),
-    ON_SPAWN_FIRST_TIME = TYPE.method("onSpawnFirstTime", "func_180482_a")
-      .desc("(Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/entity/IEntityLivingData;)"
-          + "Lnet/minecraft/entity/IEntityLivingData;");
+        .desc("()V"),
+    ON_INITIAL_SPAWN = TYPE.method("onInitialSpawn", "func_180482_a")
+        .desc("(Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/entity/IEntityLivingData;)" +
+            "Lnet/minecraft/entity/IEntityLivingData;");
 
     // patches
     public static final Patcher
@@ -354,14 +360,14 @@ public class CommonAsm {
         }
       }
     },
-    ON_SPAWN_FIRST_TIME_PATCHER = new AbstractInsnPatcher(ON_SPAWN_FIRST_TIME) {
+    ON_INITIAL_SPAWN_PATCHER = new AbstractInsnPatcher(ON_INITIAL_SPAWN) {
       /*
-       *   func_180483_b(...);
+       *   setEnchantmentBasedOnDifficulty(...);
        * + enchantSilverSword(this);
-       */
+      */
 
       @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
-        return SET_ENCHANTMENT_BASED_ON_DIFFICULTY.covers(Opcodes.INVOKEVIRTUAL, insnNode);
+        return EntityLivings.SET_ENCHANTMENT_BASED_ON_DIFFICULTY.covers(Opcodes.INVOKEVIRTUAL, insnNode);
       }
 
       @Override protected void processInsn(InsnList list, AbstractInsnNode targetInsn) {
@@ -379,16 +385,16 @@ public class CommonAsm {
     // targets
     public static final MethodPredicate
     ATTACK_ENTITY_WITH_RANGED_ATTACK = TypePredicate.of("net/minecraft/entity/IRangedAttackMob")
-      .method("attackEntityWithRangedAttack", "func_82196_d")
-      .desc("(Lnet/minecraft/entity/EntityLivingBase;F)V");
+        .method("attackEntityWithRangedAttack", "func_82196_d")
+        .desc("(Lnet/minecraft/entity/EntityLivingBase;F)V");
   }
 
-  public static class EntityAIArrowAttacks {
+  public static class EntityAIAttackRangedBows {
     // targets
     private static final MethodPredicate
-    UPDATE_TASKS = TypePredicate.of("net/minecraft/entity/ai/EntityAIArrowAttack")
-      .method("updateTask", "func_75246_d")
-      .desc("()V");
+    UPDATE_TASKS = TypePredicate.of("net/minecraft/entity/ai/EntityAIAttackRangedBow")
+        .method("updateTask", "func_75246_d")
+        .desc("()V");
 
     // patches
     public static final Patcher

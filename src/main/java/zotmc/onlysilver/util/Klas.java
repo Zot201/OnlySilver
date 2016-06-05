@@ -25,6 +25,9 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
+import javax.annotation.Nullable;
+
+@SuppressWarnings("WeakerAccess")
 public abstract class Klas<T> implements Supplier<Class<T>> {
 
   public static final Klas<Byte> BYTE = PrimitiveKlas.of(byte.class, "B");
@@ -137,7 +140,7 @@ public abstract class Klas<T> implements Supplier<Class<T>> {
     private final String name;
     private final Klas<?> component;
     private final int nDimensions;
-    private ArrayKlas(String name, Klas<?> component, int nDimensions) {
+    private ArrayKlas(String name, @Nullable Klas<?> component, int nDimensions) {
       this.name = name;
       this.component = component;
       this.nDimensions = nDimensions;
@@ -173,9 +176,9 @@ public abstract class Klas<T> implements Supplier<Class<T>> {
       return primitive;
 
     if (!clz.isArray())
-      return new ObjectKlas<T>(clz);
+      return new ObjectKlas<>(clz);
 
-    return new ArrayKlas<T>(clz);
+    return new ArrayKlas<>(clz);
   }
 
   private static <T> ArrayKlas<T> getArrayKlas(String desc) {
@@ -185,7 +188,7 @@ public abstract class Klas<T> implements Supplier<Class<T>> {
         if (desc.charAt(i) != '[')
           throw new IllegalArgumentException(desc);
 
-      return new ArrayKlas<T>(
+      return new ArrayKlas<>(
           desc.replace('/', '.'),
           ofDescriptor(desc.substring(nDims)),
           nDims);
@@ -207,7 +210,7 @@ public abstract class Klas<T> implements Supplier<Class<T>> {
     if (array != null)
       return array;
 
-    return new ObjectKlas<T>(name);
+    return new ObjectKlas<>(name);
   }
 
   public static <T> Klas<T> ofDescriptor(String desc) {
@@ -223,7 +226,7 @@ public abstract class Klas<T> implements Supplier<Class<T>> {
     if (array != null)
       return array;
 
-    return new ObjectKlas<T>(desc.substring(1, desc.length() - 1).replace('/', '.'));
+    return new ObjectKlas<>(desc.substring(1, desc.length() - 1).replace('/', '.'));
   }
 
   public static <T> Klas<T> ofType(Type type) {
@@ -252,7 +255,7 @@ public abstract class Klas<T> implements Supplier<Class<T>> {
 
     public Klas<? extends T> define() {
       visitEnd();
-      return KlasLoader.INSTANCE.<T>define(target.toName(), toByteArray());
+      return KlasLoader.INSTANCE.define(target.toName(), toByteArray());
     }
   }
 

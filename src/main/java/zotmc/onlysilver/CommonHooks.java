@@ -16,15 +16,25 @@
 package zotmc.onlysilver;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.MapMaker;
 import net.minecraft.block.BlockPumpkin;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockPattern;
 import net.minecraft.block.state.pattern.BlockPattern.PatternHelper;
 import net.minecraft.block.state.pattern.FactoryBlockPattern;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -36,11 +46,14 @@ import zotmc.onlysilver.loading.Patcher.Hook;
 import zotmc.onlysilver.loading.Patcher.ReturnBoolean;
 import zotmc.onlysilver.loading.Patcher.Srg;
 import zotmc.onlysilver.loading.Patcher.Static;
+import zotmc.onlysilver.util.Feature;
 import zotmc.onlysilver.util.Fields;
 import zotmc.onlysilver.util.Utils;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 @SuppressWarnings("WeakerAccess")
 public class CommonHooks {
@@ -113,7 +126,7 @@ public class CommonHooks {
                 block, null, Fields.get(input, ReflData.WORLD), input.getPos(), null);
 
             for (ItemStack ore : blockSilver)
-              if (itemMatches(ore, item.getItem(), item.getItemDamage()))
+              if (OreDictionary.itemMatches(ore, item, false))
                 return true;
           }
           catch (Exception e) {
@@ -123,12 +136,7 @@ public class CommonHooks {
       }
       return false;
     }
-    
-    private static boolean itemMatches(@Nullable ItemStack ore, Item i, int damage) {
-      return ore != null && i == ore.getItem()
-          && (ore.getItemDamage() == OreDictionary.WILDCARD_VALUE || ore.getItemDamage() == damage);
-    }
-    
+
     static final BlockPattern golemVacancyPattern = FactoryBlockPattern.start()
         .aisle(" ", "#")
         .where('#', INSTANCE)
@@ -168,7 +176,7 @@ public class CommonHooks {
   @Hook(Strategy.AGENT) @Srg("func_77509_b") @Static(EnchantmentHelper.class)
   public static int getEfficiencyModifier(int i, EntityLivingBase living) {
     return !silverAuraExists ? i : i + Contents.silverAura.get().getAuraEfficiency(living.getHeldItem());
-  }
+  }*/
   
   public static boolean getSilverAuraDamageNegation(ItemStack item, Random rand) {
     return silverAuraExists && Contents.silverAura.get().negateDamage(item, rand);
@@ -176,23 +184,24 @@ public class CommonHooks {
   
   public static int getSilverAuraHarvestLevel(int originalValue, EntityPlayer player) {
     if (originalValue >= 0 && silverAuraExists) {
-      ItemStack item = player.inventory.getCurrentItem();
+      ItemStack item = player.inventory.getCurrentItem(); // TODO: Made handedness sensitive?
       int lvl = Utils.getEnchLevel(item, Contents.silverAura.get());
       if (lvl > 0) return originalValue + lvl;
     }
     return originalValue;
-  }*/
+  }
   
   public static void onStoppedUsing(ItemStack item) {
     if (silverAuraExists) arrowLooseContext.set(Contents.silverAura.get().getAuraArrowDamage(item));
   }
   
-  /*public static void onMobStoppedUsing(IRangedAttackMob mob) {
-    ItemStack item = ((EntityLivingBase) mob).getHeldItem();
+  public static void onMobStoppedUsing(IRangedAttackMob mob) {
+    // TODO: Take care of handedness
+    ItemStack item = ((EntityLivingBase) mob).getHeldItem(EnumHand.MAIN_HAND);
     if (item != null) onStoppedUsing(item);
   }
   
-  @Hook @Srg("func_70097_a") @ReturnBoolean(condition = true, value = false)
+  /*@Hook @Srg("func_70097_a") @ReturnBoolean(condition = true, value = false)
   public static boolean attackEntityFrom(EntityItem entityItem, DamageSource damage, float amount) {
     return damage != DamageSource.outOfWorld && Utils.hasEnch(entityItem, Contents.silverAura);
   }
@@ -216,35 +225,37 @@ public class CommonHooks {
         }
       }
     }
-  }
+  }*/
   
   
   
   // skeleton AI
-  
+
+  // TODO: Avoid memory leak due to strong reference in values
   private static final Map<EntitySkeleton, EntityAIBase> collideGolemTasks = new MapMaker().weakKeys().makeMap();
   
-  public static Item getPrototype(Item i) {
-    return i != null && i == ItemFeature.silverBow.orNull() ? Items.bow : i;
+  public static @Nullable Item getPrototype(@Nullable Item i) {
+    return i != null && i == ItemFeature.silverBow.orNull() ? Items.BOW : i;
   }
   
   public static void setCombatTaskAgainstGolem(EntityAIBase mainAttack, EntitySkeleton skeleton) {
-    EntityAIBase task = collideGolemTasks.get(skeleton);
+    // TODO
+    /*EntityAIBase task = collideGolemTasks.get(skeleton);
     if (task != null) skeleton.tasks.removeTask(task);
     
-    if (mainAttack == Fields.<EntityAIAttackOnCollide>get(skeleton, ReflData.AI_ATTACK_ON_COLLIDE)
+    if (mainAttack == Fields.<EntityAIAttackMelee>get(skeleton, ReflData.AI_ATTACK_ON_COLLIDE)
         && OnlySilverUtils.isSilverEquip(skeleton.getHeldItem())) {
       
       if (task == null) {
-        task = new EntityAIAttackOnCollide(skeleton, EntityIronGolem.class, 1.2, false);
+        task = new EntityAIAttackMelee(skeleton, EntityIronGolem.class, 1.2, false);
         collideGolemTasks.put(skeleton, task);
       }
       
       skeleton.tasks.addTask(4, task);
-    }
+    }*/
   }
   
-  @Hook @Srg("func_82196_d") @Return(condition = true)
+  /*@Hook @Srg("func_82196_d") @Return(condition = true)
   public static boolean attackEntityWithRangedAttack(EntitySkeleton attacker, EntityLivingBase target, float strength) {
     ItemStack item = attacker.getHeldItem();
     
@@ -271,7 +282,7 @@ public class CommonHooks {
     }
     
     return false;
-  }
+  }*/
   
   
   
@@ -287,10 +298,10 @@ public class CommonHooks {
       ItemFeature.silverSword,
       ItemFeature.silverKatana,
       ItemFeature.silverBow,
-      Utils.<Item>missingFeature()
+      Utils.missingFeature()
   );
   
-  @Hook @Srg("func_180481_a")
+  /*@Hook @Srg("func_180481_a")
   public static void setEquipmentBasedOnDifficulty(EntityLiving living, DifficultyInstance difficulty) {
     Random rand = living.getRNG();
     
@@ -349,15 +360,15 @@ public class CommonHooks {
       }
     }
     return false;
-  }
+  }*/
   
   public static void enchantSilverSword(EntitySkeleton owner) {
-    ItemStack item = owner.getHeldItem();
+    ItemStack item = owner.getHeldItem(EnumHand.MAIN_HAND); // TODO: Handedness?
     Random rand = owner.getRNG();
     
     if (item != null && ItemFeature.silverSword.exists() && !item.isItemEnchanted()
         && item.getItem() == ItemFeature.silverSword.get() && rand.nextFloat() < 0.25F)
-      EnchantmentHelper.addRandomEnchantment(rand, item, 5 + rand.nextInt(18));
-  }*/
+      EnchantmentHelper.addRandomEnchantment(rand, item, 5 + rand.nextInt(18), false);
+  }
   
 }
