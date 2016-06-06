@@ -16,6 +16,7 @@
 package zotmc.onlysilver.config.gui;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.Lists;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -139,10 +140,7 @@ public class ItemIcon extends Icon<ItemIcon> implements Supplier<String> {
     }
 
     @Override public List<String> get() {
-      Minecraft mc = Minecraft.getMinecraft();
-      // TODO: Player cannot be null
-      List<String> ret = item.getTooltip(mc.thePlayer, mc.gameSettings.advancedItemTooltips);
-      return colorTooltip(ret, item.getRarity().rarityColor);
+      return colorTooltip(Lists.newArrayList(item.getDisplayName()), item.getRarity().rarityColor);
     }
   }
 
