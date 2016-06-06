@@ -15,12 +15,11 @@
  */
 package zotmc.onlysilver.config.gui;
 
+import com.google.common.base.Supplier;
 import zotmc.onlysilver.config.AbstractConfig;
 import zotmc.onlysilver.config.AbstractConfig.Property;
 import zotmc.onlysilver.data.LangData;
 import zotmc.onlysilver.util.Utils.Localization;
-
-import com.google.common.base.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -36,9 +35,9 @@ public abstract class AbstractBooleanRow<T extends AbstractConfig<T>> extends Wi
 
   protected abstract Property<Boolean> toProperty(T t);
 
-  protected abstract Boolean getRawValue(Property<Boolean> p);
+  protected abstract @Nullable Boolean getRawValue(Property<Boolean> p);
 
-  protected abstract void setRawValue(Property<Boolean> p, Boolean v);
+  protected abstract void setRawValue(Property<Boolean> p, @Nullable Boolean v);
 
 
   private class ButtonComponent implements Runnable, Supplier<String> {
@@ -46,7 +45,7 @@ public abstract class AbstractBooleanRow<T extends AbstractConfig<T>> extends Wi
 
     @Override public void run() {
       Property<Boolean> p = toProperty(getTemp());
-      setRawValue(p, State.of(getRawValue(p)).next().value);
+      setRawValue(p, getRawValue(p) != null ? null : !p.get());
     }
     @Override public String get() {
       Property<Boolean> p = toProperty(getTemp());
@@ -67,9 +66,6 @@ public abstract class AbstractBooleanRow<T extends AbstractConfig<T>> extends Wi
     }
     static State of(@Nullable Boolean value) {
       return value == null ? DEFAULT : value ? ON : OFF;
-    }
-    State next() {
-      return values()[(ordinal() + 1) % values().length];
     }
 
     public static String getLocalized(@Nullable Boolean raw, Property<Boolean> p) {
