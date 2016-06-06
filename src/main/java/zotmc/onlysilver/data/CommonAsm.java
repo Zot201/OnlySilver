@@ -344,14 +344,35 @@ public class CommonAsm {
   }
 
   public static class EntityAIAttackRangedBows {
+    private static final TypePredicate TYPE = TypePredicate.of("net/minecraft/entity/ai/EntityAIAttackRangedBow");
+
     // targets
     private static final MethodPredicate
-    UPDATE_TASKS = TypePredicate.of("net/minecraft/entity/ai/EntityAIAttackRangedBow")
-        .method("updateTask", "func_75246_d")
+    IS_BOW_IN_MAIN_HAND = TYPE.method("isBowInMainhand", "func_188498_f")
+        .desc("()Z"),
+    UPDATE_TASKS = TYPE.method("updateTask", "func_75246_d")
         .desc("()V");
 
     // patches
     public static final Patcher
+    IS_BOW_IN_MAIN_HAND_PATCHER = new AbstractInsnPatcher(IS_BOW_IN_MAIN_HAND) {
+      /*
+       * - ...getItem()
+       * + getPrototype(...getItem())
+       */
+
+      @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
+        return ItemStacks.GET_ITEM.covers(Opcodes.INVOKEVIRTUAL, insnNode);
+      }
+
+      @Override protected void processInsn(InsnList list, AbstractInsnNode targetInsn) {
+        InsnListBuilder post = new InsnListBuilder();
+
+        post.invokestatic(GET_PROTOTYPE, false);
+
+        list.insert(targetInsn, post.build());
+      }
+    },
     UPDATE_TASKS_PATCHER = new AbstractInsnPatcher(UPDATE_TASKS) {
       /*
        * + try {

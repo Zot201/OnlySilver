@@ -208,8 +208,8 @@ public class CommonHooks {
   }
   
   public static void onMobStoppedUsing(IRangedAttackMob mob) {
-    // Use active item only
-    ItemStack item = ((EntityLivingBase) mob).getActiveItemStack();
+    // Use main hand item only
+    ItemStack item = ((EntityLivingBase) mob).getHeldItemMainhand();
     if (item != null) onStoppedUsing(item);
   }
   
@@ -254,9 +254,9 @@ public class CommonHooks {
 
   @Hook @Srg("func_82196_d") @Return(condition = true)
   public static boolean attackEntityWithRangedAttack(EntitySkeleton attacker, EntityLivingBase target, float strength) {
-    // Use active item only
-    ItemStack item = attacker.getActiveItemStack();
-    
+    // Use main hand item only
+    ItemStack item = attacker.getHeldItemMainhand();
+
     if (item != null && ItemFeature.silverBow.exists() && item.getItem() == ItemFeature.silverBow.get()) {
       World world = attacker.worldObj;
       int difficulty = world.getDifficulty().getDifficultyId();
