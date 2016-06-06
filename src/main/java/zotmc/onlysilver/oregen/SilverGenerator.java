@@ -45,9 +45,9 @@ public class SilverGenerator implements IWorldGenerator {
 
   private void setSeed(Random rand, World world, BlockPos pos, long oreSeed) {
     rand.setSeed(oreSeed ^= world.getSeed());
-        long xSeed = rand.nextLong() >> 2 + 1L;
-        long zSeed = rand.nextLong() >> 2 + 1L;
-        rand.setSeed(oreSeed ^ (xSeed * (pos.getX() >> 4) + zSeed * (pos.getZ() >> 4)));
+    long xSeed = rand.nextLong() >> 2 + 1L;
+    long zSeed = rand.nextLong() >> 2 + 1L;
+    rand.setSeed(oreSeed ^ (xSeed * (pos.getX() >> 4) + zSeed * (pos.getZ() >> 4)));
   }
 
   private void genStandardOre(World world, Random rand, BlockPos pos, int count, WorldGenerator gen, int min, int max) {

@@ -15,7 +15,13 @@
  */
 package zotmc.onlysilver.config.gui;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
+import zotmc.onlysilver.util.ClientUtils;
 
 public class SpriteIcon extends Icon<SpriteIcon> {
 
@@ -36,21 +42,20 @@ public class SpriteIcon extends Icon<SpriteIcon> {
   }
 
   @Override public void drawIcon(int x, int y, int z) {
-    // TODO: Re-implementation
-    /*x -= (w - 16) / 2;
+    x -= (w - 16) / 2;
     y -= (h - 16) / 2;
 
     GlStateManager.enableAlpha();
     ClientUtils.color(color);
     Minecraft.getMinecraft().getTextureManager().bindTexture(res);
     Tessellator tessellator = Tessellator.getInstance();
-    WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-    worldrenderer.startDrawingQuads();
-    worldrenderer.addVertexWithUV(x + 0, y + h, z, (u + 0) / r, (v + h) / r);
-    worldrenderer.addVertexWithUV(x + w, y + h, z, (u + w) / r, (v + h) / r);
-    worldrenderer.addVertexWithUV(x + w, y + 0, z, (u + w) / r, (v + 0) / r);
-    worldrenderer.addVertexWithUV(x + 0, y + 0, z, (u + 0) / r, (v + 0) / r);
-    tessellator.draw();*/
+    VertexBuffer buffer = tessellator.getBuffer();
+    buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+    buffer.pos(x    , y + h, z).tex((u    ) / r, (v + h) / r).endVertex();
+    buffer.pos(x + w, y + h, z).tex((u + w) / r, (v + h) / r).endVertex();
+    buffer.pos(x + w, y    , z).tex((u + w) / r, (v    ) / r).endVertex();
+    buffer.pos(x    , y    , z).tex((u    ) / r, (v    ) / r).endVertex();
+    tessellator.draw();
   }
 
 }
