@@ -57,7 +57,8 @@ public class ExtSettings {
 
     @Deprecated @Override public Boolean load(@SuppressWarnings("NullableProblems") World key) {
       try {
-        return key.getChunkProvider().makeString().matches(regex); // TODO: Check if this work with DEFAULT_DIMS
+        // TODO: Find alternative way to identify mod dimensions (DimensionType is enum now...)
+        return key.provider.getDimensionType().getName().matches(regex);
       }
       catch (PatternSyntaxException e) {
         return true;
