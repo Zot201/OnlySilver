@@ -605,6 +605,7 @@ public class ConfigGui extends AbstractConfigFactory {
       durability = v.durability;
       reductionAmounts = Ints.toArray(v.reductionAmounts);
       enchantability = v.enchantability;
+      toughness = v.toughness;
     }
     @Override protected ArmorStats toImmutable() {
       int[] r = reductionAmounts;
@@ -723,7 +724,7 @@ public class ConfigGui extends AbstractConfigFactory {
         }
       });
 
-      ret.add(new FloatSliderRow(defaultValue.toughness, 0.1) {
+      ret.add(new FloatSliderRow(defaultValue.toughness, 1) {
         final Icon<?> icon = new ItemIcon(Blocks.DIAMOND_BLOCK);
 
         @Override protected Icon<?> icon() {
@@ -732,6 +733,7 @@ public class ConfigGui extends AbstractConfigFactory {
         @Override protected Supplier<String> title() {
           return LangData.TOUGHNESS;
         }
+
         @Override protected float getValue() {
           return toughness;
         }

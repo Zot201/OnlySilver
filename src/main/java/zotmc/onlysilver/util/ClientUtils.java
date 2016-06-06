@@ -17,6 +17,8 @@ package zotmc.onlysilver.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager.DestFactor;
+import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
@@ -53,7 +55,7 @@ public class ClientUtils {
     GlStateManager.enableAlpha();
     GlStateManager.alphaFunc(516, 0.1f);
     GlStateManager.enableBlend();
-    GlStateManager.blendFunc(770, 771);
+    GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
     color(color);
     ClientDelegates.setupGuiTransform(ri, x, y, model.isGui3d());
     model = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GUI, false);
@@ -70,21 +72,19 @@ public class ClientUtils {
       int color, boolean renderEffect) {
 
     GlStateManager.pushMatrix();
-    GlStateManager.scale(0.5f, 0.5f, 0.5f);
+    GlStateManager.translate(-0.5f, -0.5f, -0.5f);
 
-    boolean isBuiltInRenderer = model.isBuiltInRenderer();
-    if (isBuiltInRenderer) {
-      GlStateManager.rotate(180, 0, 1, 0);
-      GlStateManager.translate(-0.5f, -0.5f, -0.5f);
+    if (model.isBuiltInRenderer()) {
       color(color);
       GlStateManager.enableRescaleNormal();
       TileEntityItemStackRenderer.instance.renderByItem(stack);
     }
     else {
-      GlStateManager.translate(-0.5f, -0.5f, -0.5f);
       ClientDelegates.renderModel(ri, model, color, stack);
 
-      if (renderEffect && stack.hasEffect()) ClientDelegates.renderEffect(ri, model);
+      if (renderEffect && stack.hasEffect()) {
+        ClientDelegates.renderEffect(ri, model);
+      }
     }
 
     GlStateManager.popMatrix();
