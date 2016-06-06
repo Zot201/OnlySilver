@@ -45,11 +45,8 @@ import zotmc.onlysilver.config.GenDefaults;
 import zotmc.onlysilver.data.LangData;
 import zotmc.onlysilver.data.ModData.OnlySilvers;
 import zotmc.onlysilver.data.ReflData;
-import zotmc.onlysilver.loading.Patcher.Hook;
+import zotmc.onlysilver.loading.Patcher.*;
 import zotmc.onlysilver.loading.Patcher.Hook.Strategy;
-import zotmc.onlysilver.loading.Patcher.Name;
-import zotmc.onlysilver.loading.Patcher.ReturnBoolean;
-import zotmc.onlysilver.loading.Patcher.Static;
 import zotmc.onlysilver.util.Fields;
 import zotmc.onlysilver.util.JsonHelper;
 import zotmc.onlysilver.util.Utils;
@@ -148,8 +145,8 @@ public class OreGenHandler extends CacheLoader<WorldInfo, ExtSettings> {
     }
   }
 
-  @Hook @Name("func_177863_a")
-  public static void onReset(Factory factory) {
+  @Hook @Srg("func_177863_a")
+  public static void setDefaults(Factory factory) {
     INSTANCE.factories.remove(factory);
   }
 
@@ -200,8 +197,8 @@ public class OreGenHandler extends CacheLoader<WorldInfo, ExtSettings> {
     }
   }
 
-  @SideOnly(Side.CLIENT) @Hook @Name("func_146318_a")
-  public static void readWorldInfo(GuiCreateWorld gui, WorldInfo worldInfo) {
+  @SideOnly(Side.CLIENT) @Hook @Srg("func_146318_a")
+  public static void recreateFromExistingWorld(GuiCreateWorld gui, WorldInfo worldInfo) {
     Map<Object, String> map = Holder.silverGenStrings;
     String silverGen = map.get(worldInfo);
     if (silverGen != null) map.put(gui, silverGen);
