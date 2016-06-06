@@ -4,15 +4,9 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
-
-import zotmc.onlysilver.loading.AbstractInsnPatcher;
-import zotmc.onlysilver.loading.AbstractMethodPatcher;
-import zotmc.onlysilver.loading.InsnListBuilder;
-import zotmc.onlysilver.loading.MethodPredicate;
-import zotmc.onlysilver.loading.Patcher;
+import zotmc.onlysilver.loading.*;
 import zotmc.onlysilver.loading.Patcher.ClientOnly;
 import zotmc.onlysilver.loading.Patcher.Hook;
-import zotmc.onlysilver.loading.TypePredicate;
 
 // TODO: Forge PR to eliminate needs for low level hooks
 @SuppressWarnings("WeakerAccess")
@@ -104,13 +98,13 @@ public class OreGenAsm {
       }
 
       @Override protected void processInsn(InsnList list, AbstractInsnNode targetInsn) {
-        InsnListBuilder post = new InsnListBuilder();
+        InsnListBuilder pre = new InsnListBuilder();
 
-        post.dup();
-        post.aload(0);
-        post.invokestatic(Holder.ON_WORLD_SETTINGS_CREATED, false);
+        pre.dup();
+        pre.aload(0);
+        pre.invokestatic(Holder.ON_WORLD_SETTINGS_CREATED, false);
 
-        list.insert(targetInsn, post.build());
+        list.insertBefore(targetInsn, pre.build());
       }
     };
   }
