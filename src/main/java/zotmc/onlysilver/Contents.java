@@ -33,6 +33,9 @@ import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.Loader;
@@ -47,7 +50,6 @@ import zotmc.onlysilver.block.BlockOnlyCompressed;
 import zotmc.onlysilver.block.BlockOnlyOre;
 import zotmc.onlysilver.config.Config;
 import zotmc.onlysilver.data.ModData.MoCreatures;
-import zotmc.onlysilver.data.ModData.OnlySilvers;
 import zotmc.onlysilver.data.ModData.Thaumcraft;
 import zotmc.onlysilver.data.ModData.Thaumcraft.Aspect;
 import zotmc.onlysilver.data.ModData.WeaponMod;
@@ -65,10 +67,11 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static zotmc.onlysilver.data.ModData.OnlySilvers.MODID;
 
 @SuppressWarnings("WeakerAccess")
 public class Contents {
-  
+
   static final Map<String, String> renameMap = Utils.newHashMap();
   
   public static final EnumEnchantmentType
@@ -83,7 +86,7 @@ public class Contents {
       return checkNotNull(Item.getItemFromBlock(silverBlock.get()));
     }
   };
-  
+
   public static final Reserve<Block>
   silverOre = Reserve.absent(),
   silverBlock = Reserve.absent();
@@ -102,6 +105,13 @@ public class Contents {
   
   public static final Reserve<Achievement>
   buildSilverBow = Reserve.absent();
+
+  public static final Reserve<ResourceLocation>
+  silverGolemLoots = Reserve.absent();
+
+  public static final Reserve<SoundEvent>
+  silverGolemHit = Reserve.absent(),
+  silverGolemDeath = Reserve.absent();
   
   
   public static void init() {
@@ -132,7 +142,7 @@ public class Contents {
     
     // silver armor material
     silverArmorMaterial.set(
-        Config.current().silverArmorStats.get().addArmorMaterial("SILVER", OnlySilvers.MODID + ":silver"));
+        Config.current().silverArmorStats.get().addArmorMaterial("SILVER", MODID + ":silver"));
     injectFinal("silverArmorMaterial", silverArmorMaterial.toOptional());
     
     // items
@@ -149,7 +159,7 @@ public class Contents {
     // silver aura
     if (Config.current().silverAuraEnabled.get()) {
       EnchSilverAura ench = new EnchSilverAura();
-      ench.setName(OnlySilvers.MODID + ".silverAura")
+      ench.setName(MODID + ".silverAura")
           .setRegistryName("silver_aura");
       GameRegistry.register(ench);
       //Enchantment.addToBookList(ench); // TODO: Check effect of previous addToBookList call
@@ -161,7 +171,7 @@ public class Contents {
     if (Config.current().incantationEnabled.get()) {
       Enchantment ench = new EnchIncantation()
           .subscribeEvent()
-          .setName(OnlySilvers.MODID + ".incantation")
+          .setName(MODID + ".incantation")
           .setRegistryName("incantation");
       GameRegistry.register(ench);
       //Enchantment.addToBookList(ench); // TODO: Same as above
@@ -173,7 +183,11 @@ public class Contents {
     EntityList.NAME_TO_CLASS.put(
         "onlysilver.onlysilver.silverGolem", EntitySilverGolem.class); // re-map a mistaken previous name
     OnlySilver.INSTANCE.proxy.registerEntityRenderer(EntitySilverGolem.class);
-    
+    silverGolemLoots.set(LootTableList.register(new ResourceLocation(MODID, "entities/silver_golem")));
+    silverGolemHit.set(GameRegistry.register(Utils.createSoundEvent(MODID, "silvergolem.hit")));
+    silverGolemDeath.set(GameRegistry.register(Utils.createSoundEvent(MODID, "silvergolem.death")));
+
+
     // achievement
     if (ItemFeature.silverBow.exists()) {
       Achievement achievement = new Achievement("silverBowAch", "silverBowAch", 1, 7,

@@ -31,6 +31,8 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.MissingModsException;
@@ -137,6 +139,11 @@ public class Utils {
     }
 
     return false;
+  }
+
+  public static SoundEvent createSoundEvent(String modid, String name) {
+    ResourceLocation r = new ResourceLocation(modid, name);
+    return new SoundEvent(r).setRegistryName(r);
   }
 
 

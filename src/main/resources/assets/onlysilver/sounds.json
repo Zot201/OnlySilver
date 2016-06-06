@@ -2,16 +2,16 @@
   "silvergolem.death": {
     "category": "neutral",
     "sounds": [
-      "silvergolem/death"
+      "onlysilver:silvergolem/death"
     ]
   },
   "silvergolem.hit": {
     "category": "neutral",
     "sounds": [
-      "silvergolem/hit1",
-      "silvergolem/hit2",
-      "silvergolem/hit3",
-      "silvergolem/hit4"
+      "onlysilver:silvergolem/hit1",
+      "onlysilver:silvergolem/hit2",
+      "onlysilver:silvergolem/hit3",
+      "onlysilver:silvergolem/hit4"
     ]
   }
 }

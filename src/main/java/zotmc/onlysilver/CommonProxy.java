@@ -22,6 +22,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -94,6 +95,10 @@ class CommonProxy {
         }
       }
     }
+  }
+
+  @SubscribeEvent public void onLootTableLoad(LootTableLoadEvent event) {
+    // TODO
   }
 
 }
