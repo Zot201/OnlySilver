@@ -14,7 +14,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 group = 'zotmc.onlysilver'
 archivesBaseName = 'OnlySilver'
-version = '2.0.0.6-1.8'
+version = '2.1.0-1.9.4'
 
 minecraft {
   version = '1.9.4-12.17.0.1937'
