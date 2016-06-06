@@ -67,9 +67,7 @@ public enum ItemFeature implements Feature<Item> {
   @Recipes("·σ·|·ι·|·ι·") @Tool(ItemSpade.class) silverShovel,
   @Recipes("·σ·|·σ·|·ι·") @Tool(ItemSword.class) silverSword,
   @Recipes("σσ·| ι·| ι·") @Tool(ItemHoe.class) silverHoe,
-  @Recipes(" ɾϧ|ɪ ϧ| ɾϧ") @Tool(ItemOnlyBow.class)
-  @Models({"silver_bow", "silver_bow_pulling_0", "silver_bow_pulling_1", "silver_bow_pulling_2"})
-  silverBow,
+  @Recipes(" ɾϧ|ɪ ϧ| ɾϧ") @Tool(ItemOnlyBow.class) silverBow,
   
   @Recipes("σσσ|σ σ|···") @OnlyArmor(HEAD) @ItemId("silver_helmet") silverHelm,
   @Recipes("σ σ|σσσ|σσσ") @OnlyArmor(CHEST) @ItemId("silver_chestplate") silverChest,
@@ -196,12 +194,11 @@ public enum ItemFeature implements Feature<Item> {
     ItemId itemId = Enums.getField(this).getAnnotation(ItemId.class);
     return itemId != null ? itemId.value() : CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name());
   }
-  
+
   private String[] getModels() {
-    Models models = Enums.getField(this).getAnnotation(Models.class);
-    return models != null ? models.value() : new String[] {getItemId()};
+    return new String[] {getItemId()};
   }
-  
+
   public ResourceLocation getGuiWatermark() {
     String[] a = getModels();
     return new ResourceLocation(OnlySilvers.MODID, "textures/items/watermark/" + (a.length > 0 ? a[0] : getItemId()) + ".png");
@@ -467,13 +464,7 @@ public enum ItemFeature implements Feature<Item> {
   private @interface ItemId {
     String value();
   }
-  
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target(ElementType.FIELD)
-  private @interface Models {
-    String[] value();
-  }
-  
+
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.FIELD)
   private @interface OnlyArmor {

@@ -28,6 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -41,15 +42,6 @@ import java.util.List;
 
 public class ItemOnlyBow extends ItemBow {
 
-  /*@SideOnly(Side.CLIENT)
-  private static class Models {
-    static final ModelResourceLocation[] inventoryModels = {
-      new ModelResourceLocation(new ResourceLocation(OnlySilvers.MODID, "silver_bow_pulling_0"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(OnlySilvers.MODID, "silver_bow_pulling_1"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(OnlySilvers.MODID, "silver_bow_pulling_2"), "inventory")
-    };
-  }*/
-
   public static final String ARROW_FX = OnlySilvers.MODID + "-arrowFx";
   private final ToolMaterial material;
 
@@ -57,18 +49,19 @@ public class ItemOnlyBow extends ItemBow {
     this.material = material;
     setFull3D();
     setMaxDamage(material.getMaxUses() * 2 + 1);
-  }
 
-  // TODO: Re-implement model overriding
-  /*@SideOnly(Side.CLIENT)
-  @Override public ModelResourceLocation getModel(ItemStack item, EntityPlayer player, int useRemaining) {
-    if (player.getItemInUse() != null) {
-      if (useRemaining >= 18) return Models.inventoryModels[2];
-      if (useRemaining > 13) return Models.inventoryModels[1];
-      if (useRemaining > 0) return Models.inventoryModels[0];
-    }
-    return null;
-  }*/
+    // See ItemBow constructor
+    addPropertyOverride(new ResourceLocation("pull"), (stack, __, entity) -> {
+      if (entity != null) {
+        ItemStack active = entity.getActiveItemStack();
+
+        if (active != null && active.getItem() instanceof ItemOnlyBow) {
+          return (stack.getMaxItemUseDuration() - entity.getItemInUseCount()) / 20F;
+        }
+      }
+      return 0;
+    });
+  }
 
   @Override public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean par4) {
     list.add(LangData.KNOCKBACK_TOOLTIP.get());
