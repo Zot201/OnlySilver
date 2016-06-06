@@ -28,6 +28,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 import org.apache.logging.log4j.LogManager;
 import zotmc.onlysilver.data.ClientAsm;
 import zotmc.onlysilver.data.CommonAsm;
+import zotmc.onlysilver.data.OreGenAsm;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -59,7 +60,7 @@ public class OnlyLoading implements IFMLLoadingPlugin, IFMLCallHook {
   Iterable<Patcher> getPatchers() {
     // TODO: Re-enabled this.
     List<Iterable<Patcher>> l = Lists.newArrayList();
-    for (Class<?> clz : new Class<?>[] {CommonAsm.class, ClientAsm.class/*, OreGenAsm.class*/}) {
+    for (Class<?> clz : new Class<?>[] {CommonAsm.class, ClientAsm.class, OreGenAsm.class}) {
       l.add(new ExplicitPatchLoader(clz));
       l.add(new MethodHookGenerator(clz, classLoader));
       l.add(new DelegationGenerator(clz, classLoader));

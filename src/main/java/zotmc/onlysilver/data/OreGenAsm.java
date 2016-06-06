@@ -25,19 +25,21 @@ public class OreGenAsm {
   // callbacks
   static final MethodPredicate
   LOAD_WORLD_PROPERTY = HANDLER.method("loadWorldProperty")
-    .desc("(Ljava/util/Map;Lnet/minecraft/world/storage/WorldInfo;Lnet/minecraft/nbt/NBTTagCompound;)V");
+      .desc("(Ljava/util/Map;Lnet/minecraft/world/storage/WorldInfo;Lnet/minecraft/nbt/NBTTagCompound;)V");
 
   @ClientOnly
   private static class Holder {
     public static final MethodPredicate
     ON_WORLD_SETTINGS_CREATED = HANDLER.method("onWorldSettingsCreated")
-      .desc("(Lnet/minecraft/world/WorldSettings;Lnet/minecraft/client/gui/GuiCreateWorld;)V"),
+        .desc("(Lnet/minecraft/world/WorldSettings;Lnet/minecraft/client/gui/GuiCreateWorld;)V"),
     ON_GUI_INIT = HANDLER.method("onGuiInit")
-      .desc("([[Lnet/minecraft/client/gui/GuiPageButtonList$GuiListEntry;Lnet/minecraft/client/gui/GuiCustomizeWorldScreen;"
-          + "Lnet/minecraft/world/gen/ChunkProviderSettings$Factory;)"
-          + "[[Lnet/minecraft/client/gui/GuiPageButtonList$GuiListEntry;"),
+        .desc("([[Lnet/minecraft/client/gui/GuiPageButtonList$GuiListEntry;" +
+            "Lnet/minecraft/client/gui/GuiCustomizeWorldScreen;" +
+            "Lnet/minecraft/world/gen/ChunkProviderSettings$Factory;)" +
+            "[[Lnet/minecraft/client/gui/GuiPageButtonList$GuiListEntry;"),
     ON_GUI_SET_FLOAT_VALUE = HANDLER.method("onGuiSetFloatValue")
-      .desc("(Lnet/minecraft/client/gui/GuiCustomizeWorldScreen;Lnet/minecraft/world/gen/ChunkProviderSettings$Factory;IF)V");
+        .desc("(Lnet/minecraft/client/gui/GuiCustomizeWorldScreen;" +
+            "Lnet/minecraft/world/gen/ChunkProviderSettings$Factory;IF)V");
   }
 
 
@@ -45,17 +47,17 @@ public class OreGenAsm {
     // targets
     public static final MethodPredicate
     SET_ADDITIONAL_PROPERTIES = TypePredicate.of("net/minecraft/world/storage/WorldInfo")
-      .method("setAdditionalProperties")
-      .desc("(Ljava/util/Map;)V");
+        .method("setAdditionalProperties")
+        .desc("(Ljava/util/Map;)V");
   }
 
   public static class FMLCommonHandlers {
     // targets
     private static final MethodPredicate
     HANDLE_WORLD_DATA_LOAD = TypePredicate.of("net/minecraftforge/fml/common/FMLCommonHandler")
-      .method("handleWorldDataLoad")
-      .desc("(Lnet/minecraft/world/storage/SaveHandler;Lnet/minecraft/world/storage/WorldInfo;"
-          + "Lnet/minecraft/nbt/NBTTagCompound;)V");
+        .method("handleWorldDataLoad")
+        .desc("(Lnet/minecraft/world/storage/SaveHandler;Lnet/minecraft/world/storage/WorldInfo;" +
+            "Lnet/minecraft/nbt/NBTTagCompound;)V");
 
     // patches
     public static final Patcher
@@ -78,27 +80,27 @@ public class OreGenAsm {
   }
 
   @ClientOnly
-  private static class WorldSettingss {
+  private static class Minecrafts {
     // targets
     public static final MethodPredicate
-    SET_WORLD_NAME = TypePredicate.of("net/minecraft/world/WorldSettings")
-      .method("setWorldName", "func_82750_a")
-      .desc("(Ljava/lang/String;)Lnet/minecraft/world/WorldSettings;");
+    LAUNCH_INTEGRATED_SERVER = TypePredicate.of("net/minecraft/client/Minecraft")
+        .method("launchIntegratedServer", "func_71371_a")
+        .desc("(Ljava/lang/String;Ljava/lang/String;Lnet/minecraft/world/WorldSettings;)V");
   }
 
   @ClientOnly
   public static class GuiCreateWorlds {
     // targets
     private static final MethodPredicate
-    ACTION_PERFORMED = TypePredicate.of("net/minecraft/client/gui/GuiScreen")
-      .method("actionPerformed", "func_146284_a")
-      .desc("(Lnet/minecraft/client/gui/GuiButton;)V");
+    ACTION_PERFORMED = TypePredicate.of("net/minecraft/client/gui/GuiCreateWorld")
+        .method("actionPerformed", "func_146284_a")
+        .desc("(Lnet/minecraft/client/gui/GuiButton;)V");
 
     // patches
     public static final Patcher
     ACTION_PERFORMED_PATCHER = new AbstractInsnPatcher(ACTION_PERFORMED) {
       @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
-        return WorldSettingss.SET_WORLD_NAME.covers(Opcodes.INVOKEVIRTUAL, insnNode);
+        return Minecrafts.LAUNCH_INTEGRATED_SERVER.covers(Opcodes.INVOKEVIRTUAL, insnNode);
       }
 
       @Override protected void processInsn(InsnList list, AbstractInsnNode targetInsn) {
@@ -118,9 +120,9 @@ public class OreGenAsm {
     // targets
     public static final MethodPredicate
     CTOR = TypePredicate.of("net/minecraft/client/gui/GuiPageButtonList")
-      .method("<init>")
-      .desc("(Lnet/minecraft/client/Minecraft;IIIIILnet/minecraft/client/gui/GuiPageButtonList$GuiResponder;"
-          + "[[Lnet/minecraft/client/gui/GuiPageButtonList$GuiListEntry;)V");
+        .method("<init>")
+        .desc("(Lnet/minecraft/client/Minecraft;IIIIILnet/minecraft/client/gui/GuiPageButtonList$GuiResponder;" +
+            "[[Lnet/minecraft/client/gui/GuiPageButtonList$GuiListEntry;)V");
   }
 
   @ClientOnly
@@ -130,16 +132,17 @@ public class OreGenAsm {
 
     // callbacks
     private static final MethodPredicate
-    FACTORY = TYPE.method("field_175336_F").desc("Lnet/minecraft/world/gen/ChunkProviderSettings$Factory;");
+    SETTINGS = TYPE.method("settings", "field_175336_F")
+        .desc("Lnet/minecraft/world/gen/ChunkProviderSettings$Factory;");
 
     // targets
     private static final MethodPredicate
-    INIT_GUI_ENTRIES = TYPE.method("func_175325_f").desc("()V"),
-    SET_FLOAT_VALUE = TYPE.method("func_175320_a").desc("(IF)V");
+    CREATE_PAGED_LIST = TYPE.method("createPagedList", "func_175325_f").desc("()V"),
+    SET_ENTRY_VALUE = TYPE.method("setEntryValue", "func_175320_a").desc("(IF)V");
 
     // patches
     public static final Patcher
-    INIT_GUI_ENTRIES_PATCHER = new AbstractInsnPatcher(INIT_GUI_ENTRIES) {
+    CREATE_PAGED_LIST_PATCHER = new AbstractInsnPatcher(CREATE_PAGED_LIST) {
       @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
         return GuiPageButtonLists.CTOR.covers(Opcodes.INVOKESPECIAL, insnNode);
       }
@@ -149,19 +152,19 @@ public class OreGenAsm {
 
         pre.aload(0);
         pre.aload(0);
-        pre.getfield(FACTORY);
+        pre.getfield(SETTINGS);
         pre.invokestatic(Holder.ON_GUI_INIT, false);
 
         list.insertBefore(targetInsn, pre.build());
       }
     },
-    SET_FLOAT_VALUE_PATCHER = new AbstractMethodPatcher(SET_FLOAT_VALUE) {
+    SET_ENTRY_VALUE_PATCHER = new AbstractMethodPatcher(SET_ENTRY_VALUE) {
       @Override protected void processMethod(MethodNode targetMethod) {
         InsnListBuilder pre = new InsnListBuilder();
 
         pre.aload(0);
         pre.aload(0);
-        pre.getfield(FACTORY);
+        pre.getfield(SETTINGS);
         pre.iload(1);
         pre.fload(2);
         pre.invokestatic(Holder.ON_GUI_SET_FLOAT_VALUE, false);
