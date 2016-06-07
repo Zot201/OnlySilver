@@ -35,7 +35,12 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.world.storage.loot.LootEntryItem;
 import net.minecraft.world.storage.loot.LootTableList;
+import net.minecraft.world.storage.loot.RandomValueRange;
+import net.minecraft.world.storage.loot.conditions.LootCondition;
+import net.minecraft.world.storage.loot.functions.LootFunction;
+import net.minecraft.world.storage.loot.functions.SetCount;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.Loader;
@@ -56,10 +61,7 @@ import zotmc.onlysilver.data.ModData.WeaponMod;
 import zotmc.onlysilver.ench.EnchIncantation;
 import zotmc.onlysilver.ench.EnchSilverAura;
 import zotmc.onlysilver.entity.EntitySilverGolem;
-import zotmc.onlysilver.util.Fields;
-import zotmc.onlysilver.util.FluentMultiset;
-import zotmc.onlysilver.util.Reserve;
-import zotmc.onlysilver.util.Utils;
+import zotmc.onlysilver.util.*;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -199,15 +201,14 @@ public class Contents {
     
     
     // loots
-    // TODO: Loots
-    /*addLootItem(ChestGenHooks.VILLAGE_BLACKSMITH, ItemFeature.silverHelm, 1, 1, 2);
-    addLootItem(ChestGenHooks.VILLAGE_BLACKSMITH, ItemFeature.silverChest, 1, 1, 2);
-    addLootItem(ChestGenHooks.VILLAGE_BLACKSMITH, ItemFeature.silverLegs, 1, 1, 2);
-    addLootItem(ChestGenHooks.VILLAGE_BLACKSMITH, ItemFeature.silverBoots, 1, 1, 2);
-    addLootItem(ChestGenHooks.PYRAMID_DESERT_CHEST, ItemFeature.silverIngot, 4, 6, 4);
-    addLootItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST, ItemFeature.silverIngot, 4, 6, 4);
-    addLootItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST, ItemFeature.silverBoots, 1, 1, 2);
-    addLootItem(ChestGenHooks.DUNGEON_CHEST, ItemFeature.silverIngot, 3, 5, 1);*/
+    addLootItem(LootTableList.CHESTS_VILLAGE_BLACKSMITH, "main", ItemFeature.silverHelm, 1, 1, 1);
+    addLootItem(LootTableList.CHESTS_VILLAGE_BLACKSMITH, "main", ItemFeature.silverChest, 1, 1, 1);
+    addLootItem(LootTableList.CHESTS_VILLAGE_BLACKSMITH, "main", ItemFeature.silverLegs, 1, 1, 1);
+    addLootItem(LootTableList.CHESTS_VILLAGE_BLACKSMITH, "main", ItemFeature.silverBoots, 1, 1, 1);
+    addLootItem(LootTableList.CHESTS_DESERT_PYRAMID, "main", ItemFeature.silverIngot, 4, 6, 2);
+    addLootItem(LootTableList.CHESTS_JUNGLE_TEMPLE, "main", ItemFeature.silverIngot, 4, 6, 2);
+    addLootItem(LootTableList.CHESTS_JUNGLE_TEMPLE, "main", ItemFeature.silverBoots, 1, 1, 1);
+    addLootItem(LootTableList.CHESTS_SIMPLE_DUNGEON, "pool1", ItemFeature.silverIngot, 3, 5, 1);
     
     // silver
     OnlySilverRegistry.registerSilverPredicate(
@@ -274,9 +275,19 @@ public class Contents {
     });
   }
   
-  /*private static void addLootItem(String category, Feature<Item> i, int min, int max, int weight) {
-    if (i.exists()) ChestGenHooks.addItem(category, new WeightedRandomChestContent(i.get(), 0, min, max, weight));
-  }*/
+  private static void addLootItem(
+      ResourceLocation category, String pool, Feature<Item> feature, int min, int max, int weight) {
+    if (feature.exists()) {
+      Item i = feature.get();
+
+      OnlySilver.INSTANCE.proxy.addLootEntry(category, pool, new LootEntryItem(i, weight, 0,
+          new LootFunction[] {
+              new SetCount(new LootCondition[0], new RandomValueRange(min, max))
+          },
+          new LootCondition[0],
+          i.getRegistryName().toString()));
+    }
+  }
   
   private static void injectFinal(String name, Object value) {
     try {

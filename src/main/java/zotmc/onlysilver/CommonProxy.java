@@ -15,6 +15,9 @@
  */
 package zotmc.onlysilver;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.EntityArrow;
@@ -22,6 +25,10 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.storage.loot.LootEntry;
+import net.minecraft.world.storage.loot.LootPool;
+import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
@@ -30,9 +37,14 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 import zotmc.onlysilver.data.ModData.OnlySilvers;
 import zotmc.onlysilver.util.Utils;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 class CommonProxy {
+
+  private final Table<ResourceLocation, String, List<LootEntry>> lootEntries = HashBasedTable.create();
 
   CommonProxy() { }
 
@@ -46,6 +58,14 @@ class CommonProxy {
 
   public void spawnEntityInWorld(Entity entity) {
     entity.worldObj.spawnEntityInWorld(entity);
+  }
+
+  void addLootEntry(ResourceLocation category, String pool, LootEntry entry) {
+    List<LootEntry> list = lootEntries.get(category, pool);
+    if (list == null) {
+      lootEntries.put(category, pool, list = Lists.newArrayList());
+    }
+    list.add(entry);
   }
 
 
@@ -98,7 +118,23 @@ class CommonProxy {
   }
 
   @SubscribeEvent public void onLootTableLoad(LootTableLoadEvent event) {
-    // TODO
+    Map<String, List<LootEntry>> entries = lootEntries.row(event.getName());
+
+    if (!entries.isEmpty()) {
+      LootTable table = event.getTable();
+
+      entries.entrySet().forEach(e -> {
+        LootPool pool = table.getPool(e.getKey());
+
+        //noinspection ConstantConditions
+        if (pool != null) {
+          e.getValue().forEach(pool::addEntry);
+        }
+        else {
+          OnlySilver.INSTANCE.log.error("Missing pool %s in %s?", e.getKey(), event.getName());
+        }
+      });
+    }
   }
 
 }
