@@ -279,13 +279,13 @@ public class Contents {
       ResourceLocation category, String pool, Feature<Item> feature, int min, int max, int weight) {
     if (feature.exists()) {
       Item i = feature.get();
+      LootCondition[] lootConditions = new LootCondition[0];
 
       OnlySilver.INSTANCE.proxy.addLootEntry(category, pool, new LootEntryItem(i, weight, 0,
           new LootFunction[] {
-              new SetCount(new LootCondition[0], new RandomValueRange(min, max))
+              new SetCount(lootConditions, new RandomValueRange(min, max))
           },
-          new LootCondition[0],
-          i.getRegistryName().toString()));
+          lootConditions, i.getRegistryName().toString()));
     }
   }
   
