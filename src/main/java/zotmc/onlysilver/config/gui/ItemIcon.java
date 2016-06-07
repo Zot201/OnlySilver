@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -140,7 +141,12 @@ public class ItemIcon extends Icon<ItemIcon> implements Supplier<String> {
     }
 
     @Override public List<String> get() {
-      return colorTooltip(Lists.newArrayList(item.getDisplayName()), item.getRarity().rarityColor);
+      Minecraft mc = Minecraft.getMinecraft();
+      EntityPlayer player = mc.thePlayer;
+      List<String> ret = player == null ?
+          Lists.newArrayList(item.getDisplayName()) :
+          item.getTooltip(player, mc.gameSettings.advancedItemTooltips);
+      return colorTooltip(ret, item.getRarity().rarityColor);
     }
   }
 
