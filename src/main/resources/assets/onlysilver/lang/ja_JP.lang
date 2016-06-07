@@ -17,8 +17,6 @@ item.silverChest.name=銀のチェストプレート
 item.silverLegs.name=銀のレギンス
 item.silverBoots.name=銀のブーツ
 
-item.silverHammer.name=銀のハンマー
-
 enchantment.onlysilver.silverAura=シルバーオーラ
 enchantment.onlysilver.incantation=呪文
 

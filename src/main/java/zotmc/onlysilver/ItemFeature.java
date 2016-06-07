@@ -72,15 +72,7 @@ public enum ItemFeature implements Feature<Item> {
   @Recipes("σσσ|σ σ|···") @OnlyArmor(HEAD) @ItemId("silver_helmet") silverHelm,
   @Recipes("σ σ|σσσ|σσσ") @OnlyArmor(CHEST) @ItemId("silver_chestplate") silverChest,
   @Recipes("σσσ|σ σ|σ σ") @OnlyArmor(LEGS) @ItemId("silver_leggings") silverLegs,
-  @Recipes("···|σ σ|σ σ") @OnlyArmor(FEET) silverBoots,
-  
-  
-  // mods
-  @Recipes(" σ | ισ|ι  ")
-  @Depends("exnihilo") @Tool(string = "exnihilo.items.hammers.ItemHammerBase")
-  silverHammer {{
-    recipesEnabledFactory = Dynamic.refer("exnihilo.data.ModData", "ALLOW_HAMMERS");
-  }};
+  @Recipes("···|σ σ|σ σ") @OnlyArmor(FEET) silverBoots;
 
   
   

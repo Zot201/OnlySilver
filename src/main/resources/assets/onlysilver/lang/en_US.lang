@@ -16,9 +16,6 @@ item.silverChest.name=Silver Chestplate
 item.silverLegs.name=Silver Leggings
 item.silverBoots.name=Silver Boots
 
-# Mod Items
-item.silverHammer.name=Silver Hammer
-
 # Enchantments
 enchantment.onlysilver.silverAura=Silver Aura
 enchantment.onlysilver.incantation=Incantation
