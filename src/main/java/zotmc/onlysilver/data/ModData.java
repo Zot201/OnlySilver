@@ -15,6 +15,10 @@
  */
 package zotmc.onlysilver.data;
 
+import com.google.common.base.Supplier;
+import com.google.common.collect.Multiset;
+import com.google.common.reflect.Invokable;
+import com.google.common.reflect.TypeToken;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -30,15 +34,9 @@ import zotmc.onlysilver.util.Utils.Dependency;
 import zotmc.onlysilver.util.Utils.Modid;
 import zotmc.onlysilver.util.Utils.Requirements;
 
-import com.google.common.base.Supplier;
-import com.google.common.collect.Multiset;
-import com.google.common.reflect.Invokable;
-import com.google.common.reflect.TypeToken;
-
 import javax.annotation.Nullable;
 
 @MCVersion(Loader.MC_VERSION)
-@Requirements("1.9 = 1.9")
 public class ModData {
   
   public static class OnlySilvers {
@@ -74,6 +72,7 @@ public class ModData {
     public enum Aspect {
       METAL, GREED, EARTH;
       
+      @SuppressWarnings("Guava")
       private static Supplier<?> adapt(Multiset<Aspect> aspects) {
         Chain<?> ret = Dynamic.construct(ASPECT_LIST);
         for (Multiset.Entry<Aspect> entry : aspects.entrySet())

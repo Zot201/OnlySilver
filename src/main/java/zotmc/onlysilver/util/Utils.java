@@ -438,7 +438,7 @@ public class Utils {
   }
 
   private static ArtifactVersion check(Class<?> c, String modid, SimpleVersion key, ModContainer mc) {
-    boolean isLoaded = Loader.isModLoaded(modid);
+    boolean isLoaded = Loader.isModLoaded(modid) || modid.equals("Minecraft");
 
     if (isLoaded || c.getAnnotation(Dependency.class) != null) {
       Requirements requirements = c.getAnnotation(Requirements.class);

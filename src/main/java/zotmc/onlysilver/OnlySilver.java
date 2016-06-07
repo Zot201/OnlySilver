@@ -21,6 +21,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespaced;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.InstanceFactory;
@@ -44,7 +45,8 @@ import javax.annotation.Nullable;
 import static zotmc.onlysilver.data.ModData.OnlySilvers.*;
 import static zotmc.onlysilver.util.Utils.isClientSide;
 
-@Mod(modid = MODID, dependencies = DEPENDENCIES, guiFactory = GUI_FACTORY)
+@Mod(modid = MODID, dependencies = DEPENDENCIES, guiFactory = GUI_FACTORY,
+    acceptedMinecraftVersions = "[" + Loader.MC_VERSION + ",)")
 public enum OnlySilver {
   INSTANCE;
   
