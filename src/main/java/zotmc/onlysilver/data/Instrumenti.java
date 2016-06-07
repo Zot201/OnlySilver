@@ -16,7 +16,6 @@
 package zotmc.onlysilver.data;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.Invokable;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -36,14 +35,7 @@ public class Instrumenti {
 
   private static final MethodInfo
   GET_IS_REPAIRABLE = Utils.findMethod(Item.class, "getIsRepairable", "func_82789_a")
-      .asMethodInfo(ItemStack.class, ItemStack.class),
-  GET_ITEM_ENCHANTABILITY = Utils.findMethod(Item.class, "getItemEnchantability", "func_77619_b")
-      .asMethodInfo();
-
-  public static final Invokable<Item, Item>
-  SET_MAX_DAMAGE = Utils.findMethod(Item.class, "setMaxDamage", "func_77656_e")
-      .asInvokable(int.class)
-      .returning(Item.class);
+      .asMethodInfo(ItemStack.class, ItemStack.class);
 
 
   public static final Consumer<KlastWriter<?>>
@@ -51,12 +43,6 @@ public class Instrumenti {
     GeneratorAdapter mg = new GeneratorAdapter(ACC_PUBLIC, GET_IS_REPAIRABLE, null, null, cw);
     mg.loadArg(1);
     mg.invokeStatic(Type.getType(CommonHooks.class), MethodInfo.of("isSilverIngot", "(Lnet/minecraft/item/ItemStack;)Z"));
-    mg.returnValue();
-    mg.endMethod();
-  },
-  GET_ITEM_ENCHANTABILITY_SILVER = cw -> {
-    GeneratorAdapter mg = new GeneratorAdapter(ACC_PUBLIC, GET_ITEM_ENCHANTABILITY, null, null, cw);
-    mg.invokeStatic(Type.getType(CommonHooks.class), MethodInfo.of("getSilverToolEnchantability", "()I"));
     mg.returnValue();
     mg.endMethod();
   };

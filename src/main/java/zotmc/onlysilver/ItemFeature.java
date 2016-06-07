@@ -80,17 +80,6 @@ public enum ItemFeature implements Feature<Item> {
   @Depends("exnihilo") @Tool(string = "exnihilo.items.hammers.ItemHammerBase")
   silverHammer {{
     recipesEnabledFactory = Dynamic.refer("exnihilo.data.ModData", "ALLOW_HAMMERS");
-  }},
-  
-  @Recipes("　σσ|σ ι|  ι")
-  @Depends("BiomesOPlenty") @Tool
-  silverScythe {{
-    itemFactory = Dynamic.<Item>construct("biomesoplenty.common.items.ItemBOPScythe")
-        .via(ToolMaterial.class, ToolMaterial.IRON)
-        .viaInt(-1)
-        .assemble(Instrumenti.GET_IS_REPAIRABLE_SILVER)
-        .assemble(Instrumenti.GET_ITEM_ENCHANTABILITY_SILVER)
-        .call(Instrumenti.SET_MAX_DAMAGE, Contents.silverToolMaterial.get().getMaxUses());
   }};
 
   
