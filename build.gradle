@@ -11,8 +11,9 @@ buildscript {
 }
 
 plugins {
-  id "net.minecraftforge.gradle.forge" version "2.0.2"
-  id "com.jfrog.bintray" version "1.6"
+  id 'net.minecraftforge.gradle.forge' version '2.0.2'
+  id 'com.jfrog.bintray' version '1.6'
+  id 'com.matthewprenger.cursegradle' version '1.0.7'
 }
 
 ext.coreModManifest = {
@@ -21,6 +22,7 @@ ext.coreModManifest = {
 }
 apply plugin: 'maven'
 apply from: 'bintray.gradle'
+apply from: 'curseforge.gradle'
 
 minecraft {
   version = '1.9.4-12.17.0.1937'

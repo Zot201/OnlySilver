@@ -1,0 +1,154 @@
+2016/06/08 version 2.2.3-1.9.4
+- Changed item and block ids to conform vanilla standard. (thanks given for the FMLMissingMappingsEvent, old save can be migrated without losing items!)
+- New textures for silver ingot and silver rod.
+- Allow silver ingots being used as a beacon payment.
+- Silver bows now do a melee knockback.
+- Skeletons can now shoot with a silver bow.
+- Rewrote equipment spawning to a vanilla-like fashion.
+- Silver Golems has reduced size, health and cost only a single silver block.
+- Incantation now come with a looting effect.
+- Added a new enchantment Silver Aura as a substitute for the old Everlasting.
+- Changed map color for silver block.
+- Adjusted achievement icon coordinates.
+- Added GUI for mod options.
+- Added per world silver ore generation settings which are accessible from mod options and customized world type settings.
+- Rewrote API.
+- Added en_UK language file
+- Converted the silver block model to an overlay on the stone texture so it looks better with texture packs.
+
+2014/07/31 version 1.9.4-1.7.2
+- Fixed crashes on server start-up.
+- Added es_MX.lang translated by guekho64.
+- Silver hammer recipe is now disabled whenever you disable hammers in Ex Nihilo's config.
+- Fixed API version number not updated.
+
+2014/07/25 version 1.9.3-1.7.2
+- Fixed silver hammer not being added.
+- Use a more smart implementation for werewolf effectiveness with the aid of OnlySilverRegistry. Instead of detecting what is being held by the player, the actual tool involved is traced for calculation.
+- Arrows shot by a silver bow now deal 6 damages on werewolves.
+- Added OnlySilverRegistry.registerWerewolfDamage. Add-on developers have no longer to write their own werewolf handler. Please take a look at OnlySilverRegistry for more information.
+- Updated OnlySilverRegistry.registerSilverPredicate for better performance.
+
+2014/07/20 version 1.9.1-1.7.2
+- Fixed enchantment related crashes.
+- API improvements. Now with Forge @API annotation.
+- Removed the recipe prioritization option in config.
+- Silver block can now be used for beacon base.
+- Fixed werewolf effectiveness not working.
+- Silver bow is now effective against werewolves.
+- Added metadata support in ore generation.
+- Added weapons from Balkon's weapon mod, a hammer from Ex Nihilo and a scythe from Biomes o' Plenty.
+- Registered silver block as "blockSilver" in OreDictionary.
+- Silver bow durability is now twice of other tools.
+
+2014/04/23 version 1.7.6-1.7.2
+- Silver Bow now knockbacks on direct hits.
+- Added TC4 aspects.
+- Tweaked API.
+
+2014/04/21 version 1.7.5-1.7.2
+- Fixed 2 crashing bugs.
+- Improved API.
+
+2014/03/30 version 1.7.4-1.7.2
+- Fixed blocks do not drop.
+
+2014/03/29 version 1.7.3-1.7.2
+- Everlasting enchantment now brings invulnerability to block drops and mob drops.
+
+2014/03/28 version 1.7.2-1.7.2
+- Fixed Silver Block recipe prioritization.
+- Added Everlasting and Incantation Enchantments.
+
+2014/03/10 version 1.6.8-1.7.2 & 1.6.8-1.6.4
+- Fixed FOV retraction on bow use.
+- Tweaked mob equip spawning.
+- Added optional Akkamaddi Style mob equip spawning.
+- Items and blocks would now automatically search a blank id to assign to. (1.6.8-1.6.4)
+
+2014/02/25 version 1.6.6-1.7.2 & 1.6.6-1.6.4
+- Fixed silver bow does not consume arrows.
+- Updated textures for silver ore and silver ingot.
+- Added the tool enum and armor enum to the API. (1.6.6-1.7.2)
+
+2014/02/24 version 1.6.5-1.6.4
+- Fixed a crash occurs whenever a block with multiple names being loaded.
+- Added the tool enum and armor enum to the API.
+
+2014/02/23 version 1.6.4-1.7.2 & 1.6.4-1.6.4
+- Fixed the unusual high spawn rate of silver items in chests.
+- Integrated Treecapitator setting for silver axe.
+
+2014/02/18 version 1.6.3-1.6.4
+- Backported features from 1.6.3-1.7.2 (Please delete the old config and let Minecraft to generate a new one, or the game will crash on startup)
+- Released aspect data for Thaumcraft as add-on.
+
+2014/02/18 version 1.6.3-1.7.2
+- Fixed a naming issues concerning silver golem.
+- Moved the ore generation to post-initialization phase, in order to allow proper customisation.
+
+2014/02/16 version 1.6.2-1.7.2
+- Swapped the vein size and the spawn rate in the ore generation setting since ORE x VEIN_SIZE x SPAWN_RATE sounds better.
+- Added '-INF' and '+INF' keywords for the ore generation.
+- Added '..' (two period) as an alternative separator for the interval notation.
+
+2014/02/15 version 1.6.1-1.7.2
+- Fixed a consistency issue concerning ore spawn rates.
+- Added '‥' as an alternative separator for the interval notation.
+
+2014/02/15 version 1.6.0-1.7.2
+- Updated to Minecraft 1.7.2 and Forge 10.12.0.1029
+- Fully customizable ore generation. You can define ore generation of any blocks. See config for more details.
+
+2014/02/15 version 1.5.5-1.6.4
+- Registered items.
+
+2013/11/25 version 1.5.4-1.6.4
+- Fixed a bug that crashes server.
+- Tweaked golem sounds.
+
+2013/11/16 version 1.5.2-1.6.4
+- Fixed a bug that equips are attempted spawning on zombies and skeletons for each time a chunk reloads.
+- Zombies and skeletons are not going to hold silver bows on spawning.
+- Removed old localisation as it is now redundant.
+- Added ru_RU localisation.
+- Removed the "Use Alternative Texture for Silver Ore" toggle in the config file. The alternative is now standard.
+- Re-organised the config file. Please delete the config file and let it generate a new one. (You are suggested to back up your worlds and config files if you are not using the default IDs)
+- Reduced durability of silver tools (250 -> 226). Bow and armor are not affected.
+- Added config options for tools, armor and block stats.
+- Added a min spawn height setting.
+- Silver is now spawning in all dimensions. You could define exclusions in the config file.
+- Added silver golem which moves faster, immues to poison and does extra damage to werewolves but serve less health point.
+- You could only make silver golem with the silver block in OnlySilver (it is the limit without base class edits), so there is an option to prioritize the silver block recipe. Turn it on if you have problem crafting the silver block provided by OnlySilver.
+
+2013/9/26 version 1.4.6-1.6.4
+- Fixed a bug on matching the repairing material.
+- Made silver bow repairable from silver ingot.
+- Made silver tools effective on Mo' Creatures werewolf. (Also an option to disable the effectiveness)
+
+2013/9/25 version 1.3.9-1.6.4
+- Updated to Minecraft 1.6.4 and Forge 9.11.0.884 (Minecraft 1.6.2 compatible)
+- Integrated localization.
+- Added an option to enable the old localization file.
+- For any occurrences of stick in recipes, the Ore Dictionary counterpart is now used instead.
+- Any species of silver ingot registered in Ore Dictionary can be now used as repairing material.
+- Fixed a failure on assigning an achievement ID.
+
+2013/8/17 version 1.2.3-1.6.2
+- Set silver ingot the repairing material for silver tools and armors.
+
+2013/8/17 version 1.2.2-1.6.2
+- Fixed a calculation to resemble SimpleOres 1.5.2_1 the probability for a skeleton or zombie to equip silvers.
+- Added Japanese language support.
+- Added an option to use alternative texture for silver ore.
+
+2013/8/14 version 1.1.1-1.6.2
+- Added API support.
+
+2013/8/4 version 1.0.1-1.6.2
+- Ported from SimpleOres 1.5.2_1 the silvers.
+- Integrated all items into one creative tab.
+- Changed the prerequisite of the achievement "A New... Bow?" to "Acquire Hardware".
+- Changed some calculations about fov.
+- Changed default id's.
+- Changed silver ore texture for better recognition to tin ore in SimpleOresII.

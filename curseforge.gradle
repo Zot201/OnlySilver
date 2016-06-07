@@ -1,0 +1,21 @@
+def prop(String key) {
+  ext.has(key) ? ext[key] : null
+}
+
+def gameVersions = ['1.9.4']
+
+curseforge {
+  apiKey = prop('curseforge.apiKey')
+
+  //noinspection GroovyAssignabilityCheck
+  project {
+    id = '245902'
+    changelog = file('changelog.txt')
+    releaseType = 'release'
+    gameVersions.each { addGameVersion it }
+
+    mainArtifact(jar) {
+      displayName = "OnlySilver-$project.version"
+    }
+  }
+}

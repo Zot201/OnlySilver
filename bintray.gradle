@@ -9,7 +9,7 @@ def prop(String key) {
 bintray {
   user = prop('bintray.username')
   key = prop('bintray.apiKey')
-  configurations = ['published']
+  configurations = ['publish']
   publish = true
 
   pkg {
@@ -26,7 +26,7 @@ bintray {
 }
 
 project.configurations {
-  published
+  publish
 }
 
 task devJar(type: Jar) {
@@ -41,7 +41,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 artifacts {
-  published devJar
-  published sourceJar
-  published javadocJar
+  publish devJar
+  publish sourceJar
+  publish javadocJar
 }
