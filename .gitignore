@@ -2,6 +2,7 @@
 /.gradle
 /build
 /run
+/gradle.properties
 
 # Eclipse
 /.settings

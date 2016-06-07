@@ -10,17 +10,25 @@ buildscript {
   }
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
+plugins {
+  id "net.minecraftforge.gradle.forge" version "2.0.2"
+  id "com.jfrog.bintray" version "1.6"
+}
 
-group = 'zotmc.onlysilver'
-archivesBaseName = 'OnlySilver'
-version = '2.2.0-1.9.4'
+ext.coreModManifest = {
+  attributes 'FMLCorePlugin': 'zotmc.onlysilver.loading.OnlyLoading'
+  attributes 'FMLCorePluginContainsFMLMod': 'true'
+}
+apply plugin: 'maven'
+apply from: 'bintray.gradle'
 
 minecraft {
   version = '1.9.4-12.17.0.1937'
   runDir = 'run'
   mappings = 'snapshot_20160518'
 }
+
+jar.manifest coreModManifest as Closure
 
 processResources.with {
   from(sourceSets.main.resources.srcDirs) {
@@ -32,15 +40,8 @@ processResources.with {
   }
 }
 
-jar.with {
-  manifest {
-    attributes 'FMLCorePlugin': 'zotmc.onlysilver.loading.OnlyLoading'
-    attributes 'FMLCorePluginContainsFMLMod': 'true'
-  }
-}
-
-tasks.withType(JavaCompile) { 
-  options.encoding = 'UTF-8'
+[compileJava, javadoc].forEach{
+  it.options.encoding = 'UTF-8'
 }
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

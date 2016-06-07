@@ -1,0 +1,47 @@
+group = 'zotmc.onlysilver'
+project.archivesBaseName = 'onlysilver'
+version = '2.2.3-1.9.4'
+
+def prop(String key) {
+  ext.has(key) ? ext[key] : null
+}
+
+bintray {
+  user = prop('bintray.username')
+  key = prop('bintray.apiKey')
+  configurations = ['published']
+  publish = true
+
+  pkg {
+    repo = 'maven'
+    name = 'OnlySilver'
+    licenses = ['Apache-2.0']
+    vcsUrl = 'https://github.com/Zot201/OnlySilver.git'
+
+    version.with {
+      name = project.version
+      released = new Date()
+    }
+  }
+}
+
+project.configurations {
+  published
+}
+
+task devJar(type: Jar) {
+  from sourceSets.main.output as Object
+  classifier = 'dev'
+  manifest project.ext.coreModManifest as Closure
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  from javadoc.destinationDir as Object
+  classifier = 'javadoc'
+}
+
+artifacts {
+  published devJar
+  published sourceJar
+  published javadocJar
+}
