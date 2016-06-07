@@ -16,13 +16,11 @@
 package zotmc.onlysilver;
 
 import com.google.common.base.*;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.*;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -31,7 +29,6 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import zotmc.onlysilver.config.Config;
 import zotmc.onlysilver.data.Instrumenti;
 import zotmc.onlysilver.data.ModData.OnlySilvers;
-import zotmc.onlysilver.data.ModData.WeaponMod;
 import zotmc.onlysilver.item.ItemOnlyArmor;
 import zotmc.onlysilver.item.ItemOnlyAxe;
 import zotmc.onlysilver.item.ItemOnlyBow;
@@ -48,7 +45,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -91,84 +87,8 @@ public enum ItemFeature implements Feature<Item> {
         .assemble(Instrumenti.GET_IS_REPAIRABLE_SILVER)
         .assemble(Instrumenti.GET_ITEM_ENCHANTABILITY_SILVER)
         .call(Instrumenti.SET_MAX_DAMAGE, Contents.silverToolMaterial.get().getMaxUses());
-  }},
-  
-  
-  // balkon's
-  @Recipes("  ϧ| ιϧ|ι σ")
-  @WM(isEnabled = "flail")
-  silverFlail {{
-    itemFactory = Dynamic.<Item>construct("ckathode.weaponmod.item.ItemFlail")
-        .via(getItemId())
-        .via(ToolMaterial.class, Contents.silverToolMaterial)
-        .assemble(Instrumenti.GET_IS_REPAIRABLE_SILVER);
-  }},
-  
-  @Recipes("  σ| ι |ι  ")
-  @WM(isEnabled = "spear", meleeComp = "ckathode.weaponmod.item.MeleeCompSpear")
-  silverSpear,
-  
-  @Recipes(" σσ| ισ|ι  ")
-  @WM(isEnabled = "halberd", meleeComp = "ckathode.weaponmod.item.MeleeCompHalberd")
-  silverHalberd,
-  
-  @Recipes({"ισ", "σ|ι"})
-  @WM(isEnabled = "knife", meleeComp = "ckathode.weaponmod.item.MeleeCompKnife")
-  silverKnife,
-  
-  @Recipes("σισ|σισ| ι ")
-  @WM(isEnabled = "warhammer", meleeComp = "ckathode.weaponmod.item.MeleeCompWarhammer")
-  silverWarhammer,
-  
-  @Recipes("϶϶σ|  ϶|  ϶")
-  @WM(isEnabled = "boomerang", meleeComp = "ckathode.weaponmod.item.MeleeCompBoomerang")
-  silverBoomerang,
-  
-  @Recipes("σσσ|σισ| ι ")
-  @WM(isEnabled = "battleaxe")
-  silverBattleaxe {{
-    Supplier<?> meleeComp = Dynamic.construct("ckathode.weaponmod.item.MeleeCompBattleaxe")
-        .via(ToolMaterial.class, Contents.silverToolMaterial)
-        .assign("ignoreArmourAmount", 1);
-    
-    itemFactory = new WeaponMod.ItemMeleeSupplier(getItemId(), meleeComp);
-  }},
-  
-  @Recipes("  σ| σ |ι  ")
-  @WM(isEnabled = "katana")
-  silverKatana {{
-    Supplier<?> meleeComp = Dynamic.construct(WeaponMod.MELEE_COMPONENT)
-        .via(Dynamic.refer(WeaponMod.MELEE_COMPONENT + "$MeleeSpecs", "KATANA"))
-        .via(ToolMaterial.class, Contents.silverToolMaterial);
-    
-    itemFactory = new WeaponMod.ItemMeleeSupplier(getItemId(), meleeComp);
-  }},
-  
-  @WM(isEnabled = {"musketbayonet", "knife"})
-  silverBayonetMusket {{
-    recipeFactory = new Iterable<IRecipe>() { public Iterator<IRecipe> iterator() {
-      Item musket = Item.REGISTRY.getObject(new ResourceLocation(WeaponMod.MODID, "musket"));
-      if (silverKnife.exists() && musket != null) {
-        IRecipe r = new ShapelessRecipes(
-            new ItemStack(silverBayonetMusket.get()),
-            Lists.newArrayList(new ItemStack(silverKnife.get()), new ItemStack(musket))
-        );
-        return Iterators.singletonIterator(r);
-      }
-      return Iterators.emptyIterator();
-    }};
-    
-    Supplier<Item> knife = new Supplier<Item>() { public Item get() { return silverKnife.get(); }};
-    Supplier<?> meleeComp = Dynamic.construct("ckathode.weaponmod.item.MeleeCompKnife")
-        .via(ToolMaterial.class, Contents.silverToolMaterial);
-    
-    itemFactory = Dynamic.<Item>construct("ckathode.weaponmod.item.ItemMusket")
-        .via(getItemId())
-        .via(WeaponMod.MELEE_COMPONENT, meleeComp)
-        .via(Item.class, knife)
-        .assemble(Instrumenti.GET_IS_REPAIRABLE_SILVER);
   }};
-  
+
   
   
   Supplier<Boolean> recipesEnabledFactory;
@@ -206,7 +126,7 @@ public enum ItemFeature implements Feature<Item> {
   
   public boolean isTool() {
     Field f = Enums.getField(this);
-    return f.getAnnotation(Tool.class) != null || f.getAnnotation(WM.class) != null;
+    return f.getAnnotation(Tool.class) != null;
   }
   
   public boolean isArmor() {
@@ -232,23 +152,7 @@ public enum ItemFeature implements Feature<Item> {
       for (String modid : depends.value())
         if (!Loader.isModLoaded(modid))
           return false;
-    
-    WM wm = f.getAnnotation(WM.class);
-    if (wm != null) {
-      if (!Loader.isModLoaded(WeaponMod.MODID))
-        return false;
-      
-      try {
-        for (String weaponType : wm.isEnabled())
-          if (!WeaponMod.isEnabled.via(weaponType).get())
-            return false;
-        
-      } catch (Throwable t) {
-        OnlySilver.INSTANCE.log.catching(t);
-        return false;
-      }
-    }
-    
+
     return true;
   }
   
@@ -320,23 +224,7 @@ public enum ItemFeature implements Feature<Item> {
         valid = true;
         value = new ItemOnlyArmor(Contents.silverArmorMaterial.get(), onlyArmor.value());
       }
-      
-      WM wm = f.getAnnotation(WM.class);
-      if (wm != null && !wm.meleeComp().isEmpty()) {
-        checkArgument(!valid);
-        valid = true;
-        
-        try {
-          Supplier<?> meleeComp = Dynamic.construct(wm.meleeComp())
-              .via(ToolMaterial.class, Contents.silverToolMaterial);
-          
-          value = new WeaponMod.ItemMeleeSupplier(getItemId(), meleeComp).get();
-          
-        } catch (Throwable t) {
-          OnlySilver.INSTANCE.log.catching(t);
-        }
-      }
-      
+
       checkArgument(valid);
 
       if (value != null) {
@@ -469,13 +357,6 @@ public enum ItemFeature implements Feature<Item> {
   @Target(ElementType.FIELD)
   private @interface OnlyArmor {
     EntityEquipmentSlot value();
-  }
-  
-  @Retention(RetentionPolicy.RUNTIME)
-  @Target(ElementType.FIELD)
-  private @interface WM {
-    String[] isEnabled();
-    String meleeComp() default "";
   }
 
 }

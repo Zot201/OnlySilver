@@ -299,7 +299,7 @@ public class CommonHooks {
   );
   private static final List<Feature<Item>> weaponList = ImmutableList.of(
       ItemFeature.silverSword,
-      ItemFeature.silverKatana,
+      Utils.missingFeature(),
       ItemFeature.silverBow,
       Utils.missingFeature()
   );

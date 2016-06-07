@@ -17,24 +17,16 @@ package zotmc.onlysilver.data;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.Multiset;
-import com.google.common.reflect.Invokable;
-import com.google.common.reflect.TypeToken;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
-import zotmc.onlysilver.api.DamageSourceHandler;
 import zotmc.onlysilver.util.Dynamic;
 import zotmc.onlysilver.util.Dynamic.Chain;
-import zotmc.onlysilver.util.Dynamic.Invoke;
 import zotmc.onlysilver.util.Utils;
 import zotmc.onlysilver.util.Utils.Dependency;
 import zotmc.onlysilver.util.Utils.Modid;
 import zotmc.onlysilver.util.Utils.Requirements;
-
-import javax.annotation.Nullable;
 
 @MCVersion(Loader.MC_VERSION)
 public class ModData {
@@ -98,82 +90,5 @@ public class ModData {
           .get();
     }
   }
-  
-  public static class WeaponMod {
-    @Modid public static final String MODID = "weaponmod";
-    public static final String MELEE_COMPONENT = "ckathode.weaponmod.item.MeleeComponent";
-    
-    public static final Invoke<Boolean> isEnabled = Dynamic
-        .refer("ckathode.weaponmod.BalkonsWeaponMod", "instance")
-        .refer("modConfig")
-        .invoke("isEnabled");
-    
-    @SuppressWarnings("Guava")
-    public static class ItemMeleeSupplier implements Supplier<Item> {
-      private final String itemId;
-      private final Supplier<?> meleeComp;
-      
-      public ItemMeleeSupplier(String itemId, Supplier<?> meleeComp) {
-        this.itemId = itemId;
-        this.meleeComp = meleeComp;
-      }
-      
-      @Override public Item get() {
-        return Dynamic.<Item>construct("ckathode.weaponmod.item.ItemMelee")
-            .via(itemId)
-            .via(MELEE_COMPONENT, meleeComp)
-            .assemble(Instrumenti.GET_IS_REPAIRABLE_SILVER)
-            .get();
-      }
-    }
-    
-    public static class ProjectileHandler<EntityMaterialProjectile> implements DamageSourceHandler {
-      private final Class<EntityMaterialProjectile> empType;
-      private final Invokable<EntityMaterialProjectile, ItemStack> getPickupItem;
-      private final Invokable<EntityMaterialProjectile, Void> setThrownItemStack;
 
-      public ProjectileHandler() throws Throwable {
-        //noinspection unchecked
-        empType = (Class<EntityMaterialProjectile>) Class.forName(
-            "ckathode.weaponmod.entity.projectile.EntityMaterialProjectile");
-        
-        getPickupItem = TypeToken.of(empType)
-            .method(empType.getMethod("getPickupItem"))
-            .returning(ItemStack.class);
-        
-        setThrownItemStack = TypeToken.of(empType)
-            .method(empType.getMethod("setThrownItemStack", ItemStack.class))
-            .returning(void.class);
-      }
-      
-      @Override public String[] getTargetDamageTypes() {
-        return new String[] {"weapon"};
-      }
-      
-      @Override public ItemStack getItem(DamageSource damage) {
-        Entity sourceOfDamage = damage.getSourceOfDamage();
-        
-        if (empType.isInstance(sourceOfDamage)) {
-          try {
-            return getPickupItem.invoke(empType.cast(sourceOfDamage));
-          }
-          catch (Throwable t) {
-            throw Utils.propagate(t);
-          }
-        }
-        
-        return null;
-      }
-      
-      @Override public void updateItem(DamageSource damage, @Nullable ItemStack item) {
-        try {
-          setThrownItemStack.invoke(empType.cast(damage.getSourceOfDamage()), item);
-        }
-        catch (Throwable t) {
-          throw Utils.propagate(t);
-        }
-      }
-    }
-  }
-  
 }

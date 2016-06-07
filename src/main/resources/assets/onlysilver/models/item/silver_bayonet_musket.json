@@ -1,6 +1,0 @@
-{
-  "parent": "onlysilver:item/silver_bow",
-  "textures": {
-    "layer0": "onlysilver:items/silver_bayonet_musket"
-  }
-}

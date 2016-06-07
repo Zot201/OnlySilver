@@ -20,17 +20,6 @@ item.silverBoots.name=Silver Boots
 item.silverHammer.name=Silver Hammer
 item.silverScythe.name=Silver Scythe
 
-# Balkon's WeaponMod Items
-item.silverSpear.name=Silver Spear
-item.silverHalberd.name=Silver Halberd
-item.silverBattleaxe.name=Silver Battleaxe
-item.silverKnife.name=Silver Knife
-item.silverWarhammer.name=Silver Warhammer
-item.silverFlail.name=Silver Flail
-item.silverKatana.name=Silver Katana
-item.silverBoomerang.name=Silver Boomerang
-item.silverBayonetMusket.name=Musket with Silver Bayonet
-
 # Enchantments
 enchantment.onlysilver.silverAura=Silver Aura
 enchantment.onlysilver.incantation=Incantation

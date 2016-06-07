@@ -57,7 +57,6 @@ import zotmc.onlysilver.config.Config;
 import zotmc.onlysilver.data.ModData.MoCreatures;
 import zotmc.onlysilver.data.ModData.Thaumcraft;
 import zotmc.onlysilver.data.ModData.Thaumcraft.Aspect;
-import zotmc.onlysilver.data.ModData.WeaponMod;
 import zotmc.onlysilver.ench.EnchIncantation;
 import zotmc.onlysilver.ench.EnchSilverAura;
 import zotmc.onlysilver.entity.EntitySilverGolem;
@@ -254,16 +253,7 @@ public class Contents {
         }
       }
     });
-    
-    // balkon's
-    if (Loader.isModLoaded(WeaponMod.MODID))
-      try {
-        OnlySilverRegistry.registerDamageSourceHandler(new WeaponMod.ProjectileHandler<>());
-        
-      } catch (Throwable t) {
-        OnlySilver.INSTANCE.log.error("Error while adding handler for WM projectiles", t);
-      }
-    
+
     // API
     injectFinal("applySilverAura", (BiConsumer<ItemStack, Runnable>) (t, u) -> {
       try {
