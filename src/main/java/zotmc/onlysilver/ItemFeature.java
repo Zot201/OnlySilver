@@ -17,6 +17,9 @@ package zotmc.onlysilver;
 
 import com.google.common.base.*;
 import com.google.common.collect.Lists;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
+import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.*;
 import net.minecraft.item.Item.ToolMaterial;
@@ -26,6 +29,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import zotmc.onlysilver.api.OnlySilverRegistry;
 import zotmc.onlysilver.config.Config;
 import zotmc.onlysilver.data.Instrumenti;
 import zotmc.onlysilver.data.ModData.OnlySilvers;
@@ -231,28 +235,25 @@ public enum ItemFeature implements Feature<Item> {
         value.setUnlocalizedName(name()).setCreativeTab(Contents.tabOnlySilver);
 
         String id = getItemId();
-        // TODO: Check if already registered
-        //if (GameData.getItemRegistry().getNameForObject(value) == null)
         value.setRegistryName(id);
-        GameRegistry.register(value);
-        
+        if (Item.REGISTRY.getObject(value.getRegistryName()) != value) {
+          GameRegistry.register(value);
+        }
+
         if (f.getAnnotation(ItemId.class) != null) Contents.renameMap.put(name(), id);
         
         OnlySilver.INSTANCE.proxy.registerItemModels(value, getModels());
 
-        // TODO: Re-implementation
-        //noinspection SpellCheckingInspection
-        {
-        /*if (isTool()) {
-          BaseAttributeMap attrs = new ServersideAttributeMap();
-          attrs.registerAttribute(SharedMonsterAttributes.attackDamage);
-          attrs.applyAttributeModifiers(new ItemStack(value).getAttributeModifiers());
+        if (isTool()) {
+          AbstractAttributeMap attrs = new AttributeMap();
+          attrs.registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+          // TODO: Refactor for dual wielding
+          attrs.applyAttributeModifiers(new ItemStack(value).getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 
           float damage = (float)
-              attrs.getAttributeInstance(SharedMonsterAttributes.attackDamage).getAttributeValue();
+              attrs.getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
           damage = 6 + Math.max(0, damage - 2 - Contents.silverToolMaterial.get().getDamageVsEntity());
           OnlySilverRegistry.registerWerewolfDamage(value, Functions.constant(damage));
-        }*/
         }
       }
       
