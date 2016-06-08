@@ -3,7 +3,6 @@
 - Balkon's weapons and Ex Nihilo hammer are no longer supported.
 - New textures for silver ingot and silver rod.
 - Allow silver ingots being used as a beacon payment.
-- Silver bows now do a melee knockback.
 - Skeletons can now shoot with a silver bow.
 - Rewrote equipment spawning to a vanilla-like fashion.
 - Silver Golems has reduced size, health and cost only a single silver block.
