@@ -31,6 +31,7 @@ minecraft {
 }
 
 jar.manifest coreModManifest as Closure
+sourceJar.classifier = 'obfSources'
 
 processResources.with {
   from(sourceSets.main.resources.srcDirs) {
