@@ -141,7 +141,9 @@ public class OreGenAsm {
 
     // callbacks
     private static final MethodPredicate
-    SETTINGS = TYPE.method("settings", "field_175336_F")
+    SETTINGS = TYPE.method("settings")
+        .desc("Lnet/minecraft/world/gen/ChunkProviderSettings$Factory;"),
+    SETTINGS_SRG = TYPE.method("field_175336_F")
         .desc("Lnet/minecraft/world/gen/ChunkProviderSettings$Factory;");
 
     // targets
@@ -161,7 +163,7 @@ public class OreGenAsm {
 
         pre.aload(0);
         pre.aload(0);
-        pre.getfield(SETTINGS);
+        pre.getfield(useMcpNames() ? SETTINGS : SETTINGS_SRG);
         pre.invokestatic(Holder.ON_GUI_INIT, false);
 
         list.insertBefore(targetInsn, pre.build());
@@ -173,7 +175,7 @@ public class OreGenAsm {
 
         pre.aload(0);
         pre.aload(0);
-        pre.getfield(SETTINGS);
+        pre.getfield(useMcpNames() ? SETTINGS : SETTINGS_SRG);
         pre.iload(1);
         pre.fload(2);
         pre.invokestatic(Holder.ON_GUI_SET_FLOAT_VALUE, false);

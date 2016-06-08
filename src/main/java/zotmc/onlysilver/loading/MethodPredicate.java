@@ -29,6 +29,7 @@ import zotmc.onlysilver.util.init.MethodInfo;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
+@SuppressWarnings("WeakerAccess")
 public final class MethodPredicate {
 
   private final String owner;
@@ -83,7 +84,6 @@ public final class MethodPredicate {
     return getOwner().covers(owner) && covers(name, desc);
   }
 
-  @SuppressWarnings("WeakerAccess")
   public boolean covers(MethodNode node) {
     return covers(node.name, node.desc);
   }
