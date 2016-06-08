@@ -1,5 +1,6 @@
-2016/06/08 version 2.2.6-1.9.4
+﻿2016/06/08 version 2.2.6-1.9.4
 - Changed item and block ids to conform vanilla standard. (thanks given for the FMLMissingMappingsEvent, old save can be migrated without losing items!)
+- Balkon's weapons and Ex Nihilo hammer are no longer supported.
 - New textures for silver ingot and silver rod.
 - Allow silver ingots being used as a beacon payment.
 - Silver bows now do a melee knockback.
