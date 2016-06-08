@@ -177,14 +177,14 @@ public class CommonHooks {
         type == Contents.BREAKABLE && i.isDamageable();
   }
   
-  @Hook(Strategy.AGENT) @Srg("func_77519_f") @Static(EnchantmentHelper.class)
+  @Hook(Strategy.AGENT) @Srg("func_185283_h") @Static(EnchantmentHelper.class)
   public static int getLootingModifier(int i, EntityLivingBase living) {
     Feature<Enchantment> incantation = Contents.incantation;
     return !incantation.exists() ? i :
         i + (1 + EnchantmentHelper.getMaxEnchantmentLevel(incantation.get(), living)) / 2;
   }
   
-  @Hook(Strategy.AGENT) @Srg("func_77509_b") @Static(EnchantmentHelper.class)
+  @Hook(Strategy.AGENT) @Srg("func_185293_e") @Static(EnchantmentHelper.class)
   public static int getEfficiencyModifier(int i, EntityLivingBase living) {
     // Consider active item only
     return !silverAuraExists ? i : i + Contents.silverAura.get().getAuraEfficiency(living.getActiveItemStack());
