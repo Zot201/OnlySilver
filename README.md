@@ -4,6 +4,22 @@ OnlySilver
 
 A mod which primarily implements the old silver from SimpleOres. New features may be added for better overall experience or mod compatibility.
 
+## Add-ons and Compatibility
+
+OnlySilver API is accessible under the `zotmc.onlysilver.api` package. Please note that any class that is not placed under this package is considered internal and may be changed from time to time.
+
+You may access the `dev` jar together with source code by adding the following to the `build.gradle` of your projects:
+
+```groovy
+repositories {
+    maven { url 'https://dl.bintray.com/zot201/maven' }
+}
+
+dependencies {
+    compile 'zotmc.onlysilver:onlysilver:2.2.4-1.9.4:dev'
+}
+```
+
 ## Features
 
 * Base Items and Blocks
@@ -69,22 +85,4 @@ A mod which primarily implements the old silver from SimpleOres. New features ma
   * Capability to apply settings in-game without restart
 
   * Send and receive settings in multiplayer games
-
-    ​
-
-## Add-on and Compatibility
-
-OnlySilver API is accessible under the `zotmc.onlysilver.api` package. Please note that any class that is not placed under this package is considered internal and may be changed from time to time.
-
-You may access the `dev` jar together with source code by adding the following to the `build.gradle` of your projects:
-
-```groovy
-repositories {
-    maven { url 'https://dl.bintray.com/zot201/maven' }
-}
-
-dependencies {
-    compile 'zotmc.onlysilver:onlysilver:2.2.4-1.9.4:dev'
-}
-```
 
