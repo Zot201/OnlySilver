@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    compile 'zotmc.onlysilver:onlysilver:2.2.4-1.9.4:dev'
+    compile 'zotmc.onlysilver:onlysilver:2.2.6-1.9.4:dev'
 }
 ```
 
