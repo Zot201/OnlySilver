@@ -79,10 +79,6 @@ dependencies {
 * Mod Options
 
   * High customizability
-
   * Intuitive configuration UI
-
   * Capability to apply settings in-game without restart
-
   * Send and receive settings in multiplayer games
-
