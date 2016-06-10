@@ -12,11 +12,11 @@ You may access the `dev` jar together with source code by adding the following t
 
 ```groovy
 repositories {
-    maven { url 'https://dl.bintray.com/zot201/maven' }
+    maven { url 'https://dl.bintray.com/zot201/minecraft' }
 }
 
 dependencies {
-    compile 'zotmc.onlysilver:onlysilver:2.2.6-1.9.4:dev'
+    compile 'io.github.zot201.onlysilver:onlysilver:2.2.6-1.9.4:dev'
 }
 ```
 
