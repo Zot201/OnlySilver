@@ -8,7 +8,7 @@ A mod which primarily implements the old silver from SimpleOres. New features ma
 
 OnlySilver API is accessible under the `zotmc.onlysilver.api` package. Please note that any class that is not placed under this package is considered internal and may be changed from time to time.
 
-You may access the `dev` jar together with source code from *Bintray's JCenter*, by adding the following to the `build.gradle` of your projects:
+You may access the `dev` jar together with source code from Bintray's *JCenter*, by adding the following to the `build.gradle` of your projects:
 
 ```groovy
 dependencies {
