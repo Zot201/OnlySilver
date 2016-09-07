@@ -10,7 +10,7 @@ curseforge {
   //noinspection GroovyAssignabilityCheck
   project {
     id = '245902'
-    changelog = file('changelog.txt')
+    changelog = file('changelog.html')
     releaseType = 'release'
     gameVersions.each { addGameVersion it }
 
