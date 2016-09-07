@@ -267,6 +267,9 @@ public class CommonAsm {
     public static final MethodPredicate
     GET_HARVEST_LEVEL = TYPE.method("getHarvestLevel")
         .desc("(Lnet/minecraft/item/ItemStack;Ljava/lang/String;)I"),
+    GET_HARVEST_LEVEL_FORGE = TYPE.method("getHarvestLevel")
+        .desc("(Lnet/minecraft/item/ItemStack;Ljava/lang/String;Lnet/minecraft/entity/player/EntityPlayer;" +
+            "Lnet/minecraft/block/state/IBlockState;)I"),
     ON_PLAYER_STOPPED_USING = TYPE.method("onPlayerStoppedUsing", "func_77615_a")
         .desc("(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/EntityLivingBase;I)V");
   }
@@ -288,7 +291,8 @@ public class CommonAsm {
        */
 
       @Override protected boolean isTargetInsn(AbstractInsnNode insnNode) {
-        return Itemss.GET_HARVEST_LEVEL.covers(Opcodes.INVOKEVIRTUAL, insnNode);
+        return Itemss.GET_HARVEST_LEVEL.covers(Opcodes.INVOKEVIRTUAL, insnNode)
+            || Itemss.GET_HARVEST_LEVEL_FORGE.covers(Opcodes.INVOKEVIRTUAL, insnNode);
       }
 
       @Override protected void processInsn(InsnList list, AbstractInsnNode targetInsn) {

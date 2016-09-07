@@ -1,4 +1,7 @@
-﻿2016/06/08 version 2.2.6-1.9.4
+﻿2016/09/07 version 2.2.7-1.10.2
+- Fixed a crash involving Skeleton action in 1.10/1.10.2.
+
+2016/06/08 version 2.2.6-1.9.4
 - Changed item and block ids to conform vanilla standard. (thanks given for the FMLMissingMappingsEvent, old save can be migrated without losing items!)
 - Balkon's weapons and Ex Nihilo hammer are no longer supported.
 - New textures for silver ingot and silver rod.

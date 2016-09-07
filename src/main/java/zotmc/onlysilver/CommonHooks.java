@@ -32,6 +32,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.SkeletonType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityTippedArrow;
@@ -275,9 +276,11 @@ public class CommonHooks {
       arrow.setDamage(damage);
       
       arrow.setKnockbackStrength(2 + Utils.getEnchLevel(item, Enchantments.PUNCH));
-      
-      if (Utils.getEnchLevel(item, Enchantments.FLAME) > 0 || attacker.getSkeletonType() == 1) arrow.setFire(100);
-      
+
+      if (Utils.getEnchLevel(item, Enchantments.FLAME) > 0 || attacker.func_189771_df() == SkeletonType.WITHER) {
+        arrow.setFire(100);
+      }
+
       attacker.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1, 1 / (attacker.getRNG().nextFloat() * 0.4F + 0.8F));
       attacker.worldObj.spawnEntityInWorld(arrow);
       
