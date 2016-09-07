@@ -2,7 +2,7 @@ def prop(String key) {
   ext.has(key) ? ext[key] : null
 }
 
-def gameVersions = ['1.9.4']
+def gameVersions = ['1.10', '1.10.2']
 
 curseforge {
   apiKey = prop('curseforge.apiKey')

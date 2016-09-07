@@ -1,6 +1,6 @@
 group = 'io.github.zot201.onlysilver'
 project.archivesBaseName = 'onlysilver'
-version = '2.2.6-1.9.4'
+version = '2.2.7-1.10.2'
 
 def prop(String key) {
   ext.has(key) ? ext[key] : null
