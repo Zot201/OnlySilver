@@ -12,7 +12,7 @@ You may access the `dev` jar together with source code from Bintray's *JCenter*,
 
 ```groovy
 dependencies {
-    compile 'io.github.zot201.onlysilver:onlysilver:2.2.6-1.9.4:dev'
+    compile 'io.github.zot201.onlysilver:onlysilver:2.2.7-1.10.2:dev'
 }
 ```
 
